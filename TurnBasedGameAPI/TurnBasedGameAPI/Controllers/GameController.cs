@@ -30,7 +30,21 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns></returns>
         public IHttpActionResult GetGameHistory(GameID id)
         {
-            return Ok("Game Controller GetGameHistory API Call");
+            try
+            {
+                // Need more details of database implementation, but
+                // hopefully this is similar to the actual implementation
+                using (var db = new Game.ENTITIES())
+                {
+                    var gameHistory = db.games.where(gameHistory => GetMyGames.id);
+                    return Ok("Game Controller GetGameHistory API Call");
+                }
+                    
+            }
+            catch (Exception e)
+            {
+                return Exception("GetGameHistory call failed");
+            }
         }
     }
 }

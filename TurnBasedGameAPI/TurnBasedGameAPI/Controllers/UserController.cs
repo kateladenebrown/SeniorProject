@@ -43,8 +43,19 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns></returns>
         public IHttpActionResult GetByUserID(UserID id) // custom object, int, etc for id? implementation decision for later
         {
-            
-            return Ok("User Controller GetByUserID API Call");
+            try
+            {
+                // This is a stub. It won't work, syntax, names, etc, are wrong,
+                // but should be similar to the final implementation
+                using (var db = new TurnBasedGameAPI.ENTITIES()) {
+                    var user = db.users.where(user => user.id);
+                    return Ok("User Controller GetByUserID API Call");
+                }
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
         }
 
         // PUT: api/User
@@ -58,7 +69,15 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns></returns>
         public IHttpActionResult UpdatePassword(String password)
         {
-            return Ok("User Controller UpdatePassword API Call");
+            // Use another function to check password validity
+            if (CheckPassword(password))
+            {
+                return Ok("User Controller UpdatePassword API Call");
+            }
+            else
+            {
+                return Exception("UpdatePassword call failed");
+            }
         }
 
 
