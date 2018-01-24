@@ -34,13 +34,29 @@ namespace TurnBasedGameAPI.Controllers
 
 
         // GET: api/User
-        public IHttpActionResult GetByUserID()
+        /// <summary>
+        /// Returns public information of a single user 
+        /// based on passed in ID.
+        /// @Michael Case, 1/23/18
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IHttpActionResult GetByUserID(UserID id) // custom object, int, etc for id? implementation decision for later
         {
+            
             return Ok("User Controller GetByUserID API Call");
         }
 
         // PUT: api/User
-        public IHttpActionResult UpdatePassword()
+        /// <summary>
+        /// Updates a users password, while verifying that
+        /// the new password meets the minimum strength
+        /// requirements.
+        /// @Michael Case, 1/23/18
+        /// </summary>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public IHttpActionResult UpdatePassword(String password)
         {
             return Ok("User Controller UpdatePassword API Call");
         }

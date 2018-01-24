@@ -21,6 +21,13 @@ namespace TurnBasedGameAPI.Controllers
         }
 
         // GET: api/Game
+        /// <summary>
+        /// Returns all game records for a passed in
+        /// GameID
+        /// @Michael Case, 1/23/18
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IHttpActionResult GetGameHistory(GameID id)
         {
             return Ok("Game Controller GetGameHistory API Call");
