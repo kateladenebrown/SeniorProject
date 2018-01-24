@@ -9,7 +9,7 @@ namespace TurnBasedGameAPI.Controllers
 {
     public class GameController : ApiController
     {
-        
+
 
         // GET: api/Game/getPeronalData
         /// <summary>
@@ -18,7 +18,7 @@ namespace TurnBasedGameAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IHttpActionResult getPersonalDetails( UserId id )
+        public IHttpActionResult getPersonalDetails(UserId id)
         {
             // ask database for personal details from tables matching the user id
             // returns the data in ?? specific format ?? as object ?? 
@@ -29,7 +29,7 @@ namespace TurnBasedGameAPI.Controllers
                 // format or return 
 
             }
-            catch(Exception e){ return Exception("Failure in getPersonalData");}
+            catch (Exception e) { return Exception("Failure in getPersonalData"); }
 
             return Ok("Game Controller getPersonalDetails API Call");
         }
@@ -41,16 +41,16 @@ namespace TurnBasedGameAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IHttpActionResult deleteUser( UserId id )
+        public IHttpActionResult deleteUser(UserId id)
         {
             // tell database to toggle active to false on user matching 'id'
             try
             {
-               // db is the database. varify path to active field
+                // db is the database. varify path to active field
 
-               // db.User.active.where(UserId => id) = false ;
+                // db.User.active.where(UserId => id) = false ;
             }
-            catch(Exception e) { return Exception("failure to deleteUser"); }
+            catch (Exception e) { return Exception("failure to deleteUser"); }
 
             return Ok("Game Controller deleteUser API Call");
         }
@@ -73,8 +73,8 @@ namespace TurnBasedGameAPI.Controllers
                  */
 
             }
-            catch(Exception e) { return Exception("gameCreate failed to perform as expected. :(   my bad"); }
-            
+            catch (Exception e) { return Exception("gameCreate failed to perform as expected. :(   my bad"); }
+
             return Ok("Game Controller gameCreate API Call");
         }
 
@@ -86,6 +86,14 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns></returns>
         public IHttpActionResult GetMyGames() //(GameStatus)
         {
+            try
+            {
+                //var myGames = db.games.where(GameStatus == active)
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetMyGames API call");
+            }
             return Ok("Game Controller GetMyGames API Call");
         }
 
@@ -108,7 +116,7 @@ namespace TurnBasedGameAPI.Controllers
                     var gameHistory = db.games.where(gameHistory => GetMyGames.id);
                     return Ok("Game Controller GetGameHistory API Call");
                 }
-                    
+
             }
             catch (Exception e)
             {

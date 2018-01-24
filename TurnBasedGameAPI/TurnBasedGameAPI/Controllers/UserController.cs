@@ -17,6 +17,14 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns></returns>
         public IHttpActionResult GetAll()
         {
+            try
+            {
+                //var all = db.user.where(active => true)
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetAll API call");
+            }
             return Ok("User Controller GetAll API Call");
         }
 
@@ -29,6 +37,14 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns></returns>
         public IHttpActionResult CreateUser() //(Username, Password, Email, Name, etc)
         {
+            try
+            {
+                //add user to db
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in CreateUser API call");
+            }
             return Ok("User Controller CreateUser API Call");
         }
 
@@ -47,7 +63,8 @@ namespace TurnBasedGameAPI.Controllers
             {
                 // This is a stub. It won't work, syntax, names, etc, are wrong,
                 // but should be similar to the final implementation
-                using (var db = new TurnBasedGameAPI.ENTITIES()) {
+                using (var db = new TurnBasedGameAPI.ENTITIES())
+                {
                     var user = db.users.where(user => user.id);
                     return Ok("User Controller GetByUserID API Call");
                 }
