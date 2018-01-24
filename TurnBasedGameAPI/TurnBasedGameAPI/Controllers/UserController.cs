@@ -14,5 +14,19 @@ namespace TurnBasedGameAPI.Controllers
         {
             return Ok("User Controller GetAll API Call");
         }
+
+        // GET: api/User
+        public IHttpActionResult GetByUserID()
+        {
+            return Ok("User Controller GetByUserID API Call");
+        }
+
+        // PUT: api/User
+        public IHttpActionResult UpdatePassword()
+        {
+            return Ok("User Controller UpdatePassword API Call");
+        }
+
+
     }
 }

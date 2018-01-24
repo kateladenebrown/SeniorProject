@@ -14,5 +14,11 @@ namespace TurnBasedGameAPI.Controllers
         {
             return Ok("");
         }
+
+        // GET: api/Game
+        public IHttpActionResult GetGameHistory(GameID id)
+        {
+            return Ok("Game Controller GetGameHistory API Call");
+        }
     }
 }
