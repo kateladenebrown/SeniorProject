@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\TurnBasedGameAPI"
+    "\\TurnBasedGameAPI",
+    "\\TurnBasedGameAPI\\TurnBasedGameAPI",
+    "\\TurnBasedGameAPI\\TurnBasedGameAPI\\Controllers"
   ],
-  "SelectedNode": "\\TurnBasedGameAPI\\TurnBasedGameAPI.sln",
   "PreviewInSolutionExplorer": false
 }
