@@ -9,10 +9,15 @@ namespace TurnBasedGameAPI.Controllers
 {
     public class GameController : ApiController
     {
-        // GET: api/Game
-        public IHttpActionResult Index()
+        // GET: api/Game/GetMyGames
+        /// <summary>
+        /// Returns all active User games
+        /// -Written by Garrick 1/23/18
+        /// </summary>
+        /// <returns></returns>
+        public IHttpActionResult GetMyGames() //(GameStatus)
         {
-            return Ok("");
+            return Ok("Game Controller GetMyGames API Call");
         }
 
         // GET: api/Game
