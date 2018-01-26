@@ -10,9 +10,9 @@ namespace TurnBasedGameAPI.Controllers
     public class UserController : ApiController
     {
         // GET: api/User/GetAll
+        // Written by Garrick 1/22/18
         /// <summary>
         /// Returns all Users' usernames
-        /// -Written by Garrick 1/22/18
         /// </summary>
         /// <returns></returns>
         public IHttpActionResult GetAll()
@@ -29,10 +29,10 @@ namespace TurnBasedGameAPI.Controllers
         }
 
         //POST: api/User/CreateUser
+        // -Written by Garrick 1/22/18
         /// <summary>
         /// Returns whether or not a user was created successfully.
         /// Handles account reactivation as well
-        /// -Written by Garrick 1/23/18
         /// </summary>
         /// <returns></returns>
         public IHttpActionResult CreateUser() //(Username, Password, Email, Name, etc)

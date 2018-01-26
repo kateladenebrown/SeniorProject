@@ -3,7 +3,9 @@
     "",
     "\\TurnBasedGameAPI",
     "\\TurnBasedGameAPI\\TurnBasedGameAPI",
-    "\\TurnBasedGameAPI\\TurnBasedGameAPI\\Controllers"
+    "\\TurnBasedGameAPI\\TurnBasedGameAPI\\Controllers",
+    "\\TurnBasedGameAPI\\TurnBasedGameAPI\\Views"
   ],
+  "SelectedNode": "\\TurnBasedGameAPI\\TurnBasedGameAPI\\Views",
   "PreviewInSolutionExplorer": false
 }
