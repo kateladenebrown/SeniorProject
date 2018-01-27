@@ -123,5 +123,26 @@ namespace TurnBasedGameAPI.Controllers
                 return Exception("GetGameHistory call failed");
             }
         }
+
+        // GET: api/Game
+        /// <summary>
+        /// Returns the latest game record for the passed-in GameID
+        /// >Tyler Lancaster, 1/25/18
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IHttpActionResult GetGame(GameID id)
+        {
+            try
+            {         
+                var game = db.games.where(Games.id => id && GameStates.timestamp => mostRecent);
+
+                return Ok("Game Controller GetGame API Call");
+            }
+            catch (Exception e)
+            {
+                return Exception("GetGame call failed");
+            }
+        }
     }
 }
