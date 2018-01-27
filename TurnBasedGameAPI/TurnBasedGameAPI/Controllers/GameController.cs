@@ -35,9 +35,9 @@ namespace TurnBasedGameAPI.Controllers
         }
 
         // GET: api/Game/GetMyGames
+        // Written by Garrick 1/23/18
         /// <summary>
         /// Returns all active User games
-        /// -Written by Garrick 1/23/18
         /// </summary>
         /// <returns></returns>
         public IHttpActionResult GetMyGames() //(GameStatus)
