@@ -125,9 +125,9 @@ namespace TurnBasedGameAPI.Controllers
         }
 
         // GET: api/Game
+        // >Tyler Lancaster, 1/25/18
         /// <summary>
         /// Returns the latest game record for the passed-in GameID
-        /// >Tyler Lancaster, 1/25/18
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

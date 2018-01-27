@@ -98,9 +98,9 @@ namespace TurnBasedGameAPI.Controllers
         }
 
         // GET: api/User/GetActive
+        // >Tyler Lancaster, 1/25/18
         /// <summary>
         /// Returns all active users' usernames
-        /// >Tyler Lancaster, 1/25/18
         /// </summary>
         /// <returns></returns>
         public IHttpActionResult GetActive()
@@ -117,9 +117,9 @@ namespace TurnBasedGameAPI.Controllers
         }
 
         // PUT: api/User
+        // >Tyler Lancaster, 1/25/18
         /// <summary>
         /// Updates user's publicly-available information
-        /// >Tyler Lancaster, 1/25/18
         /// </summary>
         /// <returns></returns>
         public IHttpActionResult UpdatePersonalDetails(User user)
