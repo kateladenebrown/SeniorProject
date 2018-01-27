@@ -48,6 +48,50 @@ namespace TurnBasedGameAPI.Controllers
             return Ok("User Controller CreateUser API Call");
         }
 
+        // GET: api/Game/GetPeronalData
+        /// <summary>
+        /// Used to gather all personal data about a user.
+        /// </summary>
+        /// coded by Stephen Bailey 1/24/18
+        /// <param name="id"></param>
+        /// <returns>  Returns all personal data about a user.</returns>
+        public IHttpActionResult GetPersonalDetails(UserId id)
+        {
+            // ask database for personal details from tables matching the user id 
+            try
+            {
+                using (var db = new Game.ENTITIES()) 
+                {
+                    User u = db.Users.Single(u => u.UserId = id);
+                }
+                
+                return Ok( u ); // returns a user object from db matching id.
+            }
+            catch (Exception e) { return Exception("Failure in getPersonalData"); }
+        }
+
+        // GET: api/Game/DeleteUser
+        /// <summary>
+        /// Used to mark users as inactive. Toggles boolean "active" to false
+        /// </summary>
+        /// coded by Stephen Bailey 1/24/18
+        /// <param name="id"></param>
+        /// <returns>IHttp result code</returns>
+        public IHttpActionResult DeleteUser(UserId id)
+        {
+            // tell database to toggle active to false on user matching 'id'
+            try
+            {
+                using (var db = new Game.ENTITIES()) 
+                {
+                    User u = db.Users.Single(u => u.UserId = id);
+                    u.Active = false ;
+                    db.SaveChanges();
+                    return Ok("Game Controller deleteUser API Call"); //  ?? would returning a bool help with this return ??        
+                }
+            }
+            catch (Exception e) { return Exception("failure to deleteUser"); }
+        }
 
         // GET: api/User
         /// <summary>
