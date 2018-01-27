@@ -3,124 +3,91 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
-using System.Web.Mvc;
+//using System.Web.Mvc;
 
 namespace TurnBasedGameAPI.Controllers
 {
+    [Authorize]
+    [RoutePrefix("api/Game")]
     public class GameController : ApiController
     {
-
-
-        // GET: api/Game/getPeronalData
+        // POST: api/Game/Create
+        // Coded by Stephen 1/24/18
         /// <summary>
-        /// Returns all personal data about a user
-        /// coded by Stephen 1/24/18, last updated 1/24/18
+        /// Starts a new game instance with the caller and listed users as players.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public IHttpActionResult getPersonalDetails(UserId id)
+        /// <param name="players">A list of usernames specifying who should be a player.</param>
+        /// <returns>A message indicating that the game was created successfully, or an error otherwise.</returns>
+        [HttpPost]
+        [Route("Create", Name = "Create New Game")]
+        public IHttpActionResult gameCreate(List<string> players)
         {
-            // ask database for personal details from tables matching the user id
-            // returns the data in ?? specific format ?? as object ?? 
-            try
-            {
-                // Obj holder = db.User.where(UserId => id) ;
-
-                // format or return 
-
-            }
-            catch (Exception e) { return Exception("Failure in getPersonalData"); }
-
-            return Ok("Game Controller getPersonalDetails API Call");
-        }
-
-        // GET: api/Game/deleteUser
-        /// <summary>
-        /// used to mark users as inactive. Toggles boolean "active" to false
-        /// coded by Stephen 1/24/18, last updated 1/24/18
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public IHttpActionResult deleteUser(UserId id)
-        {
-            // tell database to toggle active to false on user matching 'id'
-            try
-            {
-                // db is the database. varify path to active field
-
-                // db.User.active.where(UserId => id) = false ;
-            }
-            catch (Exception e) { return Exception("failure to deleteUser"); }
-
-            return Ok("Game Controller deleteUser API Call");
-        }
-
-        // GET: api/Game/deleteUser
-        /// <summary>
-        /// creates an instance of game. Uses list<player>
-        /// coded by Stephen 1/24/18, last updated 1/24/18
-        /// </summary>
-        /// <param name="players"></param>
-        /// <returns></returns>
-        public IHttpActionResult gameCreate(List<Player> players)
-        {
-            /* used to instanciate a game instance
-             * args: List of Player, 
-             */
             try
             {
                 /* not sure what all we are going to need here just yet.
                  */
 
+                return Ok("Game Controller gameCreate API Call");
             }
-            catch (Exception e) { return Exception("gameCreate failed to perform as expected. :(   my bad"); }
+            catch (Exception e)
+            {
 
-            return Ok("Game Controller gameCreate API Call");
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
+            }
+
         }
 
-        // GET: api/Game/GetMyGames
+        // GET: api/Game/MyGames
+        // -Written by Garrick 1/23/18
         /// <summary>
-        /// Returns all active User games
-        /// -Written by Garrick 1/23/18
+        /// Retrieves a list of games the user is or was a player in.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A list of Game objects.</returns>
+        [HttpGet]
+        [Route("MyGames", Name = "Get My Games")]
         public IHttpActionResult GetMyGames() //(GameStatus)
         {
             try
             {
                 //var myGames = db.games.where(GameStatus == active)
+                return Ok("Game Controller GetMyGames API Call");
             }
             catch (Exception e)
             {
-                throw new Exception("Error in GetMyGames API call");
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error retrieving the list of games. Please inform the development team.");
             }
-            return Ok("Game Controller GetMyGames API Call");
         }
 
-        // GET: api/Game
+        // GET: api/Game/GameHistory
+        // @Michael Case, 1/23/18
         /// <summary>
-        /// Returns all game records for a passed in
+        /// Retrieves all game records related to a specific game.
         /// GameID
-        /// @Michael Case, 1/23/18
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public IHttpActionResult GetGameHistory(GameID id)
+        /// <param name="id">The ID of the game whose history should be returned.</param>
+        /// <returns>A list of GameState objects.</returns>
+        [HttpGet]
+        [Route("GameHistory", Name = "Get Game History")]
+        public IHttpActionResult GetGameHistory(int id)
         {
             try
             {
                 // Need more details of database implementation, but
                 // hopefully this is similar to the actual implementation
-                using (var db = new Game.ENTITIES())
-                {
-                    var gameHistory = db.games.where(gameHistory => GetMyGames.id);
-                    return Ok("Game Controller GetGameHistory API Call");
-                }
 
+                // -Cameron: This looks good. I just commented out pieces for the moment so that the solution would build.
+
+                //using (var db = new Game.ENTITIES())
+                //{
+                //    var gameHistory = db.games.where(gameHistory => GetMyGames.id);
+                //    return Ok("Game Controller GetGameHistory API Call");
+                //}
+
+                return Ok("Game Controller GetGameHistory API Call");
             }
             catch (Exception e)
             {
-                return Exception("GetGameHistory call failed");
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
             }
         }
 
