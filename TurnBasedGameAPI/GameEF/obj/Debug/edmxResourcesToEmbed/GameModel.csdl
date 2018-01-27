@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="GameModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Game">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Start" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="End" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Status" Type="Int32" />
+    <NavigationProperty Name="GameStatusLookup" Relationship="Self.FK_Game_GameStatusLookup" FromRole="Games" ToRole="GameStatusLookup" />
+    <NavigationProperty Name="GameStates" Relationship="Self.FK_GameState_Game" FromRole="Games" ToRole="GameStates" />
+    <NavigationProperty Name="GameUsers" Relationship="Self.FK_GameUser_Game" FromRole="Games" ToRole="GameUsers" />
+  </EntityType>
+  <EntityType Name="GameState">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="GameState1" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="TimeStamp" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="GameID" Type="Int32" />
+    <NavigationProperty Name="Game" Relationship="Self.FK_GameState_Game" FromRole="GameStates" ToRole="Games" />
+  </EntityType>
+  <EntityType Name="GameStatusLookup">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="Description" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="Games" Relationship="Self.FK_Game_GameStatusLookup" FromRole="GameStatusLookup" ToRole="Games" />
+  </EntityType>
+  <EntityType Name="GameUser">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="GameID" Type="Int32" />
+    <Property Name="UserID" Type="Int32" />
+    <Property Name="Status" Type="Int32" />
+    <NavigationProperty Name="Game" Relationship="Self.FK_GameUser_Game" FromRole="GameUsers" ToRole="Games" />
+    <NavigationProperty Name="User" Relationship="Self.FK_GameUser_User" FromRole="GameUsers" ToRole="Users" />
+    <NavigationProperty Name="UserStatusLookup" Relationship="Self.FK_GameUser_UserStatusLookup" FromRole="GameUsers" ToRole="UserStatusLookup" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Hash" Type="Binary" MaxLength="8" FixedLength="true" />
+    <Property Name="Salt" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Active" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="GameUsers" Relationship="Self.FK_GameUser_User" FromRole="Users" ToRole="GameUsers" />
+  </EntityType>
+  <EntityType Name="UserStatusLookup">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="Description" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="GameUsers" Relationship="Self.FK_GameUser_UserStatusLookup" FromRole="UserStatusLookup" ToRole="GameUsers" />
+  </EntityType>
+  <Association Name="FK_Game_GameStatusLookup">
+    <End Role="GameStatusLookup" Type="Self.GameStatusLookup" Multiplicity="0..1" />
+    <End Role="Games" Type="Self.Game" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="GameStatusLookup">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Games">
+        <PropertyRef Name="Status" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_GameState_Game">
+    <End Role="Games" Type="Self.Game" Multiplicity="0..1" />
+    <End Role="GameStates" Type="Self.GameState" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Games">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="GameStates">
+        <PropertyRef Name="GameID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_GameUser_Game">
+    <End Role="Games" Type="Self.Game" Multiplicity="0..1" />
+    <End Role="GameUsers" Type="Self.GameUser" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Games">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="GameUsers">
+        <PropertyRef Name="GameID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_GameUser_User">
+    <End Role="Users" Type="Self.User" Multiplicity="0..1" />
+    <End Role="GameUsers" Type="Self.GameUser" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Users">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="GameUsers">
+        <PropertyRef Name="UserID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_GameUser_UserStatusLookup">
+    <End Role="UserStatusLookup" Type="Self.UserStatusLookup" Multiplicity="0..1" />
+    <End Role="GameUsers" Type="Self.GameUser" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="UserStatusLookup">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="GameUsers">
+        <PropertyRef Name="Status" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="GameEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Games" EntityType="Self.Game" />
+    <EntitySet Name="GameStates" EntityType="Self.GameState" />
+    <EntitySet Name="GameStatusLookups" EntityType="Self.GameStatusLookup" />
+    <EntitySet Name="GameUsers" EntityType="Self.GameUser" />
+    <EntitySet Name="Users" EntityType="Self.User" />
+    <EntitySet Name="UserStatusLookups" EntityType="Self.UserStatusLookup" />
+    <AssociationSet Name="FK_Game_GameStatusLookup" Association="Self.FK_Game_GameStatusLookup">
+      <End Role="GameStatusLookup" EntitySet="GameStatusLookups" />
+      <End Role="Games" EntitySet="Games" />
+    </AssociationSet>
+    <AssociationSet Name="FK_GameState_Game" Association="Self.FK_GameState_Game">
+      <End Role="Games" EntitySet="Games" />
+      <End Role="GameStates" EntitySet="GameStates" />
+    </AssociationSet>
+    <AssociationSet Name="FK_GameUser_Game" Association="Self.FK_GameUser_Game">
+      <End Role="Games" EntitySet="Games" />
+      <End Role="GameUsers" EntitySet="GameUsers" />
+    </AssociationSet>
+    <AssociationSet Name="FK_GameUser_User" Association="Self.FK_GameUser_User">
+      <End Role="Users" EntitySet="Users" />
+      <End Role="GameUsers" EntitySet="GameUsers" />
+    </AssociationSet>
+    <AssociationSet Name="FK_GameUser_UserStatusLookup" Association="Self.FK_GameUser_UserStatusLookup">
+      <End Role="UserStatusLookup" EntitySet="UserStatusLookups" />
+      <End Role="GameUsers" EntitySet="GameUsers" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
