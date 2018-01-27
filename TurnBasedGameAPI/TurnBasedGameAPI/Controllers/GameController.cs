@@ -26,7 +26,7 @@ namespace TurnBasedGameAPI.Controllers
             {
                 using (var db = new Game.ENTITIES()) 
                 {
-
+                    // Game thisGame = new Game.Start(players) ;
                 }
 
                 return Ok("Game Controller gameCreate API Call");
