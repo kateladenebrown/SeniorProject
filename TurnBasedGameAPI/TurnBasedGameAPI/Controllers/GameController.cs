@@ -12,20 +12,23 @@ namespace TurnBasedGameAPI.Controllers
 
         // GET: api/Game/GameCreate
         /// <summary>
-        /// Creates an instance of game. Using the required 'Start( obj )' method
+        /// Creates an instance of game. Uses List<Player>
         /// </summary>
         /// coded by Stephen 1/24/18
         /// <param name="players"></param>
         /// <returns>IHttp result code</returns>
-        public IHttpActionResult GameCreate( var startStuff) 
+        public IHttpActionResult GameCreate(List<Player> players)
         {
-            // used to instanciate a game instance     
+            // used to instanciate a game instance
+            // args: List of Player, 
+            
             try
             {
                 using (var db = new Game.ENTITIES()) 
                 {
-                    // Game thisGame = new Game.Start(StartStuff) ;
+                    // Game thisGame = new Game.Start(players) ;
                 }
+
                 return Ok("Game Controller gameCreate API Call");
             }
             catch (Exception e) { return Exception("gameCreate failed to perform as expected. :(   my bad"); }

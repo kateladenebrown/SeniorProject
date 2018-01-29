@@ -5,6 +5,6 @@
     "\\TurnBasedGameAPI\\TurnBasedGameAPI",
     "\\TurnBasedGameAPI\\TurnBasedGameAPI\\Controllers"
   ],
-  "SelectedNode": "\\TurnBasedGameAPI\\TurnBasedGameAPI\\Controllers\\UserController.cs",
+  "SelectedNode": "\\TurnBasedGameAPI\\TurnBasedGameAPI\\Controllers\\GameController.cs",
   "PreviewInSolutionExplorer": false
 }
