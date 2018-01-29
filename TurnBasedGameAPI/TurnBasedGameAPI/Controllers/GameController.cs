@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameEF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -47,14 +48,17 @@ namespace TurnBasedGameAPI.Controllers
         [Route("MyGames", Name = "Get My Games")]
         public IHttpActionResult GetMyGames() //(GameStatus)
         {
-            try
+            using (var db = new GameEntities())
             {
-                //var myGames = db.games.where(GameStatus == active)
-                return Ok("Game Controller GetMyGames API Call");
-            }
-            catch (Exception e)
-            {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error retrieving the list of games. Please inform the development team.");
+                try
+                {
+                    //List<User> myGames = db.GameUsers.Where(u => u.Username == User.Identity.Name).ToList();
+                    return Ok("Game Controller GetMyGames API Call");
+                }
+                catch (Exception e)
+                {
+                    return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error retrieving the list of games. Please inform the development team.");
+                }
             }
         }
 
