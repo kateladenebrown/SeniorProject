@@ -75,12 +75,9 @@ namespace TurnBasedGameAPI.Controllers
             {
                 try
                 {
-                    Game myGame = db.Games.Single(g => g.ID == id);
-
-                    // need to go back and look through the entire history, and return a list or something.
-                    return Ok("Game " + myGame.ID + "started at " + myGame.Start + " and ended at " + myGame.End + 
-                        ". The status is " + myGame.Status); // return something for the time being
-                    //return Ok("Game Controller GetGameHistory API Call");
+                    List<GameState> myGames = db.Games.Single(g => g.ID == id).GameStates.ToList();
+                    
+                    return Ok(myGames); // return something for the time being
                 }
                 catch (Exception e)
                 {
