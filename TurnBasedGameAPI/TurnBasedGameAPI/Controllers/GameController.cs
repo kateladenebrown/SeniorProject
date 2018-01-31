@@ -55,6 +55,7 @@ namespace TurnBasedGameAPI.Controllers
                 using (var db = new GameEntities())
                  {
 
+                    //If this syntax works, it should get all gamestates that match the id, then sort and return the most recent gamestate
                     GameState latestGameState = db.GameStates.Where(gs => gs.GameID == id).OrderByDescending(x => x.TimeStamp).First();
 
 
