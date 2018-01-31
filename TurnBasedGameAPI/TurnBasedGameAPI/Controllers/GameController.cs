@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameEF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -70,24 +71,21 @@ namespace TurnBasedGameAPI.Controllers
         [Route("GameHistory", Name = "Get Game History")]
         public IHttpActionResult GetGameHistory(int id)
         {
-            try
+            using (var db = new GameEntities())
             {
-                // Need more details of database implementation, but
-                // hopefully this is similar to the actual implementation
+                try
+                {
+                    // -Cameron: This looks good. I just commented out pieces for the moment so that the solution would build.
+                    Game myGame = db.Games.Single(g => g.ID == id);
 
-                // -Cameron: This looks good. I just commented out pieces for the moment so that the solution would build.
 
-                //using (var db = new Game.ENTITIES())
-                //{
-                //    var gameHistory = db.games.where(gameHistory => GetMyGames.id);
-                //    return Ok("Game Controller GetGameHistory API Call");
-                //}
-
-                return Ok("Game Controller GetGameHistory API Call");
-            }
-            catch (Exception e)
-            {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
+                    return Ok(myGame);
+                    //return Ok("Game Controller GetGameHistory API Call");
+                }
+                catch (Exception e)
+                {
+                    return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
+                }
             }
         }
     }
