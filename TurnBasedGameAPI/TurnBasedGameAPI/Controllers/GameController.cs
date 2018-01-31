@@ -38,6 +38,36 @@ namespace TurnBasedGameAPI.Controllers
 
         }
 
+        // GET: api/Game/GameID
+        // Written by Tyler Lancaster, 1/25/2018
+        /// <summary>
+        /// Returns the latest game record for the passed-in GameID
+        /// </summary>
+        /// <param name="id">The ID of the game whose most recent state should be returned.</param>
+        /// <returns>Latest gamestate of given gameID.</returns>
+        [HttpGet]
+        [Route("GameID", Name = "Get Latest Game")]    //What exactly is the name of this? 
+        public IHttpActionResult GetGameID(int id)
+        {
+            try
+            {
+
+                using (var db = new GameEntities())
+                 {
+
+                    GameState latestGameState = db.GameStates.Where(gs => gs.GameID == id).OrderByDescending(x => x.TimeStamp).First();
+
+
+                    return Ok(latestGameState);
+                }
+
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
+            }
+        }
+
         // GET: api/Game/MyGames
         // -Written by Garrick 1/23/18
         /// <summary>
