@@ -46,24 +46,24 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>A list of Game objects.</returns>
         [HttpGet]
         [Route("MyGames", Name = "Get My Games")]
-        public IHttpActionResult GetMyGames()
+        public IHttpActionResult GetMyGames(int gameStatus = null) // string? Gamestatus to check for active vs inactive games
         {
             using (var db = new GameEntities())
             {
                 try
                 {
-                    User myUser = db.Users.Single(u => u.Username == "evangarr");//TODO: Change to User.Identity.Name and uncomment Authorize
-                    List<GameUser> myGameUsers = db.GameUsers.Where(gu => gu.UserID == myUser.ID).ToList();
-                    List<Game> myGames = new List<Game>();
-                    foreach (GameUser gu in myGameUsers)
+                    //User myUser = db.Users.Single(u => u.Username == "evangarr");//TODO: Change to User.Identity.Name and uncomment Authorize
+                    IQueryable<Game> myGames = db.GameUsers
+                        .Where(gu => gu.username == User.Identity.Name)
+                        .Select(g => g.game);
+                    if (gameStatus != null)
                     {
-                        myGames.Add(db.Games.Single(game => game.ID == gu.GameID));
-                        //TODO: I feel like there is a much better way to do this than this roundabout way
+                        myGames = myGames.Where(x => x.Status == gameStatus);
                     }
-                    return Ok(myGames);//"Game Controller GetMyGames API Call");
+
+                    return Ok(myGames.ToList());
                 }
                 catch (InvalidOperationException e)//User does not exist
-                //I'm aware this probably isnt the right exception
                 {
                     return NotFound();
                 }
