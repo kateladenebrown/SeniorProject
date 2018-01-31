@@ -8,7 +8,7 @@ using System.Web.Http;
 
 namespace TurnBasedGameAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [RoutePrefix("api/Game")]
     public class GameController : ApiController
     {
@@ -46,14 +46,20 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>A list of Game objects.</returns>
         [HttpGet]
         [Route("MyGames", Name = "Get My Games")]
-        public IHttpActionResult GetMyGames() //(GameStatus)
+        public IHttpActionResult GetMyGames()
         {
             using (var db = new GameEntities())
             {
                 try
                 {
-                    //List<User> myGames = db.GameUsers.Where(u => u.Username == User.Identity.Name).ToList();
-                    return Ok("Game Controller GetMyGames API Call");
+                    User myUser = db.Users.Single(u => u.Username == User.Identity.Name);
+                    List<GameUser> myGames = db.GameUsers.Where(g => g.UserID == myUser.ID).ToList();
+                    return Ok(myGames);//"Game Controller GetMyGames API Call");
+                }
+                catch (InvalidOperationException e)//User does not exist
+                //I'm aware this probably isnt the right exception
+                {
+                    return NotFound();
                 }
                 catch (Exception e)
                 {
