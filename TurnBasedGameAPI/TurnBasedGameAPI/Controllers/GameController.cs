@@ -52,8 +52,14 @@ namespace TurnBasedGameAPI.Controllers
             {
                 try
                 {
-                    User myUser = db.Users.Single(u => u.Username == User.Identity.Name);
-                    List<GameUser> myGames = db.GameUsers.Where(g => g.UserID == myUser.ID).ToList();
+                    User myUser = db.Users.Single(u => u.Username == "evangarr");//TODO: Change to User.Identity.Name and uncomment Authorize
+                    List<GameUser> myGameUsers = db.GameUsers.Where(gu => gu.UserID == myUser.ID).ToList();
+                    List<Game> myGames = new List<Game>();
+                    foreach (GameUser gu in myGameUsers)
+                    {
+                        myGames.Add(db.Games.Single(game => game.ID == gu.GameID));
+                        //TODO: I feel like there is a much better way to do this than this roundabout way
+                    }
                     return Ok(myGames);//"Game Controller GetMyGames API Call");
                 }
                 catch (InvalidOperationException e)//User does not exist
