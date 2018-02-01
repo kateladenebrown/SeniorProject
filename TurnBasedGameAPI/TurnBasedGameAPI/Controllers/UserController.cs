@@ -23,6 +23,7 @@ namespace TurnBasedGameAPI.Controllers
         {
             try
             {
+                int test1 = 4;
                 //var all = db.user.where(active => true)
                 return Ok("User Controller GetAll API Call");
             }
