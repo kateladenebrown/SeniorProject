@@ -79,6 +79,11 @@ namespace TurnBasedGameAPI.Controllers
                     
                     return Ok(myGames); // return something for the time being
                 }
+              
+                catch (InvalidOperationException e)
+                {
+                    return NotFound();
+                }
                 catch (Exception e)
                 {
                     return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");

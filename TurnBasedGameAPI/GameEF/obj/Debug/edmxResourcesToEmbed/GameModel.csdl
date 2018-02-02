@@ -124,7 +124,7 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <EntityContainer Name="GameEntities" annotation:LazyLoadingEnabled="true">
+  <EntityContainer Name="GameEntities" annotation:LazyLoadingEnabled="false">
     <EntitySet Name="Games" EntityType="Self.Game" />
     <EntitySet Name="GameStates" EntityType="Self.GameState" />
     <EntitySet Name="GameStatusLookups" EntityType="Self.GameStatusLookup" />

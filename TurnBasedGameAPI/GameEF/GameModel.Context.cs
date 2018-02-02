@@ -18,6 +18,7 @@ namespace GameEF
         public GameEntities()
             : base("name=GameEntities")
         {
+            this.Configuration.LazyLoadingEnabled = false;
         }
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
