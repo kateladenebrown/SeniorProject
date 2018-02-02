@@ -50,7 +50,7 @@ namespace TurnBasedGameAPI.Controllers
         {
             try
             {
-                //var myGames = db.games.where(GameStatus == active)
+                //var myGames = db.games.where(GameStatus == actiC:\Users\mcase\source\repos\SeniorProject\TurnBasedGameAPI\TurnBasedGameAPI\Controllers\ve)
                 return Ok("Game Controller GetMyGames API Call");
             }
             catch (Exception e)
