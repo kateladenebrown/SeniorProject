@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurnBasedGameAPI", "TurnBas
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurnBasedGameAPI.Tests", "TurnBasedGameAPI.Tests\TurnBasedGameAPI.Tests.csproj", "{F23C59C2-40DF-4A69-BB79-BE4FCBD6F318}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEF", "GameEF\GameEF.csproj", "{F37BFDD6-C74C-45B8-8E4E-C317F57A4587}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F23C59C2-40DF-4A69-BB79-BE4FCBD6F318}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F23C59C2-40DF-4A69-BB79-BE4FCBD6F318}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F23C59C2-40DF-4A69-BB79-BE4FCBD6F318}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F37BFDD6-C74C-45B8-8E4E-C317F57A4587}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F37BFDD6-C74C-45B8-8E4E-C317F57A4587}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F37BFDD6-C74C-45B8-8E4E-C317F57A4587}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F37BFDD6-C74C-45B8-8E4E-C317F57A4587}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

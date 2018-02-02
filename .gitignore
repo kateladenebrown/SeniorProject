@@ -1,0 +1,16 @@
+TurnBasedGameAPI/UpgradeLog2.htm
+TurnBasedGameAPI/UpgradeLog.htm
+TurnBasedGameAPI/.vs/TurnBasedGameAPI/v15/Server/sqlite3/storage_REMOTE_28256.ide-shm
+TurnBasedGameAPI/.vs/TurnBasedGameAPI/v15/Server/sqlite3/storage_LOCAL_28256.ide-shm
+TurnBasedGameAPI/.vs/TurnBasedGameAPI/v15/Server/sqlite3/storage_BASE_28256.ide-shm
+TurnBasedGameAPI/.vs/TurnBasedGameAPI/v15/Server/sqlite3/storage.ide-wal
+TurnBasedGameAPI/.vs/TurnBasedGameAPI/v15/Server/sqlite3/storage.ide-shm
+TurnBasedGameAPI/.vs/TurnBasedGameAPI/v15/Server/sqlite3/storage.ide
+TurnBasedGameAPI/.vs/
+TurnBasedGameAPI/GameEF/bin
+TurnBasedGameAPI/GameEF/obj
+TurnBasedGameAPI/TurnBasedGameAPI/obj/
+TurnBasedGameAPI/TurnBasedGameAPI.Tests/obj/
+*.cache
+TurnBasedGameAPI/TurnBasedGameAPI.Tests/bin/
+TurnBasedGameAPI/TurnBasedGameAPI/bin/
