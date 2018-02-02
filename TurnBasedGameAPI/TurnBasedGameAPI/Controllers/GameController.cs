@@ -38,7 +38,7 @@ namespace TurnBasedGameAPI.Controllers
 
         }
 
-        // GET: api/Game/GameID
+        // GET: api/Game/{GameID}
         // Written by Tyler Lancaster, 1/25/2018
         /// <summary>
         /// Returns the latest game record for the passed-in GameID
@@ -46,22 +46,29 @@ namespace TurnBasedGameAPI.Controllers
         /// <param name="id">The ID of the game whose most recent state should be returned.</param>
         /// <returns>Latest gamestate of given gameID.</returns>
         [HttpGet]
-        [Route("GameID", Name = "Get Latest Game")]    //What exactly is the name of this? 
+        [Route("id", Name = "Get Latest Game")]    //What exactly is the name of this? 
         public IHttpActionResult GetGameID(int id)
         {
             try
             {
-
                 using (var db = new GameEntities())
                  {
 
-                    //If this syntax works, it should get all gamestates that match the id, then sort and return the most recent gamestate
-                    GameState latestGameState = db.GameStates.Where(gs => gs.GameID == id).OrderByDescending(x => x.TimeStamp).First();
+                    //get all gamestates that match the id, then sort and return the most recent gamestate
+                    GameState latestGameState = db.GameStates.Where(gs => gs.GameID == id).OrderByDescending(gs => gs.TimeStamp).First();
 
 
                     return Ok(latestGameState);
                 }
 
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "Issue");
+            }
+            catch (InvalidOperationException e)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "Can't do that.");
             }
             catch (Exception e)
             {
