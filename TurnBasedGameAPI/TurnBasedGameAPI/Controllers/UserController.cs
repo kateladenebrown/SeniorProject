@@ -57,7 +57,7 @@ namespace TurnBasedGameAPI.Controllers
             }
 
         }
-
+        //
         //POST: api/User/Create
         // -Written by Garrick 1/23/18
         /// <summary>
