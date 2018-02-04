@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
+using GameEF;
 //using System.Web.Mvc;
 
 namespace TurnBasedGameAPI.Controllers
@@ -20,22 +21,49 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>A message indicating that the game was created successfully, or an error otherwise.</returns>
         [HttpPost]
         [Route("Create", Name = "Create New Game")]
-        public IHttpActionResult gameCreate(List<string> players)
+        public IHttpActionResult gameCreate(List<User> players)
         {
-            try
+            // changed to List of User. Couldnt find a way to access playerId from string UserName
+            int GIDHolder;
+            if (players.Count == 0)
             {
-                /* not sure what all we are going to need here just yet.
-                 */
+                using (var db = new GameEntities())
+                {
+                    try
+                    {
+                        Game g = new Game(); // create a game
+                        g.Start = System.DateTime.Now; // set start time to now
+                        g.Status = 1; // set to pending status ( 1 ) 
+                        GIDHolder = g.ID; // hold the created game ID
 
-                return Ok("Game Controller gameCreate API Call");
-            }
-            catch (Exception e)
-            {
+                        foreach (User name in players)
+                        {
+                            GameUser usr = new GameUser(); // make a GameUser holder
+                            usr.UserID = name.ID; // set UserID to Current iterations Id
+                            usr.GameID = GIDHolder; // Set gameId to GIDHolders value
+                            usr.Status = 1; // set each player to pending status
+                            g.GameUsers.Add(usr); // add each GameUser iteration to the game instance
+                        } // end foreach
 
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
-            }
-
+                        try { db.Games.Add(g); } catch (Exception e) { return Content(System.Net.HttpStatusCode.NotModified, "Failure to add Game to Database."); } // end try2
+                        db.SaveChanges() ; // save changes to db 
+                        return Ok("Game Controller gameCreate API Call");
+                    } // end try1
+                    catch (Exception e)
+                    { return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team."); } // end catch1
+                } // end using
+            } // end if players == 0
+            else { return Content(System.Net.HttpStatusCode.NotAcceptable, "Failure to create game due to 0 players in list.") ; }
         }
+
+        /* testing notes for GameCreate: 
+         * Method requires a List<User>. 
+         * Send an empty list or one that has a 0 count.
+         * Send List<User> that has more than 1 User in the list. 
+         * Send List<User> where one userId is invalid $$ no catch for this specifically yet
+         */
+
+
 
         // GET: api/Game/MyGames
         // -Written by Garrick 1/23/18
