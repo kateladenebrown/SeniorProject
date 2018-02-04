@@ -90,5 +90,26 @@ namespace TurnBasedGameAPI.Controllers
                 return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
             }
         }
+
+        // GET: api/Game
+        // >Tyler Lancaster, 1/25/18
+        /// <summary>
+        /// Returns the latest game record for the passed-in GameID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IHttpActionResult GetGame(GameID id)
+        {
+            try
+            {         
+                var game = db.games.where(Games.id => id && GameStates.timestamp => mostRecent);
+
+                return Ok("Game Controller GetGame API Call");
+            }
+            catch (Exception e)
+            {
+                return Exception("GetGame call failed");
+            }
+        }
     }
 }

@@ -164,6 +164,44 @@ namespace TurnBasedGameAPI.Controllers
             }
         }
 
+        // GET: api/User/GetActive
+        // >Tyler Lancaster, 1/25/18
+        /// <summary>
+        /// Returns all active users' usernames
+        /// </summary>
+        /// <returns></returns>
+        public IHttpActionResult GetActive()
+        {
+            try
+            {
+                //var activeUsers = db.user.where(active => true);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetActive API call");
+            }
+            return activeUserList;
+        }
 
+        // PUT: api/User
+        // >Tyler Lancaster, 1/25/18
+        /// <summary>
+        /// Updates user's publicly-available information
+        /// </summary>
+        /// <returns></returns>
+        public IHttpActionResult UpdatePersonalDetails(User user)
+        {
+            try
+            {
+                //check user authentication or assume user has access?
+                //update username
+                //What other details are available for change?
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in UpdatePersonalDetails API call");
+            }
+            return Ok("User Controller UpdatePersonalDetails API Call");
+        }
     }
 }
