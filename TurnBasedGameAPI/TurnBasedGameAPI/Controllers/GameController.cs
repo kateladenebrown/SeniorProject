@@ -21,9 +21,8 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>A message indicating that the game was created successfully, or an error otherwise.</returns>
         [HttpPost]
         [Route("Create", Name = "Create New Game")]
-        public IHttpActionResult gameCreate(List<User> players)
+        public IHttpActionResult gameCreate(List<string> players)
         {
-            // changed to List of User. Couldnt find a way to access playerId from string UserName
             int GIDHolder;
             if (players.Count == 0)
             {
@@ -36,10 +35,10 @@ namespace TurnBasedGameAPI.Controllers
                         g.Status = 1; // set to pending status ( 1 ) 
                         GIDHolder = g.ID; // hold the created game ID
 
-                        foreach (User name in players)
+                        foreach ( string name in players)
                         {
                             GameUser usr = new GameUser(); // make a GameUser holder
-                            usr.UserID = name.ID; // set UserID to Current iterations Id
+                            usr.UserID = db.Users.Single(x => x.Username == name).ID  ; // find the single ID, where the UserName is the current name
                             usr.GameID = GIDHolder; // Set gameId to GIDHolders value
                             usr.Status = 1; // set each player to pending status
                             g.GameUsers.Add(usr); // add each GameUser iteration to the game instance

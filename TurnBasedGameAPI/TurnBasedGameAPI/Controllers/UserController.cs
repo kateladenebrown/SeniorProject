@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
+using GameEF;
 //using System.Web.Mvc;
 
 namespace TurnBasedGameAPI.Controllers
@@ -38,25 +39,25 @@ namespace TurnBasedGameAPI.Controllers
         /// Retrieves personal details for the currently logged in user.
         /// </summary>
         /// <returns>A single User object.</returns>
+        [Authorize]
         [HttpGet]
         [Route("GetPersonalDetails", Name = "Get User Personal Details")]
         public IHttpActionResult GetPersonalDetails()
         {
-            // ask database for personal details from tables matching the user id
-            // returns the data in ?? specific format ?? as object ?? 
+            User u = new User();
             try
             {
-                // Obj holder = db.User.where(UserId => id) ;
-
-                // format or return 
-                return Ok("Game Controller getPersonalDetails API Call");
+                using (var db = new GameEntities())
+                {
+                    u = db.Users.Single(x => x.Username == User.Identity.Name );
+                }
+                return Ok(u);
             }
             catch (Exception e)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError, "The server was unable to retrieve your personal details. Please inform the development team.");
             }
-
-        }
+        } // end GetPersonalDetails
 
         //POST: api/User/Create
         // -Written by Garrick 1/23/18
@@ -152,11 +153,12 @@ namespace TurnBasedGameAPI.Controllers
             // tell database to toggle active to false on user matching 'id'
             try
             {
-                // db is the database. varify path to active field
-
-                // db.User.active.where(UserId => id) = false ;
-
-                return Ok("Game Controller deleteUser API Call");
+                using (var db = new GameEntities())
+                {
+                    db.Users.Single(x => x.ID == id).Active = false; // set active to false
+                    db.SaveChanges();   // save changes made to db back to main DataBase
+                }           
+                    return Ok(); // ??do we want to return a bool or something??
             }
             catch (Exception e)
             {
