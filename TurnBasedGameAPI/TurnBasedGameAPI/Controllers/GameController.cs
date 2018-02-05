@@ -54,7 +54,7 @@ namespace TurnBasedGameAPI.Controllers
                 try
                 {
                     IQueryable<Game> myGames = db.GameUsers
-                        .Where(gu => gu.Username == User.Identity.Name)
+                        .Where(gu => gu.UserID == User.Identity.Name)
                         .Select(g => g.Game);
                     if (gameStatus != -1)
                     {

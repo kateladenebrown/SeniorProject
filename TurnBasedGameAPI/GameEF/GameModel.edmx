@@ -101,7 +101,7 @@
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="GameID" Type="int" />
           <Property Name="Status" Type="int" />
-          <Property Name="Username" Type="nvarchar" MaxLength="256" />
+          <Property Name="UserID" Type="nvarchar" MaxLength="128" />
         </EntityType>
         <EntityType Name="UserStatusLookup">
           <Key>
@@ -190,6 +190,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_GameUser_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="0..1" />
+          <End Role="GameUsers" Type="Self.GameUsers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="GameUsers">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_GameUser_Game">
           <End Role="Games" Type="Self.Games" Multiplicity="0..1" />
           <End Role="GameUsers" Type="Self.GameUsers" Multiplicity="*" />
@@ -202,9 +214,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <!--Errors Found During Generation:
-warning 6035: The relationship 'FK_GameUser_User' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
-        <Association Name="FK_GameUser_User" />-->
         <Association Name="FK_GameUser_UserStatusLookup">
           <End Role="UserStatusLookup" Type="Self.UserStatusLookup" Multiplicity="0..1" />
           <End Role="GameUsers" Type="Self.GameUsers" Multiplicity="*" />
@@ -252,6 +261,10 @@ warning 6035: The relationship 'FK_GameUser_User' has columns that are not part 
           <AssociationSet Name="FK_GameState_Game" Association="Self.FK_GameState_Game">
             <End Role="Games" EntitySet="Games" />
             <End Role="GameStates" EntitySet="GameStates" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GameUser_AspNetUsers" Association="Self.FK_GameUser_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="GameUsers" EntitySet="GameUsers" />
           </AssociationSet>
           <AssociationSet Name="FK_GameUser_Game" Association="Self.FK_GameUser_Game">
             <End Role="Games" EntitySet="Games" />
@@ -327,6 +340,7 @@ warning 6035: The relationship 'FK_GameUser_User' has columns that are not part 
           <Property Name="Active" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="AspNetUserClaims" Relationship="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserClaims" />
           <NavigationProperty Name="AspNetUserLogins" Relationship="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserLogins" />
+          <NavigationProperty Name="GameUsers" Relationship="Self.FK_GameUser_AspNetUsers" FromRole="AspNetUsers" ToRole="GameUsers" />
           <NavigationProperty Name="AspNetRoles" Relationship="Self.AspNetUserRoles" FromRole="AspNetUsers" ToRole="AspNetRoles" />
         </EntityType>
         <EntityType Name="Game">
@@ -366,7 +380,8 @@ warning 6035: The relationship 'FK_GameUser_User' has columns that are not part 
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="GameID" Type="Int32" />
           <Property Name="Status" Type="Int32" />
-          <Property Name="Username" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="UserID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AspNetUser" Relationship="Self.FK_GameUser_AspNetUsers" FromRole="GameUsers" ToRole="AspNetUsers" />
           <NavigationProperty Name="Game" Relationship="Self.FK_GameUser_Game" FromRole="GameUsers" ToRole="Games" />
           <NavigationProperty Name="UserStatusLookup" Relationship="Self.FK_GameUser_UserStatusLookup" FromRole="GameUsers" ToRole="UserStatusLookup" />
         </EntityType>
@@ -403,6 +418,18 @@ warning 6035: The relationship 'FK_GameUser_User' has columns that are not part 
             </Principal>
             <Dependent Role="AspNetUserLogins">
               <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GameUser_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="0..1" />
+          <End Role="GameUsers" Type="Self.GameUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="GameUsers">
+              <PropertyRef Name="UserID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -476,6 +503,10 @@ warning 6035: The relationship 'FK_GameUser_User' has columns that are not part 
           <AssociationSet Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserLogins" EntitySet="AspNetUserLogins" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GameUser_AspNetUsers" Association="Self.FK_GameUser_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="GameUsers" EntitySet="GameUsers" />
           </AssociationSet>
           <AssociationSet Name="FK_Game_GameStatusLookup" Association="Self.FK_Game_GameStatusLookup">
             <End Role="GameStatusLookup" EntitySet="GameStatusLookups" />
@@ -596,7 +627,7 @@ warning 6035: The relationship 'FK_GameUser_User' has columns that are not part 
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="GameID" ColumnName="GameID" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -17,8 +17,9 @@ namespace GameEF
         public int ID { get; set; }
         public Nullable<int> GameID { get; set; }
         public Nullable<int> Status { get; set; }
-        public string Username { get; set; }
+        public string UserID { get; set; }
     
+        public virtual AspNetUser AspNetUser { get; set; }
         public virtual Game Game { get; set; }
         public virtual UserStatusLookup UserStatusLookup { get; set; }
     }
