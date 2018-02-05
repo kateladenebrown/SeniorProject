@@ -23,7 +23,7 @@ namespace GameEF
     
         public int ID { get; set; }
         public System.DateTime Start { get; set; }
-        public System.DateTime End { get; set; }
+        public Nullable<System.DateTime> End { get; set; }
         public Nullable<int> Status { get; set; }
     
         public virtual GameStatusLookup GameStatusLookup { get; set; }
