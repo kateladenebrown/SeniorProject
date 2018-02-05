@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameEF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -93,18 +94,18 @@ namespace TurnBasedGameAPI.Controllers
         {
             try
             {
-                // This is a stub. It won't work, syntax, names, etc, are wrong,
-                // but should be similar to the final implementation
-
                 // -Cameron: looks good. Commented out for now so that the solution will build.
 
-                //using (var db = new TurnBasedGameAPI.ENTITIES())
-                //{
-                //    var user = db.users.where(user => user.id);
-                //    return Ok("User Controller GetByUserID API Call");
-                //}
-
-                return Ok("User Controller GetByUserID API Call");
+                using (var db = new GameEntities())
+                {
+                    // Still need to change so only public fields are returned.
+                    var user = db.Users.Single(u => u.ID == id);
+                    return Ok(user);
+                }
+            }
+            catch (KeyNotFoundException e)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "The user with the ID " + id + " was not found.");
             }
             catch (Exception e)
             {
