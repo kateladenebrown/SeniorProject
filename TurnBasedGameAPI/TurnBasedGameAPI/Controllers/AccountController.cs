@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http;
-using System.Web.Http.ModelBinding;
+﻿using GameEF;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Http;
 using TurnBasedGameAPI.Models;
 using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
@@ -37,14 +38,11 @@ namespace TurnBasedGameAPI.Controllers
             AccessTokenFormat = accessTokenFormat;
         }
 
-        public ApplicationUserManager UserManager
-        {
-            get
-            {
+        public ApplicationUserManager UserManager {
+            get {
                 return _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
             }
-            private set
-            {
+            private set {
                 _userManager = value;
             }
         }
@@ -125,7 +123,7 @@ namespace TurnBasedGameAPI.Controllers
 
             IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword,
                 model.NewPassword);
-            
+
             if (!result.Succeeded)
             {
                 return GetErrorResult(result);
@@ -152,6 +150,35 @@ namespace TurnBasedGameAPI.Controllers
 
             return Ok();
         }
+
+        //GET api/Account/GetAll
+        //Written by Garrick 2/5/18
+        /// <summary>
+        /// Returns a list of active user's usernames
+        /// </summary>
+        /// <returns>Returns OK status code with username list for success, not found otherwise</returns>
+        [HttpGet]
+        [Route("GetAll", Name = "Get all users")]
+        public IHttpActionResult GetAll()
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    IQueryable<AspNetUser> users = db.AspNetUsers.Where(u => u.Active == true);
+                    return Ok(users.ToList());
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return NotFound();
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server was unable to retrieve the list of users. Please inform the development team.");
+            }
+        }
+
 
         // POST api/Account/AddExternalLogin
         [Route("AddExternalLogin")]
@@ -258,9 +285,9 @@ namespace TurnBasedGameAPI.Controllers
             if (hasRegistered)
             {
                 Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                
-                 ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager,
-                    OAuthDefaults.AuthenticationType);
+
+                ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager,
+                   OAuthDefaults.AuthenticationType);
                 ClaimsIdentity cookieIdentity = await user.GenerateUserIdentityAsync(UserManager,
                     CookieAuthenticationDefaults.AuthenticationType);
 
@@ -368,7 +395,7 @@ namespace TurnBasedGameAPI.Controllers
             result = await UserManager.AddLoginAsync(user.Id, info.Login);
             if (!result.Succeeded)
             {
-                return GetErrorResult(result); 
+                return GetErrorResult(result);
             }
             return Ok();
         }
@@ -386,8 +413,7 @@ namespace TurnBasedGameAPI.Controllers
 
         #region Helpers
 
-        private IAuthenticationManager Authentication
-        {
+        private IAuthenticationManager Authentication {
             get { return Request.GetOwinContext().Authentication; }
         }
 
