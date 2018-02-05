@@ -43,20 +43,20 @@ namespace TurnBasedGameAPI.Controllers
         /// <summary>
         /// Retrieves a list of games the user is or was a player in.
         /// </summary>
+        /// <param name="gameStatus">The value of the gamestatus to filter for, default is -1 for ignore</param>
         /// <returns>A list of Game objects.</returns>
         [HttpGet]
         [Route("MyGames", Name = "Get My Games")]
-        public IHttpActionResult GetMyGames(int gameStatus = null) // string? Gamestatus to check for active vs inactive games
+        public IHttpActionResult GetMyGames(int gameStatus = -1) // string? Gamestatus to check for active vs inactive games
         {
             using (var db = new GameEntities())
             {
                 try
                 {
-                    //User myUser = db.Users.Single(u => u.Username == "evangarr");//TODO: Change to User.Identity.Name and uncomment Authorize
                     IQueryable<Game> myGames = db.GameUsers
-                        .Where(gu => gu.username == User.Identity.Name)
-                        .Select(g => g.game);
-                    if (gameStatus != null)
+                        .Where(gu => gu.Username == User.Identity.Name)
+                        .Select(g => g.Game);
+                    if (gameStatus != -1)
                     {
                         myGames = myGames.Where(x => x.Status == gameStatus);
                     }

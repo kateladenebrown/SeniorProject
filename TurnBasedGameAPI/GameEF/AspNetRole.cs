@@ -12,24 +12,18 @@ namespace GameEF
     using System;
     using System.Collections.Generic;
     
-    public partial class User
+    public partial class AspNetRole
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public User()
+        public AspNetRole()
         {
-            this.GameUsers = new HashSet<GameUser>();
+            this.AspNetUsers = new HashSet<AspNetUser>();
         }
     
-        public int ID { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Username { get; set; }
-        public byte[] Hash { get; set; }
-        public string Salt { get; set; }
-        public bool Active { get; set; }
+        public string Id { get; set; }
+        public string Name { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<GameUser> GameUsers { get; set; }
+        public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
     }
 }
