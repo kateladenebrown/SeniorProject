@@ -16,6 +16,8 @@ using Microsoft.Owin.Security.OAuth;
 using TurnBasedGameAPI.Models;
 using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
+using GameEF;
+using System.Linq;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -371,6 +373,49 @@ namespace TurnBasedGameAPI.Controllers
                 return GetErrorResult(result); 
             }
             return Ok();
+        }
+
+        // GET: api/Account/{id}
+        // @Michael Case, 1/23/18
+        /// <summary>
+        /// Retrieve's the publicly visible information for a single user.
+        /// </summary>
+        /// <param name="id">The ID for the user whose details should be returned.</param>
+        /// <returns>A single User object (with only the publicly visible fields populated.</returns>
+        [HttpGet]
+        [Route("{id}", Name = "Get User By ID")]
+        public IHttpActionResult GetByUserID(int id)
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    // Populates and returns a user view model
+                    AspNetUser user = db.AspNetUsers.Single(u => u.Id.Equals(id));
+                    UserViewModel uViewModel = new UserViewModel();
+                    uViewModel.Active = user.Active;
+                    uViewModel.Email = user.Email;
+                    uViewModel.EmailConfirmed = user.EmailConfirmed;
+                    uViewModel.FirstName = user.FirstName;
+                    uViewModel.LastName = user.LastName;
+                    uViewModel.PhoneNumber = user.PhoneNumber;
+                    uViewModel.PhoneNumberConfirmed = user.PhoneNumberConfirmed;
+                    uViewModel.UserName = user.UserName;
+
+                    return Ok(uViewModel);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error attempting to retrieve the user details. Please inform the development team.");
+            }
+            catch (InvalidOperationException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error attempting to retrieve the user details. Please inform the development team.");
+
+                // -Cameron: NotFound is great to use, but should not be in the outer-most catch block; it should be returned if the database doesn't contain an entry with the ID specified.
+                //return NotFound();
+            }
         }
 
         protected override void Dispose(bool disposing)

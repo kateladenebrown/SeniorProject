@@ -12,15 +12,16 @@ namespace GameEF
     using System;
     using System.Collections.Generic;
     
-    public partial class GameUser
+    public partial class spt_fallback_usg
     {
-        public int ID { get; set; }
-        public Nullable<int> GameID { get; set; }
-        public Nullable<int> Status { get; set; }
-        public string UserID { get; set; }
-    
-        public virtual AspNetUser AspNetUser { get; set; }
-        public virtual Game Game { get; set; }
-        public virtual UserStatusLookup UserStatusLookup { get; set; }
+        public string xserver_name { get; set; }
+        public System.DateTime xdttm_ins { get; set; }
+        public System.DateTime xdttm_last_ins_upd { get; set; }
+        public Nullable<int> xfallback_vstart { get; set; }
+        public short dbid { get; set; }
+        public int segmap { get; set; }
+        public int lstart { get; set; }
+        public int sizepg { get; set; }
+        public int vstart { get; set; }
     }
 }

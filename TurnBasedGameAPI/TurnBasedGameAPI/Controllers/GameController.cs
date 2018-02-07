@@ -76,10 +76,10 @@ namespace TurnBasedGameAPI.Controllers
                 try
                 {
                     List<GameState> myGames = db.Games.Single(g => g.ID == id).GameStates.ToList();
-                    
+
                     return Ok(myGames); // return something for the time being
                 }
-              
+
                 catch (InvalidOperationException e)
                 {
                     return NotFound();

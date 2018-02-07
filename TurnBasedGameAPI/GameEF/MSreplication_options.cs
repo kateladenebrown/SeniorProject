@@ -12,15 +12,13 @@ namespace GameEF
     using System;
     using System.Collections.Generic;
     
-    public partial class GameUser
+    public partial class MSreplication_options
     {
-        public int ID { get; set; }
-        public Nullable<int> GameID { get; set; }
-        public Nullable<int> Status { get; set; }
-        public string UserID { get; set; }
-    
-        public virtual AspNetUser AspNetUser { get; set; }
-        public virtual Game Game { get; set; }
-        public virtual UserStatusLookup UserStatusLookup { get; set; }
+        public string optname { get; set; }
+        public bool value { get; set; }
+        public int major_version { get; set; }
+        public int minor_version { get; set; }
+        public int revision { get; set; }
+        public int install_failures { get; set; }
     }
 }
