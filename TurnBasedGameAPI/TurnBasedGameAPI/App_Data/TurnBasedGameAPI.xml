@@ -488,10 +488,11 @@
             <param name="players">A list of usernames specifying who should be a player.</param>
             <returns>A message indicating that the game was created successfully, or an error otherwise.</returns>
         </member>
-        <member name="M:TurnBasedGameAPI.Controllers.GameController.GetMyGames">
+        <member name="M:TurnBasedGameAPI.Controllers.GameController.GetMyGames(System.Int32)">
             <summary>
             Retrieves a list of games the user is or was a player in.
             </summary>
+            <param name="gameStatus">The value of the gamestatus to filter for, default is -1 for ignore</param>
             <returns>A list of Game objects.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.GetGameHistory(System.Int32)">
