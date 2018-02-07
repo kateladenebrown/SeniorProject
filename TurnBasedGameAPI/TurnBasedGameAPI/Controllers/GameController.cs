@@ -32,7 +32,6 @@ namespace TurnBasedGameAPI.Controllers
             }
             catch (Exception e)
             {
-
                 return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
             }
 
