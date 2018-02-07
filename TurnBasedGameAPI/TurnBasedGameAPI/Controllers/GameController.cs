@@ -46,7 +46,7 @@ namespace TurnBasedGameAPI.Controllers
         /// <param name="id">The ID of the game whose most recent state should be returned.</param>
         /// <returns>Latest gamestate of given gameID.</returns>
         [HttpGet]
-        [Route("id", Name = "Get Latest Game")]    //What exactly is the name of this? 
+        [Route("id", Name = "Get Latest Game")]    
         public IHttpActionResult GetGameID(int id)
         {
             try
@@ -64,7 +64,7 @@ namespace TurnBasedGameAPI.Controllers
             }
             catch (ArgumentNullException e)
             {
-                return Content(System.Net.HttpStatusCode.BadRequest, "Issue");
+                return Content(System.Net.HttpStatusCode.BadRequest, "Issue!");
             }
             catch (InvalidOperationException e)
             {

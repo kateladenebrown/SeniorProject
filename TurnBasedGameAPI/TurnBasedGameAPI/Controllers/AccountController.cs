@@ -16,6 +16,8 @@ using Microsoft.Owin.Security.OAuth;
 using TurnBasedGameAPI.Models;
 using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
+using GameEF;
+using System.Linq;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -383,6 +385,71 @@ namespace TurnBasedGameAPI.Controllers
 
             base.Dispose(disposing);
         }
+
+
+        // GET api/Account/GetActive
+        // Written by Tyler Lancaster, 2/6/2018
+        /// <summary>
+        /// Returns a list of the usernames for all ACTIVE users
+        /// </summary>
+        /// <returns>List of all active users</returns>
+        [HttpGet]
+        [Route("GetActive")]
+        public async Task<IHttpActionResult> GetActive()
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+
+                    //get all users whose status is active (2)
+                    List<GameUser> activeUsers = db.GameUsers.Where(au => au.Status == 2).ToList();
+
+                    return Ok(activeUsers);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "No data found.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
+            }
+        }
+
+        // POST api/Account/UpdatePersonalDetails
+        // Written by Tyler Lancaster, 2/6/2018
+        /// <summary>
+        /// Updates user's publicly available information
+        /// </summary>
+        /// <returns>A message indicating that the details were updated successfully, or an error otherwise</returns>
+        [HttpPost]
+        [Route("UpdatePersonalDetails")]
+        public async Task<IHttpActionResult> UpdatePersonalDetails(GameUser user)
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+
+                    
+
+                    return Ok();
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "No data found.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
+            }
+        }
+
+
+
 
         #region Helpers
 
