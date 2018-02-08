@@ -392,15 +392,7 @@ namespace TurnBasedGameAPI.Controllers
                 {
                     // Populates and returns a user view model
                     AspNetUser user = db.AspNetUsers.Single(u => u.Id.Equals(id));
-                    UserViewModel uViewModel = new UserViewModel();
-                    uViewModel.Active = user.Active;
-                    uViewModel.Email = user.Email;
-                    uViewModel.EmailConfirmed = user.EmailConfirmed;
-                    uViewModel.FirstName = user.FirstName;
-                    uViewModel.LastName = user.LastName;
-                    uViewModel.PhoneNumber = user.PhoneNumber;
-                    uViewModel.PhoneNumberConfirmed = user.PhoneNumberConfirmed;
-                    uViewModel.UserName = user.UserName;
+                    UserViewModel uViewModel = new UserViewModel(user);
 
                     return Ok(uViewModel);
                 }
