@@ -33,31 +33,7 @@ namespace TurnBasedGameAPI.Controllers
             }
         }
 
-        // GET: api/User/GetPersonalDetails
-        // Coded by Stephen 1/24/18
-        /// <summary>
-        /// Retrieves personal details for the currently logged in user.
-        /// </summary>
-        /// <returns>A single User object.</returns>
-        [Authorize]
-        [HttpGet]
-        [Route("GetPersonalDetails", Name = "Get User Personal Details")]
-        public IHttpActionResult GetPersonalDetails()
-        {
-            User u = new User();
-            try
-            {
-                using (var db = new GameEntities())
-                {
-                    u = db.Users.Single(x => x.Username == User.Identity.Name );
-                }
-                return Ok(u);
-            }
-            catch (Exception e)
-            {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server was unable to retrieve your personal details. Please inform the development team.");
-            }
-        } // end GetPersonalDetails
+       
 
         //POST: api/User/Create
         // -Written by Garrick 1/23/18
@@ -140,31 +116,7 @@ namespace TurnBasedGameAPI.Controllers
             }
         }
 
-        // DELETE: api/User/Delete
-        // coded by Stephen 1/24/18
-        /// <summary>
-        /// Deactivates the current users account.
-        /// </summary>
-        /// <returns>A message indicating that the account was successfully deactivated, or an error otherwise.</returns>
-        [HttpDelete]
-        [Route("Delete", Name = "Delete User Account")]
-        public IHttpActionResult deleteUser(int id)
-        {
-            // tell database to toggle active to false on user matching 'id'
-            try
-            {
-                using (var db = new GameEntities())
-                {
-                    db.Users.Single(x => x.ID == id).Active = false; // set active to false
-                    db.SaveChanges();   // save changes made to db back to main DataBase
-                }           
-                    return Ok(); // ??do we want to return a bool or something??
-            }
-            catch (Exception e)
-            {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error while attempting to deactive the account. Please inform the development team.");
-            }
-        }
+        
 
         // GET: api/User/GetActive
         // >Tyler Lancaster, 1/25/18

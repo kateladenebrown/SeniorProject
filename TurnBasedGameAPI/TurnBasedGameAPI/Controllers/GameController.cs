@@ -21,45 +21,52 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>A message indicating that the game was created successfully, or an error otherwise.</returns>
         [HttpPost]
         [Route("Create", Name = "Create New Game")]
-        public IHttpActionResult gameCreate(List<string> players)
+        public IHttpActionResult GameCreate(List<string> players)
         {
-            int GIDHolder;
-            if (players.Count == 0)
+            using (var db = new GameEntities())
             {
-                using (var db = new GameEntities())
+                try
                 {
-                    try
-                    {
-                        Game g = new Game(); // create a game
-                        g.Start = System.DateTime.Now; // set start time to now
-                        g.Status = 1; // set to pending status ( 1 ) 
-                        GIDHolder = g.ID; // hold the created game ID
+                    User tmp = new User();
+                    tmp = db.Users.Single(x => x.Username == User.Identity.Name);
+                    players.Add(tmp.Username); // adds current player to list of players
 
-                        foreach ( string name in players)
+                    Game g = new Game(); // create a game
+                    g.Start = System.DateTime.Now; // set start time to now
+                    g.Status = 1; // set to pending status ( 1 )
+                    db.Games.Add(g); // add g to Games to generate the Game.ID
+
+                    foreach ( string name in players)
+                    {
+                        try
                         {
                             GameUser usr = new GameUser(); // make a GameUser holder
-                            usr.UserID = db.Users.Single(x => x.Username == name).ID  ; // find the single ID, where the UserName is the current name
-                            usr.GameID = GIDHolder; // Set gameId to GIDHolders value
+                            usr.UserID = db.Users.Single(x => x.Username == name).ID; // find the single ID, where the UserName is the current name
+                            usr.GameID = g.ID; 
                             usr.Status = 1; // set each player to pending status
                             g.GameUsers.Add(usr); // add each GameUser iteration to the game instance
-                        } // end foreach
+                        }
+                        catch(Exception e) { return Content( System.Net.HttpStatusCode.BadRequest ,"Failure to create GameUser."); }
+                    } // end foreach
 
-                        try { db.Games.Add(g); } catch (Exception e) { return Content(System.Net.HttpStatusCode.NotModified, "Failure to add Game to Database."); } // end try2
-                        db.SaveChanges() ; // save changes to db 
-                        return Ok("Game Controller gameCreate API Call");
-                    } // end try1
-                    catch (Exception e)
-                    { return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team."); } // end catch1
-                } // end using
-            } // end if players == 0
-            else { return Content(System.Net.HttpStatusCode.NotAcceptable, "Failure to create game due to 0 players in list.") ; }
-        }
+                    try { db.Games.Add(g); }
+                    catch (Exception e) { return Content(System.Net.HttpStatusCode.NotModified, "Failure to add Game to Database."); }
+
+                    try { db.SaveChanges(); } // save changes to db 
+                    catch(Exception e) { return Content(System.Net.HttpStatusCode.InternalServerError, "Server failed to save changes. "); }
+
+                    return Ok("Everything went shwimminminingly");
+                } 
+                catch (Exception e)
+                { return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team."); } // end catch1
+            } // end using 
+        } // end GameCreate 
 
         /* testing notes for GameCreate: 
-         * Method requires a List<User>. 
+         * Method requires a List<string>. 
          * Send an empty list or one that has a 0 count.
-         * Send List<User> that has more than 1 User in the list. 
-         * Send List<User> where one userId is invalid $$ no catch for this specifically yet
+         * Send List<string>  
+         * Send List<string> where one userId is invalid $$ no catch for this specifically yet
          */
 
 

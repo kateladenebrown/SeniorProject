@@ -16,6 +16,8 @@ using Microsoft.Owin.Security.OAuth;
 using TurnBasedGameAPI.Models;
 using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
+using GameEF;
+using System.Linq;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -48,6 +50,57 @@ namespace TurnBasedGameAPI.Controllers
                 _userManager = value;
             }
         }
+
+        // DELETE: api/User/Delete
+        // coded by Stephen 1/24/18
+        /// <summary>
+        /// Deactivates the current users account.
+        /// </summary>
+        /// <returns>A message indicating that the account was successfully deactivated, or an error otherwise.</returns>
+        [HttpDelete]
+        [Route("Delete", Name = "Delete User Account")]
+        public IHttpActionResult deleteUser(int id)
+        {
+            // tell database to toggle active to false on user matching 'id'
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    db.Users.Single(x => x.ID == id).Active = false; // set active to false
+                    try { db.SaveChanges(); }
+                    catch (Exception e ) { return Content(System.Net.HttpStatusCode.ExpectationFailed, "Failure to delete user, data base save failed. "); }
+                           // save changes made to db back to main DataBase
+                }
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error while attempting to deactive the account. Please inform the development team.");
+            }
+        }
+
+        // DETAILS: api/User/Details
+        // coded by Stephen 2/7/18
+        /// <summary>
+        /// Gets the Users personal information.
+        /// </summary>
+        /// <returns> The Users personal details in 'UserDetailsModel' type object.</returns>
+        //[HttpDelete] copied from delete. please update this code 
+        [Route("Details", Name = "Get Personal Details")]
+        public IHttpActionResult GetPeronalDetails(int id)
+        {
+            using (var db = new GameEntities() )
+            {
+                try
+                {
+                    User u = db.Users.Single(x => x.ID == id);
+                    UserDetailsModel holder = new UserDetailsModel(u.FirstName, u.LastName, u.Username, u.Email);
+                    return Ok(holder);
+                } // end try 
+                catch (Exception e){ return Content(System.Net.HttpStatusCode.NotFound, "No record of that player was found.");  }
+            } // end using    
+        } // end GetPersonalDetails
+
 
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
 
