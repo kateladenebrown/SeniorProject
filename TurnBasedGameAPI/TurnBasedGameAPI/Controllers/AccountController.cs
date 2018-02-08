@@ -403,7 +403,7 @@ namespace TurnBasedGameAPI.Controllers
                 {
 
                     //get all users whose status is active (2)
-                    List<GameUser> activeUsers = db.GameUsers.Where(au => au.Status == 2).ToList();
+                    List<AspNetUser> activeUsers = db.AspNetUsers.Where(au => au.Active == true).ToList();
 
                     return Ok(activeUsers);
                 }
@@ -426,14 +426,29 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>A message indicating that the details were updated successfully, or an error otherwise</returns>
         [HttpPost]
         [Route("UpdatePersonalDetails")]
-        public async Task<IHttpActionResult> UpdatePersonalDetails(GameUser user)
+        public async Task<IHttpActionResult> UpdatePersonalDetails(AspNetUser user)
         {
             try
             {
                 using (var db = new GameEntities())
                 {
-
                     
+
+                    AspNetUser u = db.AspNetUsers.Single(us => us.Id == user.Id);
+
+                    if (user.LastName != null)
+                        u.LastName = user.LastName;
+
+                    if (user.FirstName != null)
+                        u.FirstName = user.FirstName;
+
+                    if (user.Email != null)
+                        u.Email = user.Email;
+
+                    if (user.PhoneNumber != null)
+                        u.PhoneNumber = user.PhoneNumber;
+
+                    db.SaveChanges();
 
                     return Ok();
                 }
