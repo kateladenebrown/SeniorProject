@@ -13,7 +13,7 @@ namespace TurnBasedGameAPI.Controllers
     public class GameController : ApiController
     {
         // POST: api/Game/Create
-        // Coded by Stephen 1/24/18
+        // Coded by Stephen 2/7/18
         /// <summary>
         /// Starts a new game instance with the caller and listed users as players.
         /// </summary>
@@ -27,10 +27,6 @@ namespace TurnBasedGameAPI.Controllers
             {
                 try
                 {
-                    User tmp = new User();
-                    tmp = db.Users.Single(x => x.Username == User.Identity.Name);
-                    players.Add(tmp.Username); // adds current player to list of players
-
                     Game g = new Game(); // create a game
                     g.Start = System.DateTime.Now; // set start time to now
                     g.Status = 1; // set to pending status ( 1 )
@@ -48,6 +44,16 @@ namespace TurnBasedGameAPI.Controllers
                         }
                         catch(Exception e) { return Content( System.Net.HttpStatusCode.BadRequest ,"Failure to create GameUser."); }
                     } // end foreach
+
+                    // actions to make initiating user active and added to list of players
+                    User tmp = new User();
+                    tmp = db.Users.Single(x => x.Username == User.Identity.Name);
+                    players.Add(tmp.Username); // adds current player to list of players
+                    GameUser u = db.GameUsers.Single(x => x.UserID == tmp.ID );
+                    u.UserID = tmp.ID;
+                    u.GameID = g.ID;
+                    u.Status = 2; // 2 is active
+                    g.GameUsers.Add(u);
 
                     try { db.Games.Add(g); }
                     catch (Exception e) { return Content(System.Net.HttpStatusCode.NotModified, "Failure to add Game to Database."); }

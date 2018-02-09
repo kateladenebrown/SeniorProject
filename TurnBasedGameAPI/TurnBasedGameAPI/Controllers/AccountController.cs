@@ -52,7 +52,7 @@ namespace TurnBasedGameAPI.Controllers
         }
 
         // DELETE: api/User/Delete
-        // coded by Stephen 1/24/18
+        // coded by Stephen 2/7/18
         /// <summary>
         /// Deactivates the current users account.
         /// </summary>
@@ -69,14 +69,11 @@ namespace TurnBasedGameAPI.Controllers
                     db.Users.Single(x => x.ID == id).Active = false; // set active to false
                     try { db.SaveChanges(); }
                     catch (Exception e ) { return Content(System.Net.HttpStatusCode.ExpectationFailed, "Failure to delete user, data base save failed. "); }
-                           // save changes made to db back to main DataBase
                 }
                 return Ok();
             }
             catch (Exception e)
-            {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error while attempting to deactive the account. Please inform the development team.");
-            }
+            { return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error while attempting to deactive the account. Please inform the development team."); }
         }
 
         // DETAILS: api/User/Details
