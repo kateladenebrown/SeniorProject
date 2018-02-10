@@ -244,6 +244,8 @@
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\UserDetailsModel.cs" />
+    <Compile Include="ViewModels\UserViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
@@ -322,7 +324,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameEF\GameEF.csproj">
-      <Project>{F37BFDD6-C74C-45B8-8E4E-C317F57A4587}</Project>
+      <Project>{1AFFA97A-D283-4928-A20E-C1B05F67E63C}</Project>
       <Name>GameEF</Name>
     </ProjectReference>
   </ItemGroup>

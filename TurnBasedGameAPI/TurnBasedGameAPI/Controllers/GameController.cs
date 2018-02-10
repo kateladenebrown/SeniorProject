@@ -38,7 +38,7 @@ namespace TurnBasedGameAPI.Controllers
                         try
                         {
                             GameUser usr = new GameUser(); // make a GameUser holder
-                            usr.UserID = db.Users.Single(x => x.Username == name).ID; // find the single ID, where the UserName is the current name
+                            usr.UserID = db.AspNetUsers.Single(x => x.UserName == name).Id; // find the single ID, where the UserName is the current name
                             usr.GameID = g.ID; 
                             usr.Status = 1; // set each player to pending status
                             g.GameUsers.Add(usr); // add each GameUser iteration to the game instance
@@ -47,11 +47,11 @@ namespace TurnBasedGameAPI.Controllers
                     } // end foreach
 
                     // actions to make initiating user active and added to list of players
-                    User tmp = new User();
-                    tmp = db.Users.Single(x => x.Username == User.Identity.Name);
-                    players.Add(tmp.Username); // adds current player to list of players
-                    GameUser u = db.GameUsers.Single(x => x.UserID == tmp.ID );
-                    u.UserID = tmp.ID;
+                    AspNetUser tmp = new AspNetUser();
+                    tmp = db.AspNetUsers.Single(x => x.UserName == User.Identity.Name);
+                    players.Add(tmp.UserName); // adds current player to list of players
+                    GameUser u = db.GameUsers.Single(x => x.UserID == tmp.Id );
+                    u.UserID = tmp.Id;
                     u.GameID = g.ID;
                     u.Status = 2; // 2 is active
                     g.GameUsers.Add(u);
@@ -134,19 +134,19 @@ namespace TurnBasedGameAPI.Controllers
 
                     return Ok(myGames); // return something for the time being
                 }
-
+                catch (Exception e)
+                {
+                    return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
+                }
                 //using (var db = new Game.ENTITIES())
                 //{
                 //    var gameHistory = db.games.where(gameHistory => GetMyGames.id);
                 //    return Ok("Game Controller GetGameHistory API Call");
                 //}
 
-                return Ok("Game Controller GetGameHistory API Call");
+                //return Ok("Game Controller GetGameHistory API Call");
             }
-            catch (Exception e)
-            {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
-            }
+            
         }
 
         // GET: api/Game
@@ -156,17 +156,21 @@ namespace TurnBasedGameAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IHttpActionResult GetGame(GameID id)
+        public IHttpActionResult GetGame(int id)
         {
-            try
-            {         
-                var game = db.games.where(Games.id => id && GameStates.timestamp => mostRecent);
-
-                return Ok("Game Controller GetGame API Call");
-            }
-            catch (Exception e)
+            using (var db = new GameEntities())
             {
-                return Exception("GetGame call failed");
+                try
+                {
+                    //Note: The database is ordered by timestampt descending, we can use the first record.
+                    GameState game = db.GameStates.First(gs => gs.GameID == id);
+
+                    return Ok("Game Controller GetGame API Call");
+                }
+                catch (Exception e)
+                {
+                    return Content(System.Net.HttpStatusCode.InternalServerError, "GetGame call failed");
+                }
             }
         }
     }

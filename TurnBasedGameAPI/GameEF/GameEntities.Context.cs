@@ -16,7 +16,7 @@ namespace GameEF
     public partial class GameEntities : DbContext
     {
         public GameEntities()
-            : base("name=GameEntities")
+            : base("name=gameDBEntities")
         {
         }
     
@@ -25,7 +25,6 @@ namespace GameEF
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<C__MigrationHistory> C__MigrationHistory { get; set; }
         public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
         public virtual DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
         public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
@@ -35,10 +34,5 @@ namespace GameEF
         public virtual DbSet<GameStatusLookup> GameStatusLookups { get; set; }
         public virtual DbSet<GameUser> GameUsers { get; set; }
         public virtual DbSet<UserStatusLookup> UserStatusLookups { get; set; }
-        public virtual DbSet<MSreplication_options> MSreplication_options { get; set; }
-        public virtual DbSet<spt_fallback_db> spt_fallback_db { get; set; }
-        public virtual DbSet<spt_fallback_dev> spt_fallback_dev { get; set; }
-        public virtual DbSet<spt_fallback_usg> spt_fallback_usg { get; set; }
-        public virtual DbSet<spt_monitor> spt_monitor { get; set; }
     }
 }

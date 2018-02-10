@@ -65,7 +65,7 @@ namespace TurnBasedGameAPI.Controllers
         /// <param name="id">The ID for the user whose details should be returned.</param>
         /// <returns>A single User object (with only the publicly visible fields populated.</returns>
         [HttpGet]
-        [Route("{id}", Name = "Get User By ID")]
+        [Route("{id}", Name = "Get User By ID OLD")]
         public IHttpActionResult GetByUserID(int id)
         {
             try
@@ -134,7 +134,7 @@ namespace TurnBasedGameAPI.Controllers
             {
                 throw new Exception("Error in GetActive API call");
             }
-            return activeUserList;
+            return null;
         }
 
         // PUT: api/User
@@ -143,7 +143,7 @@ namespace TurnBasedGameAPI.Controllers
         /// Updates user's publicly-available information
         /// </summary>
         /// <returns></returns>
-        public IHttpActionResult UpdatePersonalDetails(User user)
+        public IHttpActionResult UpdatePersonalDetails(AspNetUser user)
         {
             try
             {

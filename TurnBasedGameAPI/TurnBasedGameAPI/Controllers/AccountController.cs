@@ -18,6 +18,7 @@ using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
 using GameEF;
 using System.Linq;
+using TurnBasedGameAPI.ViewModels;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -59,14 +60,14 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>A message indicating that the account was successfully deactivated, or an error otherwise.</returns>
         [HttpDelete]
         [Route("Delete", Name = "Delete User Account")]
-        public IHttpActionResult deleteUser(int id)
+        public IHttpActionResult deleteUser(string id)
         {
             // tell database to toggle active to false on user matching 'id'
             try
             {
                 using (var db = new GameEntities())
                 {
-                    db.Users.Single(x => x.ID == id).Active = false; // set active to false
+                    db.AspNetUsers.Single(x => x.Id == id).Active = false; // set active to false
                     try { db.SaveChanges(); }
                     catch (Exception e ) { return Content(System.Net.HttpStatusCode.ExpectationFailed, "Failure to delete user, data base save failed. "); }
                 }
@@ -84,14 +85,14 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns> The Users personal details in 'UserDetailsModel' type object.</returns>
         //[HttpDelete] copied from delete. please update this code 
         [Route("Details", Name = "Get Personal Details")]
-        public IHttpActionResult GetPeronalDetails(int id)
+        public IHttpActionResult GetPeronalDetails(string id)
         {
             using (var db = new GameEntities() )
             {
                 try
                 {
-                    User u = db.Users.Single(x => x.ID == id);
-                    UserDetailsModel holder = new UserDetailsModel(u.FirstName, u.LastName, u.Username, u.Email);
+                    AspNetUser u = db.AspNetUsers.Single(x => x.Id == id);
+                    UserDetailsModel holder = new UserDetailsModel() { FirstName = u.FirstName, LastName = u.LastName, UserName = u.UserName, Email = u.Email };
                     return Ok(holder);
                 } // end try 
                 catch (Exception e){ return Content(System.Net.HttpStatusCode.NotFound, "No record of that player was found.");  }
