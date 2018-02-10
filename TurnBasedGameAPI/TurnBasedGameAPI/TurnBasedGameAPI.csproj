@@ -232,6 +232,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\GameController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -321,7 +322,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GameEF\GameEF.csproj">
-      <Project>{f37bfdd6-c74c-45b8-8e4e-c317f57a4587}</Project>
+      <Project>{F37BFDD6-C74C-45B8-8E4E-C317F57A4587}</Project>
       <Name>GameEF</Name>
     </ProjectReference>
   </ItemGroup>

@@ -9,9 +9,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GameEF</RootNamespace>
     <AssemblyName>GameEF</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,76 +50,60 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AspNetRole.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>GameModel.tt</DependentUpon>
     </Compile>
     <Compile Include="AspNetUser.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>GameModel.tt</DependentUpon>
     </Compile>
     <Compile Include="AspNetUserClaim.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>GameModel.tt</DependentUpon>
     </Compile>
     <Compile Include="AspNetUserLogin.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>GameModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="UserViewModel.cs" />
     <Compile Include="C__MigrationHistory.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>GameModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Game.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>GameModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GameModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GameModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GameModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GameModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GameModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GameModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="GameState.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>GameModel.tt</DependentUpon>
     </Compile>
     <Compile Include="GameStatusLookup.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>GameModel.tt</DependentUpon>
     </Compile>
     <Compile Include="GameUser.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Model1.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Model1.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Model1.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Model1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Model1.edmx</DependentUpon>
-    </Compile>
-    <Compile Include="MSreplication_options.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>GameModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="spt_fallback_db.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="spt_fallback_dev.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="spt_fallback_usg.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
-    <Compile Include="spt_monitor.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
     <Compile Include="UserStatusLookup.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+      <DependentUpon>GameModel.tt</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />
-    <EntityDeploy Include="Model1.edmx">
+    <EntityDeploy Include="GameModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Model1.Designer.cs</LastGenOutput>
+      <LastGenOutput>GameModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <None Include="Model1.edmx.diagram">
-      <DependentUpon>Model1.edmx</DependentUpon>
+    <None Include="GameModel.edmx.diagram">
+      <DependentUpon>GameModel.edmx</DependentUpon>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
@@ -128,15 +111,15 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Model1.Context.tt">
+    <Content Include="GameModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Model1.edmx</DependentUpon>
-      <LastGenOutput>Model1.Context.cs</LastGenOutput>
+      <DependentUpon>GameModel.edmx</DependentUpon>
+      <LastGenOutput>GameModel.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="Model1.tt">
+    <Content Include="GameModel.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Model1.edmx</DependentUpon>
-      <LastGenOutput>Model1.cs</LastGenOutput>
+      <DependentUpon>GameModel.edmx</DependentUpon>
+      <LastGenOutput>GameModel.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

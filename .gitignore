@@ -11,3 +11,6 @@ TurnBasedGameAPI/GameEF/bin
 TurnBasedGameAPI/GameEF/obj
 TurnBasedGameAPI/TurnBasedGameAPI/obj/
 TurnBasedGameAPI/TurnBasedGameAPI.Tests/obj/
+*.cache
+TurnBasedGameAPI/TurnBasedGameAPI.Tests/bin/
+TurnBasedGameAPI/TurnBasedGameAPI/bin/
