@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameEF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,7 +9,7 @@ using GameEF;
 
 namespace TurnBasedGameAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [RoutePrefix("api/Game")]
     public class GameController : ApiController
     {
@@ -82,19 +83,34 @@ namespace TurnBasedGameAPI.Controllers
         /// <summary>
         /// Retrieves a list of games the user is or was a player in.
         /// </summary>
+        /// <param name="gameStatus">The value of the gamestatus to filter for, default is -1 for ignore</param>
         /// <returns>A list of Game objects.</returns>
         [HttpGet]
         [Route("MyGames", Name = "Get My Games")]
-        public IHttpActionResult GetMyGames() //(GameStatus)
+        public IHttpActionResult GetMyGames(int gameStatus = -1) // string? Gamestatus to check for active vs inactive games
         {
-            try
+            using (var db = new GameEntities())
             {
-                //var myGames = db.games.where(GameStatus == active)
-                return Ok("Game Controller GetMyGames API Call");
-            }
-            catch (Exception e)
-            {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error retrieving the list of games. Please inform the development team.");
+                try
+                {
+                    IQueryable<Game> myGames = db.GameUsers
+                        .Where(gu => gu.UserID == User.Identity.Name)
+                        .Select(g => g.Game);
+                    if (gameStatus != -1)
+                    {
+                        myGames = myGames.Where(x => x.Status == gameStatus);
+                    }
+
+                    return Ok(myGames.ToList());
+                }
+                catch (InvalidOperationException e)//User does not exist
+                {
+                    return NotFound();
+                }
+                catch (Exception e)
+                {
+                    return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error retrieving the list of games. Please inform the development team.");
+                }
             }
         }
 
