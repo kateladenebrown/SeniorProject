@@ -16,6 +16,8 @@ using Microsoft.Owin.Security.OAuth;
 using TurnBasedGameAPI.Models;
 using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
+using GameEF;
+using System.Linq;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -48,6 +50,54 @@ namespace TurnBasedGameAPI.Controllers
                 _userManager = value;
             }
         }
+
+        // DELETE: api/User/Delete
+        // coded by Stephen 2/7/18
+        /// <summary>
+        /// Deactivates the current users account.
+        /// </summary>
+        /// <returns>A message indicating that the account was successfully deactivated, or an error otherwise.</returns>
+        [HttpDelete]
+        [Route("Delete", Name = "Delete User Account")]
+        public IHttpActionResult deleteUser(int id)
+        {
+            // tell database to toggle active to false on user matching 'id'
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    db.Users.Single(x => x.ID == id).Active = false; // set active to false
+                    try { db.SaveChanges(); }
+                    catch (Exception e ) { return Content(System.Net.HttpStatusCode.ExpectationFailed, "Failure to delete user, data base save failed. "); }
+                }
+                return Ok();
+            }
+            catch (Exception e)
+            { return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error while attempting to deactive the account. Please inform the development team."); }
+        }
+
+        // DETAILS: api/User/Details
+        // coded by Stephen 2/7/18
+        /// <summary>
+        /// Gets the Users personal information.
+        /// </summary>
+        /// <returns> The Users personal details in 'UserDetailsModel' type object.</returns>
+        //[HttpDelete] copied from delete. please update this code 
+        [Route("Details", Name = "Get Personal Details")]
+        public IHttpActionResult GetPeronalDetails(int id)
+        {
+            using (var db = new GameEntities() )
+            {
+                try
+                {
+                    User u = db.Users.Single(x => x.ID == id);
+                    UserDetailsModel holder = new UserDetailsModel(u.FirstName, u.LastName, u.Username, u.Email);
+                    return Ok(holder);
+                } // end try 
+                catch (Exception e){ return Content(System.Net.HttpStatusCode.NotFound, "No record of that player was found.");  }
+            } // end using    
+        } // end GetPersonalDetails
+
 
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
 
@@ -371,6 +421,41 @@ namespace TurnBasedGameAPI.Controllers
                 return GetErrorResult(result); 
             }
             return Ok();
+        }
+
+        // GET: api/Account/{id}
+        // @Michael Case, 1/23/18
+        /// <summary>
+        /// Retrieve's the publicly visible information for a single user.
+        /// </summary>
+        /// <param name="id">The ID for the user whose details should be returned.</param>
+        /// <returns>A single User object (with only the publicly visible fields populated.</returns>
+        [HttpGet]
+        [Route("{id}", Name = "Get User By ID")]
+        public IHttpActionResult GetByUserID(int id)
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    // Populates and returns a user view model
+                    AspNetUser user = db.AspNetUsers.Single(u => u.Id.Equals(id));
+                    UserViewModel uViewModel = new UserViewModel(user);
+
+                    return Ok(uViewModel);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error attempting to retrieve the user details. Please inform the development team.");
+            }
+            catch (InvalidOperationException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error attempting to retrieve the user details. Please inform the development team.");
+
+                // -Cameron: NotFound is great to use, but should not be in the outer-most catch block; it should be returned if the database doesn't contain an entry with the ID specified.
+                //return NotFound();
+            }
         }
 
         protected override void Dispose(bool disposing)

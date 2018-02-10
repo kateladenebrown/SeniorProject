@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
+using GameEF;
 //using System.Web.Mvc;
 
 namespace TurnBasedGameAPI.Controllers
@@ -13,7 +14,7 @@ namespace TurnBasedGameAPI.Controllers
     public class GameController : ApiController
     {
         // POST: api/Game/Create
-        // Coded by Stephen 1/24/18
+        // Coded by Stephen 2/7/18
         /// <summary>
         /// Starts a new game instance with the caller and listed users as players.
         /// </summary>
@@ -21,22 +22,61 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>A message indicating that the game was created successfully, or an error otherwise.</returns>
         [HttpPost]
         [Route("Create", Name = "Create New Game")]
-        public IHttpActionResult gameCreate(List<string> players)
+        public IHttpActionResult GameCreate(List<string> players)
         {
-            try
+            using (var db = new GameEntities())
             {
-                /* not sure what all we are going to need here just yet.
-                 */
+                try
+                {
+                    Game g = new Game(); // create a game
+                    g.Start = System.DateTime.Now; // set start time to now
+                    g.Status = 1; // set to pending status ( 1 )
+                    db.Games.Add(g); // add g to Games to generate the Game.ID
 
-                return Ok("Game Controller gameCreate API Call");
-            }
-            catch (Exception e)
-            {
+                    foreach ( string name in players)
+                    {
+                        try
+                        {
+                            GameUser usr = new GameUser(); // make a GameUser holder
+                            usr.UserID = db.Users.Single(x => x.Username == name).ID; // find the single ID, where the UserName is the current name
+                            usr.GameID = g.ID; 
+                            usr.Status = 1; // set each player to pending status
+                            g.GameUsers.Add(usr); // add each GameUser iteration to the game instance
+                        }
+                        catch(Exception e) { return Content( System.Net.HttpStatusCode.BadRequest ,"Failure to create GameUser."); }
+                    } // end foreach
 
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
-            }
+                    // actions to make initiating user active and added to list of players
+                    User tmp = new User();
+                    tmp = db.Users.Single(x => x.Username == User.Identity.Name);
+                    players.Add(tmp.Username); // adds current player to list of players
+                    GameUser u = db.GameUsers.Single(x => x.UserID == tmp.ID );
+                    u.UserID = tmp.ID;
+                    u.GameID = g.ID;
+                    u.Status = 2; // 2 is active
+                    g.GameUsers.Add(u);
 
-        }
+                    try { db.Games.Add(g); }
+                    catch (Exception e) { return Content(System.Net.HttpStatusCode.NotModified, "Failure to add Game to Database."); }
+
+                    try { db.SaveChanges(); } // save changes to db 
+                    catch(Exception e) { return Content(System.Net.HttpStatusCode.InternalServerError, "Server failed to save changes. "); }
+
+                    return Ok("Everything went shwimminminingly");
+                } 
+                catch (Exception e)
+                { return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team."); } // end catch1
+            } // end using 
+        } // end GameCreate 
+
+        /* testing notes for GameCreate: 
+         * Method requires a List<string>. 
+         * Send an empty list or one that has a 0 count.
+         * Send List<string>  
+         * Send List<string> where one userId is invalid $$ no catch for this specifically yet
+         */
+
+
 
         // GET: api/Game/MyGames
         // -Written by Garrick 1/23/18
@@ -86,12 +126,14 @@ namespace TurnBasedGameAPI.Controllers
         [Route("GameHistory", Name = "Get Game History")]
         public IHttpActionResult GetGameHistory(int id)
         {
-            try
+            using (var db = new GameEntities())
             {
-                // Need more details of database implementation, but
-                // hopefully this is similar to the actual implementation
+                try
+                {
+                    List<GameState> myGames = db.Games.Single(g => g.ID == id).GameStates.ToList();
 
-                // -Cameron: This looks good. I just commented out pieces for the moment so that the solution would build.
+                    return Ok(myGames); // return something for the time being
+                }
 
                 //using (var db = new Game.ENTITIES())
                 //{
@@ -104,6 +146,27 @@ namespace TurnBasedGameAPI.Controllers
             catch (Exception e)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
+            }
+        }
+
+        // GET: api/Game
+        // >Tyler Lancaster, 1/25/18
+        /// <summary>
+        /// Returns the latest game record for the passed-in GameID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IHttpActionResult GetGame(GameID id)
+        {
+            try
+            {         
+                var game = db.games.where(Games.id => id && GameStates.timestamp => mostRecent);
+
+                return Ok("Game Controller GetGame API Call");
+            }
+            catch (Exception e)
+            {
+                return Exception("GetGame call failed");
             }
         }
     }

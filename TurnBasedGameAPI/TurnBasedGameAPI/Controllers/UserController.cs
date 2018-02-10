@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
+using GameEF;
 //using System.Web.Mvc;
 
 namespace TurnBasedGameAPI.Controllers
@@ -32,32 +33,8 @@ namespace TurnBasedGameAPI.Controllers
             }
         }
 
-        // GET: api/User/GetPersonalDetails
-        // Coded by Stephen 1/24/18
-        /// <summary>
-        /// Retrieves personal details for the currently logged in user.
-        /// </summary>
-        /// <returns>A single User object.</returns>
-        [HttpGet]
-        [Route("GetPersonalDetails", Name = "Get User Personal Details")]
-        public IHttpActionResult GetPersonalDetails()
-        {
-            // ask database for personal details from tables matching the user id
-            // returns the data in ?? specific format ?? as object ?? 
-            try
-            {
-                // Obj holder = db.User.where(UserId => id) ;
+       
 
-                // format or return 
-                return Ok("Game Controller getPersonalDetails API Call");
-            }
-            catch (Exception e)
-            {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server was unable to retrieve your personal details. Please inform the development team.");
-            }
-
-        }
-        //
         //POST: api/User/Create
         // -Written by Garrick 1/23/18
         /// <summary>
@@ -139,31 +116,46 @@ namespace TurnBasedGameAPI.Controllers
             }
         }
 
-        // DELETE: api/User/Delete
-        // coded by Stephen 1/24/18
+        
+
+        // GET: api/User/GetActive
+        // >Tyler Lancaster, 1/25/18
         /// <summary>
-        /// Deactivates the current users account.
+        /// Returns all active users' usernames
         /// </summary>
-        /// <returns>A message indicating that the account was successfully deactivated, or an error otherwise.</returns>
-        [HttpDelete]
-        [Route("Delete", Name = "Delete User Account")]
-        public IHttpActionResult deleteUser(int id)
+        /// <returns></returns>
+        public IHttpActionResult GetActive()
         {
-            // tell database to toggle active to false on user matching 'id'
             try
             {
-                // db is the database. varify path to active field
-
-                // db.User.active.where(UserId => id) = false ;
-
-                return Ok("Game Controller deleteUser API Call");
+                //var activeUsers = db.user.where(active => true);
             }
             catch (Exception e)
             {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error while attempting to deactive the account. Please inform the development team.");
+                throw new Exception("Error in GetActive API call");
             }
+            return activeUserList;
         }
 
-
+        // PUT: api/User
+        // >Tyler Lancaster, 1/25/18
+        /// <summary>
+        /// Updates user's publicly-available information
+        /// </summary>
+        /// <returns></returns>
+        public IHttpActionResult UpdatePersonalDetails(User user)
+        {
+            try
+            {
+                //check user authentication or assume user has access?
+                //update username
+                //What other details are available for change?
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in UpdatePersonalDetails API call");
+            }
+            return Ok("User Controller UpdatePersonalDetails API Call");
+        }
     }
 }
