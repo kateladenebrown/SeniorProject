@@ -9,7 +9,7 @@ using GameEF;
 
 namespace TurnBasedGameAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [RoutePrefix("api/Game")]
     public class GameController : ApiController
     {
@@ -19,61 +19,61 @@ namespace TurnBasedGameAPI.Controllers
         /// Starts a new game instance with the caller and listed users as players.
         /// </summary>
         /// <param name="players">A list of usernames specifying who should be a player.</param>
-        /// <returns>A message indicating that the game was created successfully, or an error otherwise.</returns>
+        /// <returns>Returns the newly created game's ID if the game was created successfully, or an error otherwise.</returns>
         [HttpPost]
         [Route("Create", Name = "Create New Game")]
-        public IHttpActionResult GameCreate(List<string> players)
+        public IHttpActionResult CreateGame(List<string> players)
         {
-            using (var db = new GameEntities())
+            try
             {
-                try
+                using (var db = new GameEntities())
                 {
-                    Game g = new Game(); // create a game
-                    g.Start = System.DateTime.Now; // set start time to now
-                    g.Status = 1; // set to pending status ( 1 )
-                    db.Games.Add(g); // add g to Games to generate the Game.ID
+                    //Add the user who made the call to the list of game participants.
+                    players.Add(User.Identity.Name);
 
-                    foreach ( string name in players)
+                    //Get the ID and username for each participant.
+                    var participants = db.AspNetUsers.Where(x => players.Contains(x.UserName)).Select(x => new { x.Id, x.UserName }).ToList();
+
+                    //Create a list of GameUser objects using the participants. The user who made the call will have a status of 2 (active), while all others will be 1 (pending).
+                    var newGameUsers = participants.Select(x => new GameUser
                     {
-                        try
-                        {
-                            GameUser usr = new GameUser(); // make a GameUser holder
-                            usr.UserID = db.AspNetUsers.Single(x => x.UserName == name).Id; // find the single ID, where the UserName is the current name
-                            usr.GameID = g.ID; 
-                            usr.Status = 1; // set each player to pending status
-                            g.GameUsers.Add(usr); // add each GameUser iteration to the game instance
-                        }
-                        catch(Exception e) { return Content( System.Net.HttpStatusCode.BadRequest ,"Failure to create GameUser."); }
-                    } // end foreach
+                        UserID = x.Id,
+                        Status = (x.UserName == User.Identity.Name) ? 2 : 1
+                    }).ToList();
 
-                    // actions to make initiating user active and added to list of players
-                    AspNetUser tmp = new AspNetUser();
-                    tmp = db.AspNetUsers.Single(x => x.UserName == User.Identity.Name);
-                    players.Add(tmp.UserName); // adds current player to list of players
-                    GameUser u = db.GameUsers.Single(x => x.UserID == tmp.Id );
-                    u.UserID = tmp.Id;
-                    u.GameID = g.ID;
-                    u.Status = 2; // 2 is active
-                    g.GameUsers.Add(u);
+                    //Check that all game participants have accounts (and were found) in the database. If not, return an error.
+                    if (newGameUsers.Count() != players.Count())
+                    {
+                        return Content(System.Net.HttpStatusCode.NotFound, "One or more of the game participants were not found in the database.");
+                    }
 
-                    try { db.Games.Add(g); }
-                    catch (Exception e) { return Content(System.Net.HttpStatusCode.NotModified, "Failure to add Game to Database."); }
+                    Game g = new Game()
+                    {
+                        Start = DateTime.Now,
+                        GameUsers = newGameUsers
+                    };
 
-                    try { db.SaveChanges(); } // save changes to db 
-                    catch(Exception e) { return Content(System.Net.HttpStatusCode.InternalServerError, "Server failed to save changes. "); }
+                    db.Games.Add(g);
+                    db.SaveChanges();
 
-                    return Ok("Everything went shwimminminingly");
-                } 
-                catch (Exception e)
-                { return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team."); } // end catch1
-            } // end using 
-        } // end GameCreate 
+                    return Ok(g.ID);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The database encountered an error while attempting to retrieve information about the participants.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
+            }
+        }
 
         /* testing notes for GameCreate: 
          * Method requires a List<string>. 
          * Send an empty list or one that has a 0 count.
          * Send List<string>  
-         * Send List<string> where one userId is invalid $$ no catch for this specifically yet
+         * Send List<string> where one userId is invalid
          */
 
 
@@ -83,34 +83,40 @@ namespace TurnBasedGameAPI.Controllers
         /// <summary>
         /// Retrieves a list of games the user is or was a player in.
         /// </summary>
-        /// <param name="gameStatus">The value of the gamestatus to filter for, default is -1 for ignore</param>
+        /// <param name="gameStatus">The ID of the status to filter by. (If no ID is provided, all records are returned.)</param>
         /// <returns>A list of Game objects.</returns>
         [HttpGet]
         [Route("MyGames", Name = "Get My Games")]
         public IHttpActionResult GetMyGames(int gameStatus = -1) // string? Gamestatus to check for active vs inactive games
         {
-            using (var db = new GameEntities())
+            try
             {
-                try
+                using (var db = new GameEntities())
                 {
-                    IQueryable<Game> myGames = db.GameUsers
-                        .Where(gu => gu.UserID == User.Identity.Name)
-                        .Select(g => g.Game);
+                    IQueryable<Game> myGames = db.GameUsers.Where(gu => gu.AspNetUser.UserName == User.Identity.Name).Select(g => g.Game);
+
                     if (gameStatus != -1)
                     {
                         myGames = myGames.Where(x => x.Status == gameStatus);
                     }
 
+                    ////May not be neccessary:
+                    ////In the case that the user exists but does not have any games, return OK with an empty result.
+                    //if (!myGames.Any())
+                    //{
+                    //    return Ok();
+                    //}
+
                     return Ok(myGames.ToList());
                 }
-                catch (InvalidOperationException e)//User does not exist
-                {
-                    return NotFound();
-                }
-                catch (Exception e)
-                {
-                    return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error retrieving the list of games. Please inform the development team.");
-                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "The user who made the call could not be found in the database.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error retrieving the list of games. Please inform the development team.");
             }
         }
 
@@ -118,7 +124,6 @@ namespace TurnBasedGameAPI.Controllers
         // @Michael Case, 1/23/18
         /// <summary>
         /// Retrieves all game records related to a specific game.
-        /// GameID
         /// </summary>
         /// <param name="id">The ID of the game whose history should be returned.</param>
         /// <returns>A list of GameState objects.</returns>
@@ -126,51 +131,61 @@ namespace TurnBasedGameAPI.Controllers
         [Route("GameHistory", Name = "Get Game History")]
         public IHttpActionResult GetGameHistory(int id)
         {
-            using (var db = new GameEntities())
+            try
             {
-                try
+                using (var db = new GameEntities())
                 {
                     List<GameState> myGames = db.Games.Single(g => g.ID == id).GameStates.ToList();
 
-                    return Ok(myGames); // return something for the time being
+                    return Ok(myGames);
                 }
-                catch (Exception e)
-                {
-                    return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
-                }
-                //using (var db = new Game.ENTITIES())
-                //{
-                //    var gameHistory = db.games.where(gameHistory => GetMyGames.id);
-                //    return Ok("Game Controller GetGameHistory API Call");
-                //}
-
-                //return Ok("Game Controller GetGameHistory API Call");
             }
-            
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "No game with the ID specified was found in the database.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
+            }
         }
 
         // GET: api/Game
         // >Tyler Lancaster, 1/25/18
         /// <summary>
-        /// Returns the latest game record for the passed-in GameID
+        /// Retrieves the latest game state for the game whose ID was provided.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">The ID of the game whose latest state should be returned.</param>
+        /// <returns>The latest GameState object for the specified game. If no game states exist, the response will be empty.</returns>
         public IHttpActionResult GetGame(int id)
         {
-            using (var db = new GameEntities())
+            try
             {
-                try
+                using (var db = new GameEntities())
                 {
                     //Note: The database is ordered by timestampt descending, we can use the first record.
-                    GameState game = db.GameStates.First(gs => gs.GameID == id);
 
-                    return Ok("Game Controller GetGame API Call");
+                    //Cameron: ^This is not true. We have an index which makes sorting by timestamp descending extremely fast,
+                    //  but that does not mean it is sorting by timestamp descending by default.
+
+
+                    //Get the list of game states for the id provided and order them by descending.
+                    IQueryable<GameState> gameStatesDesc = db.GameStates.Where(x => x.GameID == id).OrderByDescending(x => x.TimeStamp);
+
+                    //If game states were found, return the latest one. Otherwise, return an empty list.
+                    if (gameStatesDesc.Any())
+                    {
+                        return Ok(gameStatesDesc.First());
+                    }
+                    else
+                    {
+                        return Ok();
+                    }
                 }
-                catch (Exception e)
-                {
-                    return Content(System.Net.HttpStatusCode.InternalServerError, "GetGame call failed");
-                }
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the latest game state. Please inform the development team.");
             }
         }
     }

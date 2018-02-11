@@ -17,7 +17,7 @@ namespace GameEF
         public int ID { get; set; }
         public string GameState1 { get; set; }
         public System.DateTime TimeStamp { get; set; }
-        public Nullable<int> GameID { get; set; }
+        public int GameID { get; set; }
     
         public virtual Game Game { get; set; }
     }

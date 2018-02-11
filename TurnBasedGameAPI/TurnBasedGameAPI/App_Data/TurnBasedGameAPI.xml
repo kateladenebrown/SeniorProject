@@ -481,53 +481,57 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
-        <member name="M:TurnBasedGameAPI.Controllers.AccountController.deleteUser(System.String)">
+        <member name="T:TurnBasedGameAPI.Controllers.AccountController">
             <summary>
-            Deactivates the current users account.
+            Handles all calls related to creating, selecting, editing, and deleting user accounts.
+            </summary>
+        </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.DeleteUser">
+            <summary>
+            Deactivates the current user's account.
             </summary>
             <returns>A message indicating that the account was successfully deactivated, or an error otherwise.</returns>
         </member>
-        <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetPeronalDetails(System.String)">
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetPersonalDetails">
             <summary>
-            Gets the Users personal information.
+            Gets the user's personal information.
             </summary>
             <returns> The Users personal details in 'UserDetailsModel' type object.</returns>
         </member>
-        <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetByUserID(System.Int32)">
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetByUserID(System.String)">
             <summary>
             Retrieve's the publicly visible information for a single user.
             </summary>
             <param name="id">The ID for the user whose details should be returned.</param>
             <returns>A single User object (with only the publicly visible fields populated.</returns>
         </member>
-        <member name="M:TurnBasedGameAPI.Controllers.GameController.GameCreate(System.Collections.Generic.List{System.String})">
+        <member name="M:TurnBasedGameAPI.Controllers.GameController.CreateGame(System.Collections.Generic.List{System.String})">
             <summary>
             Starts a new game instance with the caller and listed users as players.
             </summary>
             <param name="players">A list of usernames specifying who should be a player.</param>
-            <returns>A message indicating that the game was created successfully, or an error otherwise.</returns>
+            <returns>Returns the newly created game's ID if the game was created successfully, or an error otherwise.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.GetMyGames(System.Int32)">
             <summary>
             Retrieves a list of games the user is or was a player in.
             </summary>
-            <param name="gameStatus">The value of the gamestatus to filter for, default is -1 for ignore</param>
+            <param name="gameStatus">The ID of the status to filter by. (If no ID is provided, all records are returned.)</param>
             <returns>A list of Game objects.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.GetGameHistory(System.Int32)">
             <summary>
             Retrieves all game records related to a specific game.
-            GameID
             </summary>
             <param name="id">The ID of the game whose history should be returned.</param>
             <returns>A list of GameState objects.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.GetGame(System.Int32)">
             <summary>
-            Returns the latest game record for the passed-in GameID
+            Retrieves the latest game state for the game whose ID was provided.
             </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="id">The ID of the game whose latest state should be returned.</param>
+            <returns>The latest GameState object for the specified game. If no game states exist, the response will be empty.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.UserController.GetAll">
             <summary>
@@ -569,6 +573,14 @@
             Updates user's publicly-available information
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:TurnBasedGameAPI.ViewModels.UserDetailsViewModel.#ctor(GameEF.AspNetUser)">
+            <summary>
+            A User View Model of the AspNetUser. Returns an object with the public and private fields
+            of the user of interest, but without the protected fields like password hash.
+            </summary>
+            <param name="u">AspNetUser in which the public fields will be used to return
+            a user view model</param>
         </member>
         <member name="M:GameEF.UserViewModel.#ctor(GameEF.AspNetUser)">
             <summary>

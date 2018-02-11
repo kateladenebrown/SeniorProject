@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="gameDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="gameDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AspNetRoles">
           <Key>
             <PropertyRef Name="Id" />
@@ -66,7 +66,7 @@
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Start" Type="datetime" Nullable="false" />
           <Property Name="End" Type="datetime" />
-          <Property Name="Status" Type="int" />
+          <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="GameStates">
           <Key>
@@ -75,7 +75,7 @@
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="GameState" Type="nvarchar(max)" Nullable="false" />
           <Property Name="TimeStamp" Type="datetime" Nullable="false" />
-          <Property Name="GameID" Type="int" />
+          <Property Name="GameID" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="GameStatusLookup">
           <Key>
@@ -89,9 +89,9 @@
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="GameID" Type="int" />
-          <Property Name="Status" Type="int" />
-          <Property Name="UserID" Type="nvarchar" MaxLength="128" />
+          <Property Name="GameID" Type="int" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="UserID" Type="nvarchar" MaxLength="128" Nullable="false" />
         </EntityType>
         <EntityType Name="UserStatusLookup">
           <Key>
@@ -157,7 +157,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Game_GameStatusLookup">
-          <End Role="GameStatusLookup" Type="Self.GameStatusLookup" Multiplicity="0..1" />
+          <End Role="GameStatusLookup" Type="Self.GameStatusLookup" Multiplicity="1" />
           <End Role="Games" Type="Self.Games" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="GameStatusLookup">
@@ -169,7 +169,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_GameState_Game">
-          <End Role="Games" Type="Self.Games" Multiplicity="0..1" />
+          <End Role="Games" Type="Self.Games" Multiplicity="1" />
           <End Role="GameStates" Type="Self.GameStates" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Games">
@@ -181,7 +181,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_GameUser_AspNetUsers">
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="0..1" />
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
           <End Role="GameUsers" Type="Self.GameUsers" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AspNetUsers">
@@ -193,7 +193,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_GameUser_Game">
-          <End Role="Games" Type="Self.Games" Multiplicity="0..1" />
+          <End Role="Games" Type="Self.Games" Multiplicity="1" />
           <End Role="GameUsers" Type="Self.GameUsers" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Games">
@@ -205,7 +205,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_GameUser_UserStatusLookup">
-          <End Role="UserStatusLookup" Type="Self.UserStatusLookup" Multiplicity="0..1" />
+          <End Role="UserStatusLookup" Type="Self.UserStatusLookup" Multiplicity="1" />
           <End Role="GameUsers" Type="Self.GameUsers" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="UserStatusLookup">
@@ -264,11 +264,10 @@
             <End Role="GameUsers" EntitySet="GameUsers" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="gameDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="GameModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="AspNetRole">
           <Key>
             <PropertyRef Name="Id" />
@@ -329,8 +328,8 @@
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Start" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="End" Type="DateTime" Precision="3" />
-          <Property Name="Status" Type="Int32" />
-          <NavigationProperty Name="GameStatusLookup" Relationship="Self.FK_Game_GameStatusLookup" FromRole="Games" ToRole="GameStatusLookup" />
+          <Property Name="Status" Type="Int32" Nullable="false" DefaultValue="1" />
+          <NavigationProperty Name="GameStatusLookup" Relationship="GameModel.FK_Game_GameStatusLookup" FromRole="Games" ToRole="GameStatusLookup" />
           <NavigationProperty Name="GameStates" Relationship="Self.FK_GameState_Game" FromRole="Games" ToRole="GameStates" />
           <NavigationProperty Name="GameUsers" Relationship="Self.FK_GameUser_Game" FromRole="Games" ToRole="GameUsers" />
         </EntityType>
@@ -341,7 +340,7 @@
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="GameState1" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TimeStamp" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="GameID" Type="Int32" />
+          <Property Name="GameID" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Game" Relationship="Self.FK_GameState_Game" FromRole="GameStates" ToRole="Games" />
         </EntityType>
         <EntityType Name="GameStatusLookup">
@@ -357,9 +356,9 @@
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="GameID" Type="Int32" />
-          <Property Name="Status" Type="Int32" />
-          <Property Name="UserID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="GameID" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" DefaultValue="1" />
+          <Property Name="UserID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="AspNetUser" Relationship="Self.FK_GameUser_AspNetUsers" FromRole="GameUsers" ToRole="AspNetUsers" />
           <NavigationProperty Name="Game" Relationship="Self.FK_GameUser_Game" FromRole="GameUsers" ToRole="Games" />
           <NavigationProperty Name="UserStatusLookup" Relationship="Self.FK_GameUser_UserStatusLookup" FromRole="GameUsers" ToRole="UserStatusLookup" />
@@ -401,7 +400,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_GameUser_AspNetUsers">
-          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="0..1" />
+          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1" />
           <End Role="GameUsers" Type="Self.GameUser" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="AspNetUsers">
@@ -413,7 +412,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Game_GameStatusLookup">
-          <End Role="GameStatusLookup" Type="Self.GameStatusLookup" Multiplicity="0..1" />
+          <End Role="GameStatusLookup" Type="Self.GameStatusLookup" Multiplicity="1" />
           <End Role="Games" Type="Self.Game" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="GameStatusLookup">
@@ -425,7 +424,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_GameState_Game">
-          <End Role="Games" Type="Self.Game" Multiplicity="0..1" />
+          <End Role="Games" Type="Self.Game" Multiplicity="1" />
           <End Role="GameStates" Type="Self.GameState" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Games">
@@ -437,7 +436,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_GameUser_Game">
-          <End Role="Games" Type="Self.Game" Multiplicity="0..1" />
+          <End Role="Games" Type="Self.Game" Multiplicity="1" />
           <End Role="GameUsers" Type="Self.GameUser" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Games">
@@ -449,7 +448,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_GameUser_UserStatusLookup">
-          <End Role="UserStatusLookup" Type="Self.UserStatusLookup" Multiplicity="0..1" />
+          <End Role="UserStatusLookup" Type="Self.UserStatusLookup" Multiplicity="1" />
           <End Role="GameUsers" Type="Self.GameUser" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="UserStatusLookup">
@@ -464,7 +463,7 @@
           <End Role="AspNetRoles" Type="Self.AspNetRole" Multiplicity="*" />
           <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="*" />
         </Association>
-        <EntityContainer Name="gameDBEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="GameEntities" annotation:LazyLoadingEnabled="false">
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRole" />
           <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaim" />
           <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogin" />
@@ -512,9 +511,9 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="gameDBModelStoreContainer" CdmEntityContainer="gameDBEntities">
+        <EntityContainerMapping StorageEntityContainer="gameDBModelStoreContainer" CdmEntityContainer="GameEntities">
           <EntitySetMapping Name="AspNetRoles">
-            <EntityTypeMapping TypeName="gameDBModel.AspNetRole">
+            <EntityTypeMapping TypeName="GameModel.AspNetRole">
               <MappingFragment StoreEntitySet="AspNetRoles">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
@@ -522,7 +521,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="AspNetUserClaims">
-            <EntityTypeMapping TypeName="gameDBModel.AspNetUserClaim">
+            <EntityTypeMapping TypeName="GameModel.AspNetUserClaim">
               <MappingFragment StoreEntitySet="AspNetUserClaims">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
@@ -532,7 +531,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="AspNetUserLogins">
-            <EntityTypeMapping TypeName="gameDBModel.AspNetUserLogin">
+            <EntityTypeMapping TypeName="GameModel.AspNetUserLogin">
               <MappingFragment StoreEntitySet="AspNetUserLogins">
                 <ScalarProperty Name="LoginProvider" ColumnName="LoginProvider" />
                 <ScalarProperty Name="ProviderKey" ColumnName="ProviderKey" />
@@ -541,7 +540,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="AspNetUsers">
-            <EntityTypeMapping TypeName="gameDBModel.AspNetUser">
+            <EntityTypeMapping TypeName="GameModel.AspNetUser">
               <MappingFragment StoreEntitySet="AspNetUsers">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
@@ -562,7 +561,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Games">
-            <EntityTypeMapping TypeName="gameDBModel.Game">
+            <EntityTypeMapping TypeName="GameModel.Game">
               <MappingFragment StoreEntitySet="Games">
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Start" ColumnName="Start" />
@@ -572,7 +571,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="GameStates">
-            <EntityTypeMapping TypeName="gameDBModel.GameState">
+            <EntityTypeMapping TypeName="GameModel.GameState">
               <MappingFragment StoreEntitySet="GameStates">
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="GameState1" ColumnName="GameState" />
@@ -582,7 +581,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="GameStatusLookups">
-            <EntityTypeMapping TypeName="gameDBModel.GameStatusLookup">
+            <EntityTypeMapping TypeName="GameModel.GameStatusLookup">
               <MappingFragment StoreEntitySet="GameStatusLookup">
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
@@ -590,7 +589,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="GameUsers">
-            <EntityTypeMapping TypeName="gameDBModel.GameUser">
+            <EntityTypeMapping TypeName="GameModel.GameUser">
               <MappingFragment StoreEntitySet="GameUsers">
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="GameID" ColumnName="GameID" />
@@ -600,14 +599,14 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="UserStatusLookups">
-            <EntityTypeMapping TypeName="gameDBModel.UserStatusLookup">
+            <EntityTypeMapping TypeName="GameModel.UserStatusLookup">
               <MappingFragment StoreEntitySet="UserStatusLookup">
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="AspNetUserRoles" TypeName="gameDBModel.AspNetUserRoles" StoreEntitySet="AspNetUserRoles">
+          <AssociationSetMapping Name="AspNetUserRoles" TypeName="GameModel.AspNetUserRoles" StoreEntitySet="AspNetUserRoles">
             <EndProperty Name="AspNetRoles">
               <ScalarProperty Name="Id" ColumnName="RoleId" />
             </EndProperty>
