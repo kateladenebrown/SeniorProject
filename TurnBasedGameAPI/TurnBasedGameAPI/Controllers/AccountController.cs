@@ -17,9 +17,15 @@ using System.Web.Http;
 using TurnBasedGameAPI.Models;
 using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
+using GameEF;
+using System.Linq;
+using TurnBasedGameAPI.ViewModels;
 
 namespace TurnBasedGameAPI.Controllers
 {
+    /// <summary>
+    /// Handles all calls related to creating, selecting, editing, and deleting user accounts.
+    /// </summary>
     [Authorize]
     [RoutePrefix("api/Account")]
     public class AccountController : ApiController
@@ -46,6 +52,66 @@ namespace TurnBasedGameAPI.Controllers
                 _userManager = value;
             }
         }
+
+        // DELETE: api/Account/Delete
+        // coded by Stephen 2/7/18
+        /// <summary>
+        /// Deactivates the current user's account.
+        /// </summary>
+        /// <returns>A message indicating that the account was successfully deactivated, or an error otherwise.</returns>
+        [HttpDelete]
+        [Route("Delete", Name = "Delete User Account")]
+        public IHttpActionResult DeleteUser()
+        {
+            // tell database to toggle active to false on user matching 'id'
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    db.AspNetUsers.Single(x => x.Id == User.Identity.GetUserId()).Active = false; // set active to false
+                    db.SaveChanges();
+                }
+                return Ok("The user account has been successfully deactivated.");
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The user account could not be deleted because it does not exist in the database.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error while attempting to deactive the account. Please inform the development team.");
+            }
+        }
+
+        // DETAILS: api/Account/Details
+        // coded by Stephen 2/7/18
+        /// <summary>
+        /// Gets the user's personal information.
+        /// </summary>
+        /// <returns> The Users personal details in 'UserDetailsModel' type object.</returns>
+        [HttpGet]
+        [Route("Details", Name = "Get Personal Details")]
+        public IHttpActionResult GetPersonalDetails()
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    AspNetUser u = db.AspNetUsers.Single(x => x.UserName == User.Identity.Name);
+                    UserDetailsViewModel holder = new UserDetailsViewModel(u);
+                    return Ok(holder);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The user account could not be found in the database.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error while attempting to deactive the account. Please inform the development team.");
+            }
+        }
+
 
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
 
@@ -355,7 +421,13 @@ namespace TurnBasedGameAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
+            var user = new ApplicationUser()
+            {
+                UserName = model.Username,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName
+            };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 
@@ -398,6 +470,38 @@ namespace TurnBasedGameAPI.Controllers
                 return GetErrorResult(result);
             }
             return Ok();
+        }
+
+        // GET: api/Account/{id}
+        // @Michael Case, 1/23/18
+        /// <summary>
+        /// Retrieve's the publicly visible information for a single user.
+        /// </summary>
+        /// <param name="id">The ID for the user whose details should be returned.</param>
+        /// <returns>A single User object (with only the publicly visible fields populated.</returns>
+        [HttpGet]
+        [Route("{id}", Name = "Get User By ID")]
+        public IHttpActionResult GetByUserID(string id)
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    // Populates and returns a user view model
+                    AspNetUser user = db.AspNetUsers.Single(u => u.Id.Equals(id));
+                    UserViewModel uViewModel = new UserViewModel(user);
+
+                    return Ok(uViewModel);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "The user requested does not exist.");
+            }
+            catch (InvalidOperationException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error attempting to retrieve the user details. Please inform the development team.");
+            }
         }
 
         protected override void Dispose(bool disposing)
