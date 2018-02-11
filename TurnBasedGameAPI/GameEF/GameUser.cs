@@ -14,9 +14,15 @@ namespace GameEF
     
     public partial class GameUser
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public GameUser()
+        {
+            this.Status = 1;
+        }
+    
         public int ID { get; set; }
-        public Nullable<int> GameID { get; set; }
-        public Nullable<int> Status { get; set; }
+        public int GameID { get; set; }
+        public int Status { get; set; }
         public string UserID { get; set; }
     
         public virtual AspNetUser AspNetUser { get; set; }
