@@ -496,14 +496,27 @@
             <summary>
             Gets the user's personal information.
             </summary>
-            <returns> The Users personal details in 'UserDetailsModel' type object.</returns>
+            <returns> The Users personal details in 'UserDetailsViewModel' type object.</returns>
+        </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.ChangePassword(TurnBasedGameAPI.Models.ChangePasswordBindingModel)">
+            <summary>
+            Changes the password for the currently logged in user.
+            </summary>
+            <param name="model"></param>
+            <returns>An empty response with a 200 status code if the call was successful, or an error message otherwise.</returns>
+        </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetAll">
+            <summary>
+            Retrieves the list of active users.
+            </summary>
+            <returns>Returns a 200 status code with a list of users (providing only IDs and user names) if the call is successful, or an error message otherwise.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetByUserID(System.String)">
             <summary>
             Retrieve's the publicly visible information for a single user.
             </summary>
             <param name="id">The ID for the user whose details should be returned.</param>
-            <returns>A single User object (with only the publicly visible fields populated.</returns>
+            <returns>A single User object (with only the publicly visible fields populated).</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.CreateGame(System.Collections.Generic.List{System.String})">
             <summary>
@@ -533,46 +546,20 @@
             <param name="id">The ID of the game whose latest state should be returned.</param>
             <returns>The latest GameState object for the specified game. If no game states exist, the response will be empty.</returns>
         </member>
-        <member name="M:TurnBasedGameAPI.Controllers.UserController.GetAll">
+        <member name="P:TurnBasedGameAPI.Models.ChangePasswordBindingModel.OldPassword">
             <summary>
-            Retrieves a list of all active user's usernames.
+            The user's original password.
             </summary>
-            <returns>A list of usernames.</returns>
         </member>
-        <member name="M:TurnBasedGameAPI.Controllers.UserController.CreateUser">
+        <member name="P:TurnBasedGameAPI.Models.ChangePasswordBindingModel.NewPassword">
             <summary>
-            Creates a new user account with the specified details.
-            (Handles account reactivation as well.)
+            The user's new password.
             </summary>
-            <returns>A message indicating that the user was created/re-activated successfully, or an error otherwise.</returns>
         </member>
-        <member name="M:TurnBasedGameAPI.Controllers.UserController.GetByUserID(System.Int32)">
+        <member name="P:TurnBasedGameAPI.Models.ChangePasswordBindingModel.ConfirmPassword">
             <summary>
-            Retrieve's the publicly visible information for a single user.
+            Confirmation field for the new password.
             </summary>
-            <param name="id">The ID for the user whose details should be returned.</param>
-            <returns>A single User object (with only the publicly visible fields populated.</returns>
-        </member>
-        <member name="M:TurnBasedGameAPI.Controllers.UserController.UpdatePassword(System.String)">
-            <summary>
-            Updates a users password, while verifying that
-            the new password meets the minimum strength
-            requirements.
-            </summary>
-            <param name="password">The new password as a string.</param>
-            <returns>A message indicating that the password was updated successfully, or an error otherwise.</returns>
-        </member>
-        <member name="M:TurnBasedGameAPI.Controllers.UserController.GetActive">
-            <summary>
-            Returns all active users' usernames
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:TurnBasedGameAPI.Controllers.UserController.UpdatePersonalDetails(GameEF.AspNetUser)">
-            <summary>
-            Updates user's publicly-available information
-            </summary>
-            <returns></returns>
         </member>
         <member name="M:TurnBasedGameAPI.ViewModels.UserDetailsViewModel.#ctor(GameEF.AspNetUser)">
             <summary>

@@ -63,12 +63,11 @@ namespace TurnBasedGameAPI.Controllers
         [Route("Delete", Name = "Delete User Account")]
         public IHttpActionResult DeleteUser()
         {
-            // tell database to toggle active to false on user matching 'id'
             try
             {
                 using (var db = new GameEntities())
                 {
-                    db.AspNetUsers.Single(x => x.Id == User.Identity.GetUserId()).Active = false; // set active to false
+                    db.AspNetUsers.Single(x => x.UserName == User.Identity.Name).Active = false; // set active to false
                     db.SaveChanges();
                 }
                 return Ok("The user account has been successfully deactivated.");
@@ -88,7 +87,7 @@ namespace TurnBasedGameAPI.Controllers
         /// <summary>
         /// Gets the user's personal information.
         /// </summary>
-        /// <returns> The Users personal details in 'UserDetailsModel' type object.</returns>
+        /// <returns> The Users personal details in 'UserDetailsViewModel' type object.</returns>
         [HttpGet]
         [Route("Details", Name = "Get Personal Details")]
         public IHttpActionResult GetPersonalDetails()
@@ -112,23 +111,26 @@ namespace TurnBasedGameAPI.Controllers
             }
         }
 
-
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
 
-        // GET api/Account/UserInfo
-        [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
-        [Route("UserInfo")]
-        public UserInfoViewModel GetUserInfo()
-        {
-            ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
+        /*
+         * Cameron: This is the default action for retrieving user info provided by Microsoft. 
+         * Since we have our own (which returns just the information we want), this isn't needed.
+        */
+        //// GET api/Account/UserInfo
+        //[HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
+        //[Route("UserInfo")]
+        //public UserInfoViewModel GetUserInfo()
+        //{
+        //    ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
 
-            return new UserInfoViewModel
-            {
-                Email = User.Identity.GetUserName(),
-                HasRegistered = externalLogin == null,
-                LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null
-            };
-        }
+        //    return new UserInfoViewModel
+        //    {
+        //        Email = User.Identity.GetUserName(),
+        //        HasRegistered = externalLogin == null,
+        //        LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null
+        //    };
+        //}
 
         // POST api/Account/Logout
         [Route("Logout")]
@@ -179,6 +181,11 @@ namespace TurnBasedGameAPI.Controllers
         }
 
         // POST api/Account/ChangePassword
+        /// <summary>
+        /// Changes the password for the currently logged in user.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>An empty response with a 200 status code if the call was successful, or an error message otherwise.</returns>
         [Route("ChangePassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
         {
@@ -220,19 +227,19 @@ namespace TurnBasedGameAPI.Controllers
         //GET api/Account/GetAll
         //Written by Garrick 2/5/18
         /// <summary>
-        /// Returns a list of active user's usernames
+        /// Retrieves the list of active users.
         /// </summary>
-        /// <returns>Returns OK status code with username list for success, not found otherwise</returns>
+        /// <returns>Returns a 200 status code with a list of users (providing only IDs and user names) if the call is successful, or an error message otherwise.</returns>
         [HttpGet]
-        [Route("GetAll", Name = "Get all users")]
+        [Route("GetAll", Name = "Get All Users")]
         public IHttpActionResult GetAll()
         {
             try
             {
                 using (var db = new GameEntities())
                 {
-                    IQueryable<AspNetUser> users = db.AspNetUsers.Where(u => u.Active == true);
-                    return Ok(users.ToList());
+                    var users = db.AspNetUsers.Where(u => u.Active == true).Select(x => new { x.Id, x.UserName }).ToList();
+                    return Ok(users);
                 }
             }
             catch (ArgumentNullException e)
@@ -244,7 +251,6 @@ namespace TurnBasedGameAPI.Controllers
                 return Content(System.Net.HttpStatusCode.InternalServerError, "The server was unable to retrieve the list of users. Please inform the development team.");
             }
         }
-
 
         // POST api/Account/AddExternalLogin
         [Route("AddExternalLogin")]
@@ -478,7 +484,7 @@ namespace TurnBasedGameAPI.Controllers
         /// Retrieve's the publicly visible information for a single user.
         /// </summary>
         /// <param name="id">The ID for the user whose details should be returned.</param>
-        /// <returns>A single User object (with only the publicly visible fields populated.</returns>
+        /// <returns>A single User object (with only the publicly visible fields populated).</returns>
         [HttpGet]
         [Route("{id}", Name = "Get User By ID")]
         public IHttpActionResult GetByUserID(string id)
