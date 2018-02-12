@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F37BFDD6-C74C-45B8-8E4E-C317F57A4587}</ProjectGuid>
+    <ProjectGuid>{1AFFA97A-D283-4928-A20E-C1B05F67E63C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GameEF</RootNamespace>
@@ -49,64 +49,73 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AspNetRole.cs">
+      <DependentUpon>GameEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AspNetUser.cs">
+      <DependentUpon>GameEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AspNetUserClaim.cs">
+      <DependentUpon>GameEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AspNetUserLogin.cs">
+      <DependentUpon>GameEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Game.cs">
-      <DependentUpon>GameModel.tt</DependentUpon>
+      <DependentUpon>GameEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="GameModel.Context.cs">
+    <Compile Include="GameEntities.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>GameModel.Context.tt</DependentUpon>
+      <DependentUpon>GameEntities.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="GameModel.cs">
+    <Compile Include="GameEntities.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>GameModel.tt</DependentUpon>
+      <DependentUpon>GameEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="GameModel.Designer.cs">
+    <Compile Include="GameEntities.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>GameModel.edmx</DependentUpon>
+      <DependentUpon>GameEntities.edmx</DependentUpon>
     </Compile>
     <Compile Include="GameState.cs">
-      <DependentUpon>GameModel.tt</DependentUpon>
+      <DependentUpon>GameEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="GameStatusLookup.cs">
-      <DependentUpon>GameModel.tt</DependentUpon>
+      <DependentUpon>GameEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="GameUser.cs">
-      <DependentUpon>GameModel.tt</DependentUpon>
+      <DependentUpon>GameEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="User.cs">
-      <DependentUpon>GameModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="UserStatusLookup.cs">
-      <DependentUpon>GameModel.tt</DependentUpon>
+      <DependentUpon>GameEntities.tt</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EntityDeploy Include="GameModel.edmx">
+    <EntityDeploy Include="GameEntities.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>GameModel.Designer.cs</LastGenOutput>
+      <LastGenOutput>GameEntities.Designer.cs</LastGenOutput>
     </EntityDeploy>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />
-    <None Include="GameModel.edmx.diagram">
-      <DependentUpon>GameModel.edmx</DependentUpon>
+    <None Include="GameEntities.edmx.diagram">
+      <DependentUpon>GameEntities.edmx</DependentUpon>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="GameModel.Context.tt">
+    <Content Include="GameEntities.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>GameModel.Context.cs</LastGenOutput>
-      <DependentUpon>GameModel.edmx</DependentUpon>
+      <LastGenOutput>GameEntities.Context.cs</LastGenOutput>
+      <DependentUpon>GameEntities.edmx</DependentUpon>
     </Content>
-    <Content Include="GameModel.tt">
+    <Content Include="GameEntities.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>GameModel.edmx</DependentUpon>
-      <LastGenOutput>GameModel.cs</LastGenOutput>
+      <DependentUpon>GameEntities.edmx</DependentUpon>
+      <LastGenOutput>GameEntities.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

@@ -1,24 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http;
-using System.Web.Http.ModelBinding;
+﻿using GameEF;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Http;
 using TurnBasedGameAPI.Models;
 using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
+using GameEF;
+using System.Linq;
+using TurnBasedGameAPI.ViewModels;
 
 namespace TurnBasedGameAPI.Controllers
 {
+    /// <summary>
+    /// Handles all calls related to creating, selecting, editing, and deleting user accounts.
+    /// </summary>
     [Authorize]
     [RoutePrefix("api/Account")]
     public class AccountController : ApiController
@@ -37,34 +44,93 @@ namespace TurnBasedGameAPI.Controllers
             AccessTokenFormat = accessTokenFormat;
         }
 
-        public ApplicationUserManager UserManager
-        {
-            get
-            {
+        public ApplicationUserManager UserManager {
+            get {
                 return _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
             }
-            private set
-            {
+            private set {
                 _userManager = value;
+            }
+        }
+
+        // DELETE: api/Account/Delete
+        // coded by Stephen 2/7/18
+        /// <summary>
+        /// Deactivates the current user's account.
+        /// </summary>
+        /// <returns>A message indicating that the account was successfully deactivated, or an error otherwise.</returns>
+        [HttpDelete]
+        [Route("Delete", Name = "Delete User Account")]
+        public IHttpActionResult DeleteUser()
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    db.AspNetUsers.Single(x => x.UserName == User.Identity.Name).Active = false; // set active to false
+                    db.SaveChanges();
+                }
+                return Ok("The user account has been successfully deactivated.");
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The user account could not be deleted because it does not exist in the database.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error while attempting to deactive the account. Please inform the development team.");
+            }
+        }
+
+        // DETAILS: api/Account/Details
+        // coded by Stephen 2/7/18
+        /// <summary>
+        /// Gets the user's personal information.
+        /// </summary>
+        /// <returns> The Users personal details in 'UserDetailsViewModel' type object.</returns>
+        [HttpGet]
+        [Route("Details", Name = "Get Personal Details")]
+        public IHttpActionResult GetPersonalDetails()
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    AspNetUser u = db.AspNetUsers.Single(x => x.UserName == User.Identity.Name);
+                    UserDetailsViewModel holder = new UserDetailsViewModel(u);
+                    return Ok(holder);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The user account could not be found in the database.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error while attempting to deactive the account. Please inform the development team.");
             }
         }
 
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
 
-        // GET api/Account/UserInfo
-        [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
-        [Route("UserInfo")]
-        public UserInfoViewModel GetUserInfo()
-        {
-            ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
+        /*
+         * Cameron: This is the default action for retrieving user info provided by Microsoft. 
+         * Since we have our own (which returns just the information we want), this isn't needed.
+        */
+        //// GET api/Account/UserInfo
+        //[HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
+        //[Route("UserInfo")]
+        //public UserInfoViewModel GetUserInfo()
+        //{
+        //    ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
 
-            return new UserInfoViewModel
-            {
-                Email = User.Identity.GetUserName(),
-                HasRegistered = externalLogin == null,
-                LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null
-            };
-        }
+        //    return new UserInfoViewModel
+        //    {
+        //        Email = User.Identity.GetUserName(),
+        //        HasRegistered = externalLogin == null,
+        //        LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null
+        //    };
+        //}
 
         // POST api/Account/Logout
         [Route("Logout")]
@@ -115,6 +181,11 @@ namespace TurnBasedGameAPI.Controllers
         }
 
         // POST api/Account/ChangePassword
+        /// <summary>
+        /// Changes the password for the currently logged in user.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>An empty response with a 200 status code if the call was successful, or an error message otherwise.</returns>
         [Route("ChangePassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
         {
@@ -125,7 +196,7 @@ namespace TurnBasedGameAPI.Controllers
 
             IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword,
                 model.NewPassword);
-            
+
             if (!result.Succeeded)
             {
                 return GetErrorResult(result);
@@ -151,6 +222,34 @@ namespace TurnBasedGameAPI.Controllers
             }
 
             return Ok();
+        }
+
+        //GET api/Account/GetAll
+        //Written by Garrick 2/5/18
+        /// <summary>
+        /// Retrieves the list of active users.
+        /// </summary>
+        /// <returns>Returns a 200 status code with a list of users (providing only IDs and user names) if the call is successful, or an error message otherwise.</returns>
+        [HttpGet]
+        [Route("GetAll", Name = "Get All Users")]
+        public IHttpActionResult GetAll()
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    var users = db.AspNetUsers.Where(u => u.Active == true).Select(x => new { x.Id, x.UserName }).ToList();
+                    return Ok(users);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return NotFound();
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server was unable to retrieve the list of users. Please inform the development team.");
+            }
         }
 
         // POST api/Account/AddExternalLogin
@@ -258,9 +357,9 @@ namespace TurnBasedGameAPI.Controllers
             if (hasRegistered)
             {
                 Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                
-                 ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager,
-                    OAuthDefaults.AuthenticationType);
+
+                ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager,
+                   OAuthDefaults.AuthenticationType);
                 ClaimsIdentity cookieIdentity = await user.GenerateUserIdentityAsync(UserManager,
                     CookieAuthenticationDefaults.AuthenticationType);
 
@@ -328,7 +427,13 @@ namespace TurnBasedGameAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
+            var user = new ApplicationUser()
+            {
+                UserName = model.Username,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName
+            };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 
@@ -368,9 +473,41 @@ namespace TurnBasedGameAPI.Controllers
             result = await UserManager.AddLoginAsync(user.Id, info.Login);
             if (!result.Succeeded)
             {
-                return GetErrorResult(result); 
+                return GetErrorResult(result);
             }
             return Ok();
+        }
+
+        // GET: api/Account/{id}
+        // @Michael Case, 1/23/18
+        /// <summary>
+        /// Retrieve's the publicly visible information for a single user.
+        /// </summary>
+        /// <param name="id">The ID for the user whose details should be returned.</param>
+        /// <returns>A single User object (with only the publicly visible fields populated).</returns>
+        [HttpGet]
+        [Route("{id}", Name = "Get User By ID")]
+        public IHttpActionResult GetByUserID(string id)
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+                    // Populates and returns a user view model
+                    AspNetUser user = db.AspNetUsers.Single(u => u.Id.Equals(id));
+                    UserViewModel uViewModel = new UserViewModel(user);
+
+                    return Ok(uViewModel);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "The user requested does not exist.");
+            }
+            catch (InvalidOperationException e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error attempting to retrieve the user details. Please inform the development team.");
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -386,8 +523,7 @@ namespace TurnBasedGameAPI.Controllers
 
         #region Helpers
 
-        private IAuthenticationManager Authentication
-        {
+        private IAuthenticationManager Authentication {
             get { return Request.GetOwinContext().Authentication; }
         }
 

@@ -12,21 +12,12 @@ namespace GameEF
     using System;
     using System.Collections.Generic;
     
-    public partial class GameUser
+    public partial class AspNetUserLogin
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public GameUser()
-        {
-            this.Status = 1;
-        }
-    
-        public int ID { get; set; }
-        public int GameID { get; set; }
-        public int Status { get; set; }
-        public string UserID { get; set; }
+        public string LoginProvider { get; set; }
+        public string ProviderKey { get; set; }
+        public string UserId { get; set; }
     
         public virtual AspNetUser AspNetUser { get; set; }
-        public virtual Game Game { get; set; }
-        public virtual UserStatusLookup UserStatusLookup { get; set; }
     }
 }

@@ -17,14 +17,15 @@ namespace GameEF
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Game()
         {
+            this.Status = 1;
             this.GameStates = new HashSet<GameState>();
             this.GameUsers = new HashSet<GameUser>();
         }
     
         public int ID { get; set; }
         public System.DateTime Start { get; set; }
-        public System.DateTime End { get; set; }
-        public Nullable<int> Status { get; set; }
+        public Nullable<System.DateTime> End { get; set; }
+        public int Status { get; set; }
     
         public virtual GameStatusLookup GameStatusLookup { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

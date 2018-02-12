@@ -15,17 +15,26 @@ namespace TurnBasedGameAPI.Models
 
     public class ChangePasswordBindingModel
     {
+        /// <summary>
+        /// The user's original password.
+        /// </summary>
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Current password")]
         public string OldPassword { get; set; }
 
+        /// <summary>
+        /// The user's new password.
+        /// </summary>
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "New password")]
         public string NewPassword { get; set; }
 
+        /// <summary>
+        /// Confirmation field for the new password.
+        /// </summary>
         [DataType(DataType.Password)]
         [Display(Name = "Confirm new password")]
         [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
@@ -37,6 +46,16 @@ namespace TurnBasedGameAPI.Models
         [Required]
         [Display(Name = "Email")]
         public string Email { get; set; }
+
+        [Required]
+        [Display(Name = "Username")]
+        public string Username { get; set; }
+
+        [Display(Name = "First name")]
+        public string FirstName { get; set; }
+
+        [Display(Name = "Last name")]
+        public string LastName { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
