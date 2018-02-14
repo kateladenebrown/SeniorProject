@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Http;
-using GameEF;
-//using System.Web.Mvc;
+using System.Net;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -13,6 +11,19 @@ namespace TurnBasedGameAPI.Controllers
     [RoutePrefix("api/Game")]
     public class GameController : ApiController
     {
+
+        private IGameLogic logic;
+        //Kate Brown
+        //02-13-2018
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameLogic"></param>
+        public GameController()
+        {
+            this.logic = Bootstrapper.GetGameLogic();
+        }
+
         // POST: api/Game/Create
         // Coded by Stephen 2/7/18
         /// <summary>
@@ -44,7 +55,7 @@ namespace TurnBasedGameAPI.Controllers
                     //Check that all game participants have accounts (and were found) in the database. If not, return an error.
                     if (newGameUsers.Count() != players.Count())
                     {
-                        return Content(System.Net.HttpStatusCode.NotFound, "One or more of the game participants were not found in the database.");
+                        return Content(HttpStatusCode.NotFound, "One or more of the game participants were not found in the database.");
                     }
 
                     Game g = new Game()
@@ -61,11 +72,11 @@ namespace TurnBasedGameAPI.Controllers
             }
             catch (ArgumentNullException e)
             {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The database encountered an error while attempting to retrieve information about the participants.");
+                return Content(HttpStatusCode.InternalServerError, "The database encountered an error while attempting to retrieve information about the participants.");
             }
             catch (Exception e)
             {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
+                return Content(HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
             }
         }
 
@@ -112,11 +123,11 @@ namespace TurnBasedGameAPI.Controllers
             }
             catch (ArgumentNullException e)
             {
-                return Content(System.Net.HttpStatusCode.NotFound, "The user who made the call could not be found in the database.");
+                return Content(HttpStatusCode.NotFound, "The user who made the call could not be found in the database.");
             }
             catch (Exception e)
             {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error retrieving the list of games. Please inform the development team.");
+                return Content(HttpStatusCode.InternalServerError, "The server encountered an error retrieving the list of games. Please inform the development team.");
             }
         }
 
@@ -142,11 +153,11 @@ namespace TurnBasedGameAPI.Controllers
             }
             catch (ArgumentNullException e)
             {
-                return Content(System.Net.HttpStatusCode.NotFound, "No game with the ID specified was found in the database.");
+                return Content(HttpStatusCode.NotFound, "No game with the ID specified was found in the database.");
             }
             catch (Exception e)
             {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
+                return Content(HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
             }
         }
 
@@ -185,17 +196,63 @@ namespace TurnBasedGameAPI.Controllers
             }
             catch (ArgumentNullException e)
             {
-                return Content(System.Net.HttpStatusCode.BadRequest, "Issue!");
+                return Content(HttpStatusCode.BadRequest, "Issue!");
             }
             catch (InvalidOperationException e)
             {
-                return Content(System.Net.HttpStatusCode.BadRequest, "Can't do that.");
+                return Content(HttpStatusCode.BadRequest, "Can't do that.");
             }
             catch (Exception e)
             {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
+                return Content(HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
             }
 
+        }
+
+        // POST: api/Game/Update
+        /// Kate Brown 2/13/18
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="json"></param>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Update", Name = "Update Game")]
+        public IHttpActionResult Update(int gameId, string json)
+        {
+            try
+            {
+                string currentGameState = logic.GetGameState();
+                bool isValidTurn = logic.TakeTurn(currentGameState, json);
+
+                if (isValidTurn)
+                {
+                    using (GameEntities db = new GameEntities())
+                    {
+                        Game game = db.Games.First(g => g.ID == gameId);
+                        GameState gameState = new GameState();
+                        gameState.GameID = gameId;
+                        gameState.Game = game;
+                        gameState.GameState1 = logic.GetGameState();
+                        gameState.TimeStamp = DateTime.Now;
+                        game.GameStates.Add(gameState);
+                        db.SaveChanges();
+                    }
+
+                    return Ok();
+                }
+
+                return Content(HttpStatusCode.BadRequest, "Invalid turn json string.");
+            }
+            catch(InvalidOperationException)
+            {
+                return Content(HttpStatusCode.NotFound, "Could not find a game with an ID of " + gameId);
+            }
+            catch(Exception)
+            {
+                return Content(HttpStatusCode.InternalServerError, "The server encountered an error when attempting to update the game state.");
+            }
         }
     }
 }
