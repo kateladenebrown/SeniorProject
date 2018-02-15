@@ -17,3 +17,5 @@ TurnBasedGameAPI/TurnBasedGameAPI/bin/
 TurnBasedGameAPI/GameEF/obj
 TurnBasedGameAPI/TurnBasedGameAPI/obj/Debug/TurnBasedGameAPI.csproj.FileListAbsolute.txt
 TurnBasedGameAPI/TurnBasedGameAPI.Tests/obj/Debug/TurnBasedGameAPI.Tests.csproj.FileListAbsolute.txt
+/.vs/VSWorkspaceState.json
+/.vs/slnx.sqlite

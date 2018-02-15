@@ -189,81 +189,78 @@ namespace TurnBasedGameAPI.Controllers
             }
         }
 
-        // POST: api/Game/UpdateGameUserStatus ???
-        // Written by James, 2/13/18
+        // POST: api/Game/UpdateUserStatus
+        // James 2/13/18
         /// <summary>
-        /// Determines if status change is valid. If change is valid update game status then handle change accordingly
+        /// Determines if status change is valid. 
+        /// If valid, update game status and update game state if changes were made.
         /// </summary>
         /// <param name="newStatus"></param>
         /// <param name="gID"></param>
-        /// <returns></returns>
+        /// <returns>No message if update was successful, error otherwise</returns>
         [HttpPost]
-        [Route("UpdateGameUserStatus", Name = "Update Game User Status")] // ???
-        public IHttpActionResult UpdateGameUserStatus(int newStatus, int gID)
+        [Route("UpdateUserStatus", Name = "Update Game User Status")]
+        public IHttpActionResult UpdateUserStatus(int newStatus, int gID)
         {
             try
             {
                 using (var db = new GameEntities())
                 {
+                    // Better way to do this???
+                    // Creates tuple list of userName and status
                     List<GameUser> gameUsers = db.Games.Single(g => g.ID == gID).GameUsers.ToList();
+                    var userNameStatusList = new List<(string, int)> { };
+                    string userName;
+                    int userStatus;
+                    for (int i = 0; i < gameUsers.Count; ++i)
+                    {
+                        userName = gameUsers[i].AspNetUser.UserName.ToString();
+                        userStatus = gameUsers[i].Status;
+                        userNameStatusList.Add((userName, userStatus));
+                    }
 
                     //Get the list of game states for the id provided and order them by descending.
                     IQueryable<GameState> gameStatesDesc = db.GameStates.Where(x => x.GameID == gID).OrderByDescending(x => x.TimeStamp);
 
-                    //If game states were found, set the latest one to gameState else set to null.
-                    GameState gameState;
+                    //If game states were found, set the latest one to gameState.
+                    GameState gameState = null;
                     if (gameStatesDesc.Any())
                     {
                         gameState = gameStatesDesc.First();
                     }
+
+                    string newGameState = "";
+                    if (logic.TryUpdateUserStatus(ref newGameState, userNameStatusList, gameState, newStatus))
+                    {
+                        if (!String.IsNullOrEmpty(newGameState))
+                        {
+                            // Update game state in db
+                            GameState gameSt = new GameState();
+                            Game gm = db.Games.Single(gme => gme.ID == gID);
+                            gameSt.GameID = gID;
+                            gameSt.GameState1 = newGameState;
+                            gameSt.TimeStamp = DateTime.Now;
+                            gameSt.Game = gm;
+                            gm.GameStates.Add(gameSt);
+                        }
+
+                        // Update game user's status in db
+                        db.Games.Single(gm => gm.ID == gID).
+                            GameUsers.Single(gu => gu.AspNetUser.UserName == User.Identity.Name).
+                            Status = newStatus;
+
+                        db.SaveChanges();
+                        return Ok();
+                    }
                     else
                     {
-                        gameState = null;
-                    }
-
-                    // Determine if updating game user status is valid
-                    int oldStatus = db.GameUsers.Single(gu => gu.AspNetUser.UserName == User.Identity.Name).Status;
-                    if(IsValidGUStatusChange(oldStatus, newStatus))
-                    {
-                        // Handle update or possible update to game here
-                        return Ok(); // ???
-                    } else
-                    {
-                        // Correct way to handle this return? NotImplemented status code? something else?
-                        return Content(System.Net.HttpStatusCode.PaymentRequired, "An illegal operation was attempted. Game user status was not updated.");
+                        return Content(System.Net.HttpStatusCode.BadRequest, "Invalid status change request.");
                     }
                 }
-            }
-            catch (ArgumentNullException e)
-            {
-                return Content(System.Net.HttpStatusCode.NotFound, "The user who made the call could not be found in the database.");
             }
             catch (Exception e)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error updating game user status. Please inform the development team.");
-            }
-        }
-
-        // Written by James, 2/13/18
-        /// <summary>
-        /// Determines if status codes are valid to change.
-        /// Status Codes: 1="Pending", 2="Active", 3="Inactive"
-        /// Valid Changes: 1->2 (Accept request), 1->3 (Deny request), 2->3 (Quit game)
-        /// (Possible invalid changes) 2->1, 3->1 (Poss. request sent during active game), 3->2 (Poss. allow user to start midgame)
-        /// </summary>
-        /// <param name="oldStatus"></param>
-        /// <param name="newStatus"></param>
-        /// <returns>True if valid request, false otherwise</returns>
-        private bool IsValidGUStatusChange(int oldStatus, int newStatus)
-        {
-            switch (oldStatus)
-            {
-                case 1:
-                    return (newStatus == 2 || newStatus == 3);
-                case 2:
-                    return newStatus == 3;
-                default:
-                    return false;
             }
         }
     }
