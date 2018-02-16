@@ -9,12 +9,12 @@ namespace TurnBasedGameAPI
     //02-13-2018
     public class NoLogic : IGameLogic
     {
-        public string GetGameState()
+        public int TryTakeTurn(ref string outputGameState, string currentGameState, int gameId, string callingUsername, string requestedTurn)
         {
             throw new NotImplementedException();
         }
 
-        public bool TakeTurn(string currentGameState, string playerTurn)
+        public int TryUpdateUserStatus(ref string outputGameState, string currentGameState, int gameId, List<Tuple<string, int>> usernameStatusList, string callingUsername, int requestedStatus)
         {
             throw new NotImplementedException();
         }

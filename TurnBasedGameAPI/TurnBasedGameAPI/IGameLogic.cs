@@ -18,17 +18,26 @@ namespace TurnBasedGameAPI
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="outputGameState"></param>
         /// <param name="currentGameState"></param>
-        /// <param name="playerTurn"></param>
+        /// <param name="gameId"></param>
+        /// <param name="callingUsername"></param>
+        /// <param name="requestedTurn"></param>
         /// <returns></returns>
-        bool TakeTurn(string currentGameState, string playerTurn);
+        int TryTakeTurn(ref string outputGameState, string currentGameState, int gameId, string callingUsername, string requestedTurn );
 
         //Kate Brown
         //02-13-2018
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="outputGameState"></param>
+        /// <param name="currentGameState"></param>
+        /// <param name="gameId"></param>
+        /// <param name="usernameStatusList"></param>
+        /// <param name="callingUsername"></param>
+        /// <param name="requestedStatus"></param>
         /// <returns></returns>
-        string GetGameState();
+        int TryUpdateUserStatus(ref string outputGameState, string currentGameState, int gameId, List<Tuple<string, int>> usernameStatusList, string callingUsername, int requestedStatus);
     }
 }
