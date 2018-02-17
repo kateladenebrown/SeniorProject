@@ -13,6 +13,10 @@ namespace TurnBasedGameAPI.Controllers
     [RoutePrefix("api/Game")]
     public class GameController : ApiController
     {
+        // James, 2/17/18
+        // Enum for updating game user status
+        enum UserStatusCodes { InvalidStatusChange, ValidOnlyUserStatus, ValidUserStatusGameActive, ValidUserStatusGameInActive };
+
         // POST: api/Game/Create
         // Coded by Stephen 2/7/18
         /// <summary>
@@ -193,7 +197,8 @@ namespace TurnBasedGameAPI.Controllers
         // James 2/13/18
         /// <summary>
         /// Determines if status change is valid. 
-        /// If valid, update game status and update game state if changes were made.
+        /// If valid, update game user status, update game state, and update game status as needed.
+        /// Status codes: 1="Pending", 2="Active", 3="Inactive"
         /// </summary>
         /// <param name="newStatus"></param>
         /// <param name="gID"></param>
@@ -205,49 +210,51 @@ namespace TurnBasedGameAPI.Controllers
             try
             {
                 using (var db = new GameEntities())
-                {
-                    // Better way to do this???
+                {              
                     // Creates tuple list of userName and status
-                    List<GameUser> gameUsers = db.Games.Single(g => g.ID == gID).GameUsers.ToList();
-                    var userNameStatusList = new List<(string, int)> { };
-                    string userName;
-                    int userStatus;
-                    for (int i = 0; i < gameUsers.Count; ++i)
-                    {
-                        userName = gameUsers[i].AspNetUser.UserName.ToString();
-                        userStatus = gameUsers[i].Status;
-                        userNameStatusList.Add((userName, userStatus));
-                    }
+                    var userNameStatusList = db.GameUsers.Select(x => new Tuple<string, int>(x.AspNetUser.UserName, x.Status)).ToList();
 
                     //Get the list of game states for the id provided and order them by descending.
                     IQueryable<GameState> gameStatesDesc = db.GameStates.Where(x => x.GameID == gID).OrderByDescending(x => x.TimeStamp);
 
                     //If game states were found, set the latest one to gameState.
-                    GameState gameState = null;
+                    string newGameState = "";
+                    string gameState = "";
                     if (gameStatesDesc.Any())
                     {
-                        gameState = gameStatesDesc.First();
+                        gameState = gameStatesDesc.First().GameState1;
                     }
 
-                    string newGameState = "";
-                    if (logic.TryUpdateUserStatus(ref newGameState, userNameStatusList, gameState, newStatus))
+                    int statusCode = logic.TryUpdateUserStatus(ref newGameState, gameState, gID, userNameStatusList, User.Identity.Name, newStatus);
+                    if (statusCode > 0)
                     {
+                        // Update game user's status in db
+                        db.GameUsers.Single(x => x.GameID == gID && x.AspNetUser.UserName == User.Identity.Name).Status = newStatus;
+
+                        // Update game state in db
                         if (!String.IsNullOrEmpty(newGameState))
                         {
-                            // Update game state in db
-                            GameState gameSt = new GameState();
-                            Game gm = db.Games.Single(gme => gme.ID == gID);
-                            gameSt.GameID = gID;
-                            gameSt.GameState1 = newGameState;
-                            gameSt.TimeStamp = DateTime.Now;
-                            gameSt.Game = gm;
-                            gm.GameStates.Add(gameSt);
+                            GameState gameSt = new GameState
+                            {
+                                GameState1 = newGameState,
+                                TimeStamp = DateTime.Now,
+                                GameID = gID
+                            };
+                            db.Games.Single(x => x.ID == gID).GameStates.Add(gameSt);
                         }
 
-                        // Update game user's status in db
-                        db.Games.Single(gm => gm.ID == gID).
-                            GameUsers.Single(gu => gu.AspNetUser.UserName == User.Identity.Name).
-                            Status = newStatus;
+                        // Update game status (active/inactive) if needed
+                        switch (statusCode)
+                        {
+                            case (int)UserStatusCodes.ValidUserStatusGameActive:
+                                db.Games.Single(x => x.ID == gID).Status = 2;
+                                break;
+                            case (int)UserStatusCodes.ValidUserStatusGameInActive:
+                                db.Games.Single(x => x.ID == gID).Status = 3;
+                                break;
+                            default:
+                                break;
+                        }
 
                         db.SaveChanges();
                         return Ok();
