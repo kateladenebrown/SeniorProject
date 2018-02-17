@@ -20,6 +20,7 @@ using TurnBasedGameAPI.Results;
 using GameEF;
 using System.Linq;
 using TurnBasedGameAPI.ViewModels;
+using System.Text.RegularExpressions;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -300,18 +301,29 @@ namespace TurnBasedGameAPI.Controllers
 
                     AspNetUser u = db.AspNetUsers.Single(us => us.Id == user.Id);
 
+
                     if (user.LastName != null)
+                    {
                         u.LastName = user.LastName;
+                    }
 
                     if (user.FirstName != null)
+                    {
                         u.FirstName = user.FirstName;
+                    }
 
-                    if (user.Email != null)
+                    // I found several regular expressions for email validation at this discussion on
+                    // Stack Overflow. https://stackoverflow.com/questions/5342375/regex-email-validation
+                    // Michael Case
+                    if (Regex.IsMatch(user.Email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase))
+                    {
                         u.Email = user.Email;
+                    }
 
                     if (user.PhoneNumber != null)
+                    {
                         u.PhoneNumber = user.PhoneNumber;
-
+                    }
 
                     db.SaveChanges();
 
