@@ -319,6 +319,11 @@ namespace TurnBasedGameAPI.Controllers
                     {
                         u.Email = user.Email;
                     }
+                    else
+                    {
+                        // Not 100% sure this is the correct response code
+                        return Content(System.Net.HttpStatusCode.BadRequest, "Not a valid email address.");
+                    }
 
                     if (user.PhoneNumber != null)
                     {
