@@ -183,10 +183,19 @@ namespace TurnBasedGameAPI.Controllers
                     }
                 }
             }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "Issue!");
+            }
+            catch (InvalidOperationException e)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "Can't do that.");
+            }
             catch (Exception e)
             {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the latest game state. Please inform the development team.");
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
             }
+
         }
     }
 }
