@@ -481,6 +481,12 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="M:TurnBasedGameAPI.Bootstrapper.GetGameLogic">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:TurnBasedGameAPI.Controllers.AccountController">
             <summary>
             Handles all calls related to creating, selecting, editing, and deleting user accounts.
@@ -511,12 +517,30 @@
             </summary>
             <returns>Returns a 200 status code with a list of users (providing only IDs and user names) if the call is successful, or an error message otherwise.</returns>
         </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetActive">
+            <summary>
+            Returns a list of the usernames for all ACTIVE users
+            </summary>
+            <returns>List of all active users</returns>
+        </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.UpdatePersonalDetails(GameEF.AspNetUser)">
+            <summary>
+            Updates user's publicly available information
+            </summary>
+            <returns>A message indicating that the details were updated successfully, or an error otherwise</returns>
+        </member>
         <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetByUserID(System.String)">
             <summary>
             Retrieve's the publicly visible information for a single user.
             </summary>
             <param name="id">The ID for the user whose details should be returned.</param>
             <returns>A single User object (with only the publicly visible fields populated).</returns>
+        </member>
+        <member name="M:TurnBasedGameAPI.Controllers.GameController.#ctor">
+            <summary>
+            
+            </summary>
+            <param name="gameLogic"></param>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.CreateGame(System.Collections.Generic.List{System.String})">
             <summary>
@@ -545,6 +569,44 @@
             </summary>
             <param name="id">The ID of the game whose latest state should be returned.</param>
             <returns>The latest GameState object for the specified game. If no game states exist, the response will be empty.</returns>
+        </member>
+        <member name="M:TurnBasedGameAPI.Controllers.GameController.Update(System.Int32,System.String)">
+            Kate Brown 2/13/18
+            <summary>
+            
+            </summary>
+            <param name="json"></param>
+            <param name="gameId"></param>
+            <param name="requestedTurn"></param>
+            <returns></returns>
+        </member>
+        <member name="T:TurnBasedGameAPI.IGameLogic">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TurnBasedGameAPI.IGameLogic.TryTakeTurn(System.String@,System.String,System.Int32,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="outputGameState"></param>
+            <param name="currentGameState"></param>
+            <param name="gameId"></param>
+            <param name="callingUsername"></param>
+            <param name="requestedTurn"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TurnBasedGameAPI.IGameLogic.TryUpdateUserStatus(System.String@,System.String,System.Int32,System.Collections.Generic.List{System.Tuple{System.String,System.Int32}},System.String,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="outputGameState"></param>
+            <param name="currentGameState"></param>
+            <param name="gameId"></param>
+            <param name="usernameStatusList"></param>
+            <param name="callingUsername"></param>
+            <param name="requestedStatus"></param>
+            <returns></returns>
         </member>
         <member name="P:TurnBasedGameAPI.Models.ChangePasswordBindingModel.OldPassword">
             <summary>
