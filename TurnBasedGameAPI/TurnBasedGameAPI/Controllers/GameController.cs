@@ -13,6 +13,10 @@ namespace TurnBasedGameAPI.Controllers
     [RoutePrefix("api/Game")]
     public class GameController : ApiController
     {
+        // James, 2/17/18
+        // Enum for updating game user status
+        enum UserStatusCodes { InvalidStatusChange, ValidOnlyUserStatus, ValidUserStatusGameActive, ValidUserStatusGameInActive };
+
         // POST: api/Game/Create
         // Coded by Stephen 2/7/18
         /// <summary>
@@ -196,6 +200,84 @@ namespace TurnBasedGameAPI.Controllers
                 return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error when attempting to retrieve the game history. Please inform the development team.");
             }
 
+        }
+
+        // POST: api/Game/UpdateUserStatus
+        // James 2/13/18
+        /// <summary>
+        /// Determines if status change is valid. 
+        /// If valid, update game user status, update game state, and update game status as needed.
+        /// Status codes: 1="Pending", 2="Active", 3="Inactive"
+        /// </summary>
+        /// <param name="newStatus"></param>
+        /// <param name="gID"></param>
+        /// <returns>No message if update was successful, error otherwise</returns>
+        [HttpPost]
+        [Route("UpdateUserStatus", Name = "Update Game User Status")]
+        public IHttpActionResult UpdateUserStatus(int newStatus, int gID)
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {              
+                    // Creates tuple list of userName and status
+                    var userNameStatusList = db.GameUsers.Select(x => new Tuple<string, int>(x.AspNetUser.UserName, x.Status)).ToList();
+
+                    //Get the list of game states for the id provided and order them by descending.
+                    IQueryable<GameState> gameStatesDesc = db.GameStates.Where(x => x.GameID == gID).OrderByDescending(x => x.TimeStamp);
+
+                    //If game states were found, set the latest one to gameState.
+                    string newGameState = "";
+                    string gameState = "";
+                    if (gameStatesDesc.Any())
+                    {
+                        gameState = gameStatesDesc.First().GameState1;
+                    }
+
+                    int statusCode = logic.TryUpdateUserStatus(ref newGameState, gameState, gID, userNameStatusList, User.Identity.Name, newStatus);
+                    if (statusCode > 0)
+                    {
+                        // Update game user's status in db
+                        db.GameUsers.Single(x => x.GameID == gID && x.AspNetUser.UserName == User.Identity.Name).Status = newStatus;
+
+                        // Update game state in db
+                        if (!String.IsNullOrEmpty(newGameState))
+                        {
+                            GameState gameSt = new GameState
+                            {
+                                GameState1 = newGameState,
+                                TimeStamp = DateTime.Now,
+                                GameID = gID
+                            };
+                            db.Games.Single(x => x.ID == gID).GameStates.Add(gameSt);
+                        }
+
+                        // Update game status (active/inactive) if needed
+                        switch (statusCode)
+                        {
+                            case (int)UserStatusCodes.ValidUserStatusGameActive:
+                                db.Games.Single(x => x.ID == gID).Status = 2;
+                                break;
+                            case (int)UserStatusCodes.ValidUserStatusGameInActive:
+                                db.Games.Single(x => x.ID == gID).Status = 3;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        db.SaveChanges();
+                        return Ok();
+                    }
+                    else
+                    {
+                        return Content(System.Net.HttpStatusCode.BadRequest, "Invalid status change request.");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error updating game user status. Please inform the development team.");
+            }
         }
     }
 }
