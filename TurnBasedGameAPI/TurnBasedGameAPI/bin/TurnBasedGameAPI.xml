@@ -511,6 +511,18 @@
             </summary>
             <returns>Returns a 200 status code with a list of users (providing only IDs and user names) if the call is successful, or an error message otherwise.</returns>
         </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetActive">
+            <summary>
+            Returns a list of the usernames for all ACTIVE users
+            </summary>
+            <returns>List of all active users</returns>
+        </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.UpdatePersonalDetails(GameEF.AspNetUser)">
+            <summary>
+            Updates user's publicly available information
+            </summary>
+            <returns>A message indicating that the details were updated successfully, or an error otherwise</returns>
+        </member>
         <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetByUserID(System.String)">
             <summary>
             Retrieve's the publicly visible information for a single user.
