@@ -580,6 +580,16 @@
             <param name="requestedTurn"></param>
             <returns></returns>
         </member>
+        <member name="M:TurnBasedGameAPI.Controllers.GameController.UpdateUserStatus(System.Int32,System.Int32)">
+            <summary>
+            Determines if status change is valid. 
+            If valid, update game user status, update game state, and update game status as needed.
+            Status codes: 1="Pending", 2="Active", 3="Inactive"
+            </summary>
+            <param name="newStatus"></param>
+            <param name="gID"></param>
+            <returns>No message if update was successful, error otherwise</returns>
+        </member>
         <member name="T:TurnBasedGameAPI.IGameLogic">
             <summary>
             
