@@ -15,7 +15,7 @@ namespace TurnBasedGameAPI.Controllers
     {
         // James, 2/17/18
         // Enum for updating game user status
-        enum UserStatusCodes { InvalidStatusChange, ValidOnlyUserStatus, ValidUserStatusGameActive, ValidUserStatusGameInActive };
+        enum GameLogicResponseCodes { Invalid, Valid, GameActive, GameInactive };
 
         // POST: api/Game/Create
         // Coded by Stephen 2/7/18
@@ -210,7 +210,10 @@ namespace TurnBasedGameAPI.Controllers
             try
             {
                 using (var db = new GameEntities())
-                {              
+                {
+                    // Create game object from game ID, gID, to minimize db calls
+                    Game game = db.Games.Single(x => x.ID == gID);
+
                     // Creates tuple list of userName and status
                     var userNameStatusList = db.GameUsers.Select(x => new Tuple<string, int>(x.AspNetUser.UserName, x.Status)).ToList();
 
@@ -240,22 +243,22 @@ namespace TurnBasedGameAPI.Controllers
                                 TimeStamp = DateTime.Now,
                                 GameID = gID
                             };
-                            db.Games.Single(x => x.ID == gID).GameStates.Add(gameSt);
+                            game.GameStates.Add(gameSt);
                         }
 
                         // Update game status (active/inactive) if needed
                         switch (statusCode)
                         {
-                            case (int)UserStatusCodes.ValidUserStatusGameActive:
-                                db.Games.Single(x => x.ID == gID).Status = 2;
+                            case (int)GameLogicResponseCodes.GameActive:
+                                game.Status = 2;
                                 break;
-                            case (int)UserStatusCodes.ValidUserStatusGameInActive:
-                                db.Games.Single(x => x.ID == gID).Status = 3;
+                            case (int)GameLogicResponseCodes.GameInactive:
+                                game.Status = 3;
+                                game.End = DateTime.Now;
                                 break;
                             default:
                                 break;
                         }
-
                         db.SaveChanges();
                         return Ok();
                     }
@@ -265,7 +268,11 @@ namespace TurnBasedGameAPI.Controllers
                     }
                 }
             }
-            catch (Exception e)
+            catch (InvalidOperationException)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "Cound not find game with an ID of " + gID);
+            }
+            catch (Exception)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error updating game user status. Please inform the development team.");
             }
