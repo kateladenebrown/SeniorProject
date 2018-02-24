@@ -231,35 +231,47 @@ namespace TurnBasedGameAPI.Controllers
                 using (GameEntities db = new GameEntities())
                 {
                     string outputGameState = null;
-                    GameState currentGameState = db.GameStates.Where(x => x.GameID == gameId).OrderByDescending(x => x.TimeStamp).First();
-                    string callingUsername = User.Identity.Name;
-                    int statusChangeResult = logic.TryTakeTurn(ref outputGameState, currentGameState.GameState1, gameId, callingUsername, requestedTurn);
+                    GameState currentGameState;
+                    Game currentGame = db.Games.First(g => g.ID == gameId);
+                    IQueryable<GameState> gameStatesDesc = db.GameStates.Where(gs => gs.GameID == gameId).OrderByDescending(x => x.TimeStamp);
 
-                    switch(statusChangeResult)
+                    if (gameStatesDesc.Any())
                     {
-                        case 0:
-                            //No change for the game and no change for the player.
-                            break;
-                        case 1:
-                            //Valid status change for the player but no change for the game.
-                            break;
-                        case 2:
-                            //Valid status change for the player and game status goes to active.
-                            break;
-                        case 3:
-                            //Valid status change for the player and game status goes to inactive.
-                            break;
+                        currentGameState = gameStatesDesc.First();
+                        string callingUsername = User.Identity.Name;
+                        int tryTurnResult = logic.TryTakeTurn(ref outputGameState, currentGameState.GameState1, gameId, callingUsername, requestedTurn);
+
+                        // Update game status (active/inactive) if needed
+                        switch (tryTurnResult)
+                        {
+                            case (int)UserStatusCodes.InvalidStatusChange:
+                                return BadRequest();
+                            case (int)UserStatusCodes.ValidOnlyUserStatus:
+                                break;
+                            case (int)UserStatusCodes.ValidUserStatusGameActive:
+                                db.Games.Single(x => x.ID == gameId).Status = 2;
+                                break;
+                            case (int)UserStatusCodes.ValidUserStatusGameInActive:
+                                db.Games.Single(x => x.ID == gameId).Status = 3;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(outputGameState))
+                        {
+                            GameState gameState = new GameState();
+                            gameState.GameID = currentGameState.GameID;
+                            gameState.Game = currentGameState.Game;
+                            gameState.GameState1 = outputGameState;
+                            gameState.TimeStamp = DateTime.Now;
+                            db.GameStates.Add(gameState);
+                            db.SaveChanges();
+                        }
                     }
-
-                    if(!string.IsNullOrWhiteSpace(outputGameState))
+                    else //no gamestates for game
                     {
-                        GameState gameState = new GameState();
-                        gameState.GameID = currentGameState.GameID;
-                        gameState.Game = currentGameState.Game;
-                        gameState.GameState1 = outputGameState;
-                        gameState.TimeStamp = DateTime.Now;
-                        db.GameStates.Add(gameState);
-                        db.SaveChanges();
+                        return Content(HttpStatusCode.NotFound, "The game " + gameId + " has no gamestates.");
                     }
                 }
 
