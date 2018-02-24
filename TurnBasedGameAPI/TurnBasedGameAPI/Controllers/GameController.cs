@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Net;
+using System.Data.Entity;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -339,7 +340,8 @@ namespace TurnBasedGameAPI.Controllers
                     Game game = db.Games.Single(x => x.ID == gID);
 
                     // Creates tuple list of userName and status
-                    var userNameStatusList = db.GameUsers.ToList().Select(x => new Tuple<string, int>(x.AspNetUser.UserName, x.Status));
+                    var userNameStatusList = db.GameUsers.Where(x => x.GameID == gID).Include(x => x.AspNetUser).ToList()
+                        .Select(x => new Tuple<string, int>(x.AspNetUser.UserName, x.Status)).ToList();
 
                     //Get the list of game states for the id provided and order them by descending.
                     IQueryable<GameState> gameStatesDesc = db.GameStates.Where(x => x.GameID == gID).OrderByDescending(x => x.TimeStamp);
