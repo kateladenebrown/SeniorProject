@@ -13,16 +13,34 @@ namespace TurnBasedGameAPI.Controllers
     {
         // James, 2/17/18
         // Enum for updating game user status
-        enum GameLogicResponseCodes { Invalid, Valid, GameActive, GameInactive };
-
+        /// <summary>
+        /// Expected response codes from IGameLogic calls.
+        /// </summary>
+        enum GameLogicResponseCodes {
+            /// <summary>
+            /// The change submitted to the game logic was not valid.
+            /// </summary>
+            Invalid,
+            /// <summary>
+            /// The change submitted to the game logic was valid but there is no resulting game status change.
+            /// </summary>
+            Valid,
+            /// <summary>
+            /// The change submitted to the game logic was valid and the game status should change to Active.
+            /// </summary>
+            GameActive,
+            /// <summary>
+            /// The change submitted to the game logic was valid and the game status should change to Inctive.
+            /// </summary>
+            GameInactive
+        };
 
         private IGameLogic logic;
         //Kate Brown
         //02-13-2018
         /// <summary>
-        /// 
+        /// No-arg constructor for the game controller - also instantiates the game logic specified in the web.config file.
         /// </summary>
-        /// <param name="gameLogic"></param>
         public GameController()
         {
             this.logic = Bootstrapper.GetGameLogic();
@@ -90,8 +108,6 @@ namespace TurnBasedGameAPI.Controllers
          * Send List<string>  
          * Send List<string> where one userId is invalid
          */
-
-
 
         // GET: api/Game/MyGames
         // -Written by Garrick 1/23/18
@@ -178,12 +194,6 @@ namespace TurnBasedGameAPI.Controllers
             {
                 using (var db = new GameEntities())
                 {
-                    //Note: The database is ordered by timestampt descending, we can use the first record.
-
-                    //Cameron: ^This is not true. We have an index which makes sorting by timestamp descending extremely fast,
-                    //  but that does not mean it is sorting by timestamp descending by default.
-
-
                     //Get the list of game states for the id provided and order them by descending.
                     IQueryable<GameState> gameStatesDesc = db.GameStates.Where(x => x.GameID == id).OrderByDescending(x => x.TimeStamp);
 
@@ -198,6 +208,7 @@ namespace TurnBasedGameAPI.Controllers
                     }
                 }
             }
+            //TODO: These exceptions are not very helpful and need work. 
             catch (ArgumentNullException e)
             {
                 return Content(HttpStatusCode.BadRequest, "Issue!");
@@ -259,20 +270,23 @@ namespace TurnBasedGameAPI.Controllers
                                 currentGame.End = DateTime.Now;
                                 break;
                             default:
-                                break;
+                                //If we receive a status > 3, the game logic class is bad.
+                                return Content(HttpStatusCode.InternalServerError, "The server encountered an issue while processing the request. Please inform the development team.");
                         }
 
                         //If TryTakeTurn returned a new gamestate, save it in the database
                         if (!string.IsNullOrWhiteSpace(outputGameState))
                         {
-                            GameState gameState = new GameState();
-                            gameState.GameID = currentGameState.GameID;
-                            gameState.GameState1 = outputGameState;
-                            gameState.TimeStamp = DateTime.Now;
+                            GameState gameState = new GameState
+                            {
+                                GameID = currentGameState.GameID,
+                                GameState1 = outputGameState,
+                                TimeStamp = DateTime.Now
+                            };
                             currentGame.GameStates.Add(gameState);
                         }
                     }
-                    //no gamestates exist for requested game, turn not allowed
+                    //No gamestates exist for requested game, turn not allowed
                     else
                     {
                         return Content(HttpStatusCode.NotFound, "The game " + gameId + " has no gamestates.");
@@ -289,11 +303,11 @@ namespace TurnBasedGameAPI.Controllers
                 //Otherwise, return an empty OK response.
                 return Ok();
             }
-            catch(InvalidOperationException)
+            catch (InvalidOperationException)
             {
                 return Content(HttpStatusCode.NotFound, "Could not find a game with an ID of " + gameId);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return Content(HttpStatusCode.InternalServerError, "The server encountered an error when attempting to update the game state.");
             }
@@ -301,14 +315,15 @@ namespace TurnBasedGameAPI.Controllers
 
         // POST: api/Game/UpdateUserStatus
         // James 2/13/18
+        // Determines if status change is valid. 
+        // If valid, update game user status, update game state, and update game status as needed.
+        // Status codes: 1="Pending", 2="Active", 3="Inactive"
         /// <summary>
-        /// Determines if status change is valid. 
-        /// If valid, update game user status, update game state, and update game status as needed.
-        /// Status codes: 1="Pending", 2="Active", 3="Inactive"
+        /// Changes the current user's status for the specified game.
         /// </summary>
-        /// <param name="newStatus"></param>
-        /// <param name="gID"></param>
-        /// <returns>No message if update was successful, error otherwise</returns>
+        /// <param name="newStatus">The status the user would like to change to.</param>
+        /// <param name="gID">The ID of the game for which the user would liek to change their status.</param>
+        /// <returns>A success status code with an empty body, or an error otherwise.</returns>
         [HttpPost]
         [Route("UpdateUserStatus", Name = "Update Game User Status")]
         public IHttpActionResult UpdateUserStatus(int newStatus, int gID)
@@ -355,6 +370,8 @@ namespace TurnBasedGameAPI.Controllers
                         // Update game status (active/inactive) if needed
                         switch (statusCode)
                         {
+                            case (int)GameLogicResponseCodes.Valid:
+                                break;
                             case (int)GameLogicResponseCodes.GameActive:
                                 game.Status = 2;
                                 break;
@@ -363,9 +380,18 @@ namespace TurnBasedGameAPI.Controllers
                                 game.End = DateTime.Now;
                                 break;
                             default:
-                                break;
+                                //If we receive a status > 3, the game logic class is bad.
+                                return Content(HttpStatusCode.InternalServerError, "The server encountered an issue while processing the request. Please inform the development team.");
                         }
                         db.SaveChanges();
+
+                        //If TryUpdateUserStatus returned a new gamestate, return it to the calling user.
+                        if (!string.IsNullOrWhiteSpace(newGameState))
+                        {
+                            return Ok(newGameState);
+                        }
+
+                        //Otherwise, return an empty OK response.
                         return Ok();
                     }
                     else

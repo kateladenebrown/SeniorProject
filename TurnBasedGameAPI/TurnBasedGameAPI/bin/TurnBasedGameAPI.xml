@@ -483,9 +483,9 @@
         </member>
         <member name="M:TurnBasedGameAPI.Bootstrapper.GetGameLogic">
             <summary>
-            
+            Instantiates the desired game logic class specified in the web.config file.
             </summary>
-            <returns></returns>
+            <returns>The newly instantiated game logic as an IGameLogic object.</returns>
         </member>
         <member name="T:TurnBasedGameAPI.Controllers.AccountController">
             <summary>
@@ -525,9 +525,9 @@
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.AccountController.UpdatePersonalDetails(GameEF.AspNetUser)">
             <summary>
-            Updates user's publicly available information
+            Updates user's publicly available information.
             </summary>
-            <returns>A message indicating that the details were updated successfully, or an error otherwise</returns>
+            <returns>A message indicating that the details were updated successfully, or an error otherwise.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.AccountController.GetByUserID(System.String)">
             <summary>
@@ -536,11 +536,35 @@
             <param name="id">The ID for the user whose details should be returned.</param>
             <returns>A single User object (with only the publicly visible fields populated).</returns>
         </member>
+        <member name="T:TurnBasedGameAPI.Controllers.GameController.GameLogicResponseCodes">
+            <summary>
+            Expected response codes from IGameLogic calls.
+            </summary>
+        </member>
+        <member name="F:TurnBasedGameAPI.Controllers.GameController.GameLogicResponseCodes.Invalid">
+            <summary>
+            The change submitted to the game logic was not valid.
+            </summary>
+        </member>
+        <member name="F:TurnBasedGameAPI.Controllers.GameController.GameLogicResponseCodes.Valid">
+            <summary>
+            The change submitted to the game logic was valid but there is no resulting game status change.
+            </summary>
+        </member>
+        <member name="F:TurnBasedGameAPI.Controllers.GameController.GameLogicResponseCodes.GameActive">
+            <summary>
+            The change submitted to the game logic was valid and the game status should change to Active.
+            </summary>
+        </member>
+        <member name="F:TurnBasedGameAPI.Controllers.GameController.GameLogicResponseCodes.GameInactive">
+            <summary>
+            The change submitted to the game logic was valid and the game status should change to Inctive.
+            </summary>
+        </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.#ctor">
             <summary>
-            
+            No-arg constructor for the game controller - also instantiates the game logic specified in the web.config file.
             </summary>
-            <param name="gameLogic"></param>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.CreateGame(System.Collections.Generic.List{System.String})">
             <summary>
@@ -571,24 +595,20 @@
             <returns>The latest GameState object for the specified game. If no game states exist, the response will be empty.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.Update(System.Int32,System.String)">
-            Kate Brown 2/13/18
             <summary>
-            
+            Verifies a player's turn with the game logic implementing IGameLogic.
             </summary>
-            <param name="json"></param>
-            <param name="gameId"></param>
-            <param name="requestedTurn"></param>
-            <returns></returns>
+            <param name="gameId">The ID of the game to update.</param>
+            <param name="requestedTurn">JSON representing a player's turn.</param>
+            <returns>JSON that represents the latest gamestate, assuming the game changed after a player's turn.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.UpdateUserStatus(System.Int32,System.Int32)">
             <summary>
-            Determines if status change is valid. 
-            If valid, update game user status, update game state, and update game status as needed.
-            Status codes: 1="Pending", 2="Active", 3="Inactive"
+            Changes the current user's status for the specified game.
             </summary>
-            <param name="newStatus"></param>
-            <param name="gID"></param>
-            <returns>No message if update was successful, error otherwise</returns>
+            <param name="newStatus">The status the user would like to change to.</param>
+            <param name="gID">The ID of the game for which the user would liek to change their status.</param>
+            <returns>A success status code with an empty body, or an error otherwise.</returns>
         </member>
         <member name="T:TurnBasedGameAPI.IGameLogic">
             <summary>
@@ -631,6 +651,11 @@
         <member name="P:TurnBasedGameAPI.Models.ChangePasswordBindingModel.ConfirmPassword">
             <summary>
             Confirmation field for the new password.
+            </summary>
+        </member>
+        <member name="T:TurnBasedGameAPI.NoLogic">
+            <summary>
+            A sample implementation of IGameLogic that does nothing.
             </summary>
         </member>
         <member name="M:TurnBasedGameAPI.ViewModels.UserDetailsViewModel.#ctor(GameEF.AspNetUser)">
