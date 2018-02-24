@@ -212,7 +212,6 @@ namespace TurnBasedGameAPI.Controllers
                     }
                 }
             }
-            //TODO: These exceptions are not very helpful and need work. 
             catch (ArgumentNullException e)
             {
                 return Content(HttpStatusCode.NotFound, "Requested data not found.");
@@ -238,7 +237,7 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>JSON that represents the latest gamestate, assuming the game changed after a player's turn.</returns>
         [HttpPost]
         [Route("Update", Name = "Update Game")]
-        public IHttpActionResult Update(int gameId, string requestedTurn)
+        public IHttpActionResult Update(int gameId, [FromBody] string requestedTurn)
         {
             try
             {
@@ -248,7 +247,14 @@ namespace TurnBasedGameAPI.Controllers
                 {
                     //Get the latest gamestate for the requested game
                     GameState currentGameState;
-                    Game currentGame = db.Games.First(g => g.ID == gameId);
+                    Game currentGame = db.Games.Include(x => x.GameStates).First(g => g.ID == gameId);
+
+                    // Checks if game is already over
+                    if (currentGame.Status == 3)
+                    {
+                        return Content(HttpStatusCode.BadRequest, "Game is inactive. No more status changes allowed.");
+                    }
+
                     IEnumerable<GameState> gameStatesDesc = currentGame.GameStates.Where(gs => gs.GameID == gameId).OrderByDescending(x => x.TimeStamp);
 
                     //As long as at least one game state exists, process player's turn
@@ -271,6 +277,10 @@ namespace TurnBasedGameAPI.Controllers
                                 break;
                             case (int)GameLogicResponseCodes.GameInactive: //Valid player turn, game status changes to inactive
                                 currentGame.Status = 3;
+                                foreach (var gu in db.GameUsers.Where(x => x.GameID == gameId))
+                                {
+                                    gu.Status = 3;
+                                }
                                 currentGame.End = DateTime.Now;
                                 break;
                             default:
@@ -388,7 +398,7 @@ namespace TurnBasedGameAPI.Controllers
                                 break;
                             case (int)GameLogicResponseCodes.GameInactive:
                                 game.Status = 3;
-                                foreach (var gu in db.GameUsers.Where(x => x.GameID == gID  ))
+                                foreach (var gu in db.GameUsers.Where(x => x.GameID == gID))
                                 {
                                     gu.Status = 3;
                                 }

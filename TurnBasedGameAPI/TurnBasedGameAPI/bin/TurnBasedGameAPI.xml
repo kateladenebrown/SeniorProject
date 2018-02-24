@@ -536,6 +536,20 @@
             <param name="id">The ID for the user whose details should be returned.</param>
             <returns>A single User object (with only the publicly visible fields populated).</returns>
         </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.ValidEmailCheck(System.String)">
+            <summary>
+            Checks if given email address is correctly formatted. Loose definition.
+            </summary>
+            <param name="email"></param>
+            <returns>True if email address is validly formatted else returns false</returns>
+        </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.ValidPhoneNumCheck(System.String)">
+            <summary>
+            Checks if given phone number is correctly formatted.
+            </summary>
+            <param name="number"></param>
+            <returns>True if phone number is validly formatted else returns false</returns>
+        </member>
         <member name="T:TurnBasedGameAPI.Controllers.GameController.GameLogicResponseCodes">
             <summary>
             Expected response codes from IGameLogic calls.

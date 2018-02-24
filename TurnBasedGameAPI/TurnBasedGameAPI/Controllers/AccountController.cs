@@ -240,8 +240,7 @@ namespace TurnBasedGameAPI.Controllers
                 using (var db = new GameEntities())
                 {
                     // Modified by Michael Case to use a view-model
-                    var tempUsers = db.AspNetUsers.ToList();
-                    var users = new SimpleUserModel(tempUsers);
+                    var users = db.AspNetUsers.Select(x => new { x.UserName, x.Id }).ToList();
                     return Ok(users);
                 }
             }
@@ -307,12 +306,12 @@ namespace TurnBasedGameAPI.Controllers
                         u.FirstName = user.FirstName;
                     }
 
-                    if (user.Email != null && validEmailCheck(user.Email))
+                    if (user.Email != null && ValidEmailCheck(user.Email))
                     {
                         u.Email = user.Email;
                     }
 
-                    if (user.PhoneNumber != null && validPhoneNumCheck(user.PhoneNumber))
+                    if (user.PhoneNumber != null && ValidPhoneNumCheck(user.PhoneNumber))
                     {
                         u.PhoneNumber = user.PhoneNumber;
                     }
@@ -607,7 +606,7 @@ namespace TurnBasedGameAPI.Controllers
         /// </summary>
         /// <param name="email"></param>
         /// <returns>True if email address is validly formatted else returns false</returns>
-        private static bool validEmailCheck(string email)
+        private static bool ValidEmailCheck(string email)
         {
             try
             {
@@ -626,7 +625,7 @@ namespace TurnBasedGameAPI.Controllers
         /// </summary>
         /// <param name="number"></param>
         /// <returns>True if phone number is validly formatted else returns false</returns>
-        private static bool validPhoneNumCheck(string number)
+        private static bool ValidPhoneNumCheck(string number)
         {
             return Regex.Match(number, @"^(\+[0-9]{9})$").Success;
         }
