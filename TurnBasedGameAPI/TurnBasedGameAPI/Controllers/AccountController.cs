@@ -615,6 +615,34 @@ namespace TurnBasedGameAPI.Controllers
             base.Dispose(disposing);
         }
 
+        /// <summary>
+        /// Checks if given email address is correctly formatted. Loose definition.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns>True if email address is validly formatted else returns false</returns>
+        private static bool validEmailCheck(string email)
+        {
+            try
+            {
+                var addy = new System.Net.Mail.MailAddress(email);
+                return addy.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if given phone number is correctly formatted.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>True if phone number is validly formatted else returns false</returns>
+        private static bool validPhoneNumCheck(string number)
+        {
+            return Regex.Match(number, @"^(\+[0-9]{9})$").Success;
+        }
+
         #region Helpers
 
         private IAuthenticationManager Authentication {
