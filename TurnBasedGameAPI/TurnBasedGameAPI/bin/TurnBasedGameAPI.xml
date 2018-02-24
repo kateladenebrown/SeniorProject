@@ -536,6 +536,20 @@
             <param name="id">The ID for the user whose details should be returned.</param>
             <returns>A single User object (with only the publicly visible fields populated).</returns>
         </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.ValidEmailCheck(System.String)">
+            <summary>
+            Checks if given email address is correctly formatted. Loose definition.
+            </summary>
+            <param name="email"></param>
+            <returns>True if email address is validly formatted else returns false</returns>
+        </member>
+        <member name="M:TurnBasedGameAPI.Controllers.AccountController.validPhoneNumCheck(System.String)">
+            <summary>
+            Checks if given phone number is correctly formatted.
+            </summary>
+            <param name="number"></param>
+            <returns>True if phone number is validly formatted else returns false</returns>
+        </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.#ctor">
             <summary>
             
@@ -571,14 +585,12 @@
             <returns>The latest GameState object for the specified game. If no game states exist, the response will be empty.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.Update(System.Int32,System.String)">
-            Kate Brown 2/13/18
             <summary>
-            
+            Verifies a player's turn with the game logic implementing IGameLogic.
             </summary>
-            <param name="json"></param>
-            <param name="gameId"></param>
-            <param name="requestedTurn"></param>
-            <returns></returns>
+            <param name="gameId">The ID of the game to update.</param>
+            <param name="requestedTurn">JSON representing a player's turn.</param>
+            <returns>JSON that represents the latest gamestate, assuming the game changed after a player's turn.</returns>
         </member>
         <member name="M:TurnBasedGameAPI.Controllers.GameController.UpdateUserStatus(System.Int32,System.Int32)">
             <summary>
