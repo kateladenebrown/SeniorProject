@@ -214,67 +214,79 @@ namespace TurnBasedGameAPI.Controllers
         }
 
         // POST: api/Game/Update
-        /// Kate Brown 2/13/18
+        //Kate Brown 2/13/18
         /// <summary>
-        /// 
+        /// Verifies a player's turn with the game logic implementing IGameLogic.
         /// </summary>
-        /// <param name="json"></param>
-        /// <param name="gameId"></param>
-        /// <param name="requestedTurn"></param>
-        /// <returns></returns>
+        /// <param name="gameId">The ID of the game to update.</param>
+        /// <param name="requestedTurn">JSON representing a player's turn.</param>
+        /// <returns>JSON that represents the latest gamestate, assuming the game changed after a player's turn.</returns>
         [HttpPost]
         [Route("Update", Name = "Update Game")]
         public IHttpActionResult Update(int gameId, string requestedTurn)
         {
             try
             {
+                string outputGameState = null;
+
                 using (GameEntities db = new GameEntities())
                 {
-                    string outputGameState = null;
+                    //Get the latest gamestate for the requested game
                     GameState currentGameState;
                     Game currentGame = db.Games.First(g => g.ID == gameId);
-                    IQueryable<GameState> gameStatesDesc = db.GameStates.Where(gs => gs.GameID == gameId).OrderByDescending(x => x.TimeStamp);
+                    IEnumerable<GameState> gameStatesDesc = currentGame.GameStates.Where(gs => gs.GameID == gameId).OrderByDescending(x => x.TimeStamp);
 
+                    //As long as at least one game state exists, process player's turn
                     if (gameStatesDesc.Any())
                     {
                         currentGameState = gameStatesDesc.First();
                         string callingUsername = User.Identity.Name;
+                        //Validate player's turn with the implementation of IGameLogic, returns GameLogicResponseCode
                         int tryTurnResult = logic.TryTakeTurn(ref outputGameState, currentGameState.GameState1, gameId, callingUsername, requestedTurn);
 
-                        // Update game status (active/inactive) if needed
+                        // Process response code
                         switch (tryTurnResult)
                         {
-                            case (int)UserStatusCodes.InvalidStatusChange:
+                            case (int)GameLogicResponseCodes.Invalid: //Invalid player turn, no change to game status
                                 return BadRequest();
-                            case (int)UserStatusCodes.ValidOnlyUserStatus:
+                            case (int)GameLogicResponseCodes.Valid: //Valid player turn, no change to game status
                                 break;
-                            case (int)UserStatusCodes.ValidUserStatusGameActive:
-                                db.Games.Single(x => x.ID == gameId).Status = 2;
+                            case (int)GameLogicResponseCodes.GameActive: //Valid player turn, game status changes to active
+                                currentGame.Status = 2;
                                 break;
-                            case (int)UserStatusCodes.ValidUserStatusGameInActive:
-                                db.Games.Single(x => x.ID == gameId).Status = 3;
+                            case (int)GameLogicResponseCodes.GameInactive: //Valid player turn, game status changes to inactive
+                                currentGame.Status = 3;
+                                currentGame.End = DateTime.Now;
                                 break;
                             default:
                                 break;
                         }
 
+                        //If TryTakeTurn returned a new gamestate, save it in the database
                         if (!string.IsNullOrWhiteSpace(outputGameState))
                         {
                             GameState gameState = new GameState();
                             gameState.GameID = currentGameState.GameID;
-                            gameState.Game = currentGameState.Game;
                             gameState.GameState1 = outputGameState;
                             gameState.TimeStamp = DateTime.Now;
-                            db.GameStates.Add(gameState);
-                            db.SaveChanges();
+                            currentGame.GameStates.Add(gameState);
                         }
                     }
-                    else //no gamestates for game
+                    //no gamestates exist for requested game, turn not allowed
+                    else
                     {
                         return Content(HttpStatusCode.NotFound, "The game " + gameId + " has no gamestates.");
                     }
+                    db.SaveChanges();
                 }
 
+                //If TryTakeTurn returned a new gamestate, return it to the calling user
+                if (!string.IsNullOrWhiteSpace(outputGameState))
+                {
+                    return Ok(outputGameState);
+                }
+
+                //Otherwise, return an empty OK response.
                 return Ok();
             }
             catch(InvalidOperationException)
