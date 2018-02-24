@@ -623,7 +623,8 @@ namespace TurnBasedGameAPI.Controllers
             {
                 return false;
             }
-        }
+        }
+
 
         /// <summary>
         /// Checks if given phone number is correctly formatted.
