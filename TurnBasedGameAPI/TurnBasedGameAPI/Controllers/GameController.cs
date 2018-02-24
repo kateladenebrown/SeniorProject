@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Net;
+using System.Data.Entity;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -62,7 +63,10 @@ namespace TurnBasedGameAPI.Controllers
                 using (var db = new GameEntities())
                 {
                     //Add the user who made the call to the list of game participants.
-                    players.Add(User.Identity.Name);
+                    if (!players.Contains(User.Identity.Name))
+                    {
+                        players.Add(User.Identity.Name);
+                    }
 
                     //Get the ID and username for each participant.
                     var participants = db.AspNetUsers.Where(x => players.Contains(x.UserName)).Select(x => new { x.Id, x.UserName }).ToList();
@@ -336,7 +340,8 @@ namespace TurnBasedGameAPI.Controllers
                     Game game = db.Games.Single(x => x.ID == gID);
 
                     // Creates tuple list of userName and status
-                    var userNameStatusList = db.GameUsers.Select(x => new Tuple<string, int>(x.AspNetUser.UserName, x.Status)).ToList();
+                    var userNameStatusList = db.GameUsers.Where(x => x.GameID == gID).Include(x => x.AspNetUser).ToList()
+                        .Select(x => new Tuple<string, int>(x.AspNetUser.UserName, x.Status)).ToList();
 
                     //Get the list of game states for the id provided and order them by descending.
                     IQueryable<GameState> gameStatesDesc = db.GameStates.Where(x => x.GameID == gID).OrderByDescending(x => x.TimeStamp);
@@ -404,7 +409,7 @@ namespace TurnBasedGameAPI.Controllers
             {
                 return Content(System.Net.HttpStatusCode.NotFound, "Cound not find game with an ID of " + gID);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error updating game user status. Please inform the development team.");
             }
