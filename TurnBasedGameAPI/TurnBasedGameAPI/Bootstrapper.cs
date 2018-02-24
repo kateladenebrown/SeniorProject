@@ -20,7 +20,8 @@ namespace TurnBasedGameAPI
             string gameLogicAssembly = WebConfigurationManager.AppSettings["gameLogicAssembly"];
             string gameLogicClass = WebConfigurationManager.AppSettings["gameLogicClass"];
 
-            string assemblyPath = $"{Environment.CurrentDirectory}\\{gameLogicAssembly}";
+            string assemblyPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", gameLogicAssembly);
+            //string assemblyPath = $"{Environment.CurrentDirectory}\\{gameLogicAssembly}";
 
             Assembly assembly = Assembly.LoadFrom(assemblyPath);
             Type type = assembly.GetType(gameLogicClass);
