@@ -666,6 +666,12 @@
             <param name="u">AspNetUser in which the public fields will be used to return
             a user view model</param>
         </member>
+        <member name="M:GameEF.SimpleUserModel.#ctor(System.Collections.Generic.List{GameEF.AspNetUser})">
+            <summary>
+            List of simplified users
+            </summary>
+            <param name="users">List of ASPNetUsers</param>
+        </member>
         <member name="M:GameEF.UserViewModel.#ctor(GameEF.AspNetUser)">
             <summary>
             A User View Model of the AspNetUser. Returns an object with the public fields

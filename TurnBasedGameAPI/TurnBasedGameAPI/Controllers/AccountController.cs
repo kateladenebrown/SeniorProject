@@ -239,7 +239,9 @@ namespace TurnBasedGameAPI.Controllers
             {
                 using (var db = new GameEntities())
                 {
-                    var users = db.AspNetUsers.Where(u => u.Active == true).Select(x => new { x.Id, x.UserName }).ToList();
+                    // Modified by Michael Case to use a view-model
+                    var tempUsers = db.AspNetUsers.ToList();
+                    var users = new SimpleUserModel(tempUsers);
                     return Ok(users);
                 }
             }
