@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
-using GameEF;
 //using System.Web.Mvc;
 
 namespace TurnBasedGameAPI.Controllers
@@ -87,7 +86,7 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>A list of Game objects.</returns>
         [HttpGet]
         [Route("MyGames", Name = "Get My Games")]
-        public IHttpActionResult GetMyGames(int gameStatus = -1) // string? Gamestatus to check for active vs inactive games
+        public IHttpActionResult GetMyGames(int gameStatus = -1)
         {
             try
             {
