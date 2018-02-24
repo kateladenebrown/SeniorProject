@@ -252,6 +252,83 @@ namespace TurnBasedGameAPI.Controllers
             }
         }
 
+        // GET api/Account/GetActive
+        // Written by Tyler Lancaster, 2/6/2018
+        /// <summary>
+        /// Returns a list of the usernames for all ACTIVE users
+        /// </summary>
+        /// <returns>List of all active users</returns>
+        [HttpGet]
+        [Route("GetActive")]
+        public async Task<IHttpActionResult> GetActive()
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+
+                    //get all users whose status is active (2)
+                    List<AspNetUser> activeUsers = db.AspNetUsers.Where(au => au.Active == true).ToList();
+
+                    return Ok(activeUsers);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "No data found.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
+            }
+        }
+
+        // POST api/Account/UpdatePersonalDetails
+        // Written by Tyler Lancaster, 2/6/2018
+        /// <summary>
+        /// Updates user's publicly available information
+        /// </summary>
+        /// <returns>A message indicating that the details were updated successfully, or an error otherwise</returns>
+        [HttpPost]
+        [Route("UpdatePersonalDetails")]
+        public async Task<IHttpActionResult> UpdatePersonalDetails(AspNetUser user)
+        {
+            try
+            {
+                using (var db = new GameEntities())
+                {
+
+                    AspNetUser u = db.AspNetUsers.Single(us => us.Id == user.Id);
+
+                    if (user.LastName != null)
+                        u.LastName = user.LastName;
+
+                    if (user.FirstName != null)
+                        u.FirstName = user.FirstName;
+
+                    if (user.Email != null)
+                        u.Email = user.Email;
+
+                    if (user.PhoneNumber != null)
+                        u.PhoneNumber = user.PhoneNumber;
+
+
+                    db.SaveChanges();
+
+                    return Ok();
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "No data found.");
+            }
+            catch (Exception e)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
+            }
+        }
+
+
         // POST api/Account/AddExternalLogin
         [Route("AddExternalLogin")]
         public async Task<IHttpActionResult> AddExternalLogin(AddExternalLoginBindingModel model)
