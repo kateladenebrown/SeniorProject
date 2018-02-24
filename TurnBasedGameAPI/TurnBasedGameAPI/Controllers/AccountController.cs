@@ -20,6 +20,7 @@ using TurnBasedGameAPI.Results;
 using GameEF;
 using System.Linq;
 using TurnBasedGameAPI.ViewModels;
+using System.Text.RegularExpressions;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -67,7 +68,7 @@ namespace TurnBasedGameAPI.Controllers
             {
                 using (var db = new GameEntities())
                 {
-                    db.AspNetUsers.Single(x => x.UserName == User.Identity.Name).Active = false; // set active to false
+                    db.AspNetUsers.Single(x => x.UserName == User.Identity.Name).Active = false;
                     db.SaveChanges();
                 }
                 return Ok("The user account has been successfully deactivated.");
@@ -260,58 +261,67 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>List of all active users</returns>
         [HttpGet]
         [Route("GetActive")]
-        public async Task<IHttpActionResult> GetActive()
+        public IHttpActionResult GetActive()
         {
             try
             {
                 using (var db = new GameEntities())
                 {
-
-                    //get all users whose status is active (2)
-                    List<AspNetUser> activeUsers = db.AspNetUsers.Where(au => au.Active == true).ToList();
+                    //Get all users whose status is active.
+                    List<AspNetUser> activeUsers = db.AspNetUsers.Where(au => au.Active).ToList();
 
                     return Ok(activeUsers);
                 }
             }
-            catch (ArgumentNullException e)
-            {
-                return Content(System.Net.HttpStatusCode.BadRequest, "No data found.");
-            }
             catch (Exception e)
             {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error. Please inform the development team.");
             }
         }
 
         // POST api/Account/UpdatePersonalDetails
         // Written by Tyler Lancaster, 2/6/2018
         /// <summary>
-        /// Updates user's publicly available information
+        /// Updates user's publicly available information.
         /// </summary>
-        /// <returns>A message indicating that the details were updated successfully, or an error otherwise</returns>
+        /// <returns>A message indicating that the details were updated successfully, or an error otherwise.</returns>
         [HttpPost]
         [Route("UpdatePersonalDetails")]
-        public async Task<IHttpActionResult> UpdatePersonalDetails(AspNetUser user)
+        public IHttpActionResult UpdatePersonalDetails(AspNetUser user)
         {
             try
             {
                 using (var db = new GameEntities())
                 {
-
                     AspNetUser u = db.AspNetUsers.Single(us => us.Id == user.Id);
 
                     if (user.LastName != null)
+                    {
                         u.LastName = user.LastName;
+                    }
 
                     if (user.FirstName != null)
+                    {
                         u.FirstName = user.FirstName;
+                    }
 
-                    if (user.Email != null)
+                    // I found several regular expressions for email validation at this discussion on
+                    // Stack Overflow. https://stackoverflow.com/questions/5342375/regex-email-validation
+                    // Michael Case
+                    if (Regex.IsMatch(user.Email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase))
+                    {
                         u.Email = user.Email;
+                    }
+                    else
+                    {
+                        // Not 100% sure this is the correct response code
+                        return Content(System.Net.HttpStatusCode.BadRequest, "Not a valid email address.");
+                    }
 
                     if (user.PhoneNumber != null)
+                    {
                         u.PhoneNumber = user.PhoneNumber;
-
+                    }
 
                     db.SaveChanges();
 

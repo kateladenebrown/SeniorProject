@@ -7,6 +7,9 @@ namespace TurnBasedGameAPI
 {
     //Kate Brown
     //02-13-2018
+    /// <summary>
+    /// A sample implementation of IGameLogic that does nothing.
+    /// </summary>
     public class NoLogic : IGameLogic
     {
         public int TryTakeTurn(ref string outputGameState, string currentGameState, int gameId, string callingUsername, string requestedTurn)
