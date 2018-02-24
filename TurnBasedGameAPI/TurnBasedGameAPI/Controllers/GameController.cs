@@ -339,6 +339,12 @@ namespace TurnBasedGameAPI.Controllers
                     // Create game object from game ID, gID, to minimize db calls
                     Game game = db.Games.Single(x => x.ID == gID);
 
+                    // Checks if game is already over
+                    if (game.Status == 3)
+                    {
+                        return Content(HttpStatusCode.BadRequest, "Game is inactive. No more status changes allowed.");
+                    }
+
                     // Creates tuple list of userName and status
                     var userNameStatusList = db.GameUsers.Where(x => x.GameID == gID).Include(x => x.AspNetUser).ToList()
                         .Select(x => new Tuple<string, int>(x.AspNetUser.UserName, x.Status)).ToList();
@@ -382,6 +388,10 @@ namespace TurnBasedGameAPI.Controllers
                                 break;
                             case (int)GameLogicResponseCodes.GameInactive:
                                 game.Status = 3;
+                                foreach (var gu in db.GameUsers.Where(x => x.GameID == gID  ))
+                                {
+                                    gu.Status = 3;
+                                }
                                 game.End = DateTime.Now;
                                 break;
                             default:
