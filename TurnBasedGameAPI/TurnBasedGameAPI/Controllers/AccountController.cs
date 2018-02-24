@@ -312,20 +312,12 @@ namespace TurnBasedGameAPI.Controllers
                         u.FirstName = user.FirstName;
                     }
 
-                    // I found several regular expressions for email validation at this discussion on
-                    // Stack Overflow. https://stackoverflow.com/questions/5342375/regex-email-validation
-                    // Michael Case
-                    if (Regex.IsMatch(user.Email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase))
+                    if (user.Email != null && validEmailCheck(user.Email))
                     {
                         u.Email = user.Email;
                     }
-                    else
-                    {
-                        // Not 100% sure this is the correct response code
-                        return Content(System.Net.HttpStatusCode.BadRequest, "Not a valid email address.");
-                    }
 
-                    if (user.PhoneNumber != null)
+                    if (user.PhoneNumber != null && validPhoneNumCheck(user.PhoneNumber))
                     {
                         u.PhoneNumber = user.PhoneNumber;
                     }

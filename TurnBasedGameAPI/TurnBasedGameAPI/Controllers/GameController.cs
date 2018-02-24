@@ -200,11 +200,11 @@ namespace TurnBasedGameAPI.Controllers
             }
             catch (ArgumentNullException e)
             {
-                return Content(HttpStatusCode.BadRequest, "Issue!");
+                return Content(HttpStatusCode.NotFound, "Requested data not found.");
             }
             catch (InvalidOperationException e)
             {
-                return Content(HttpStatusCode.BadRequest, "Can't do that.");
+                return Content(HttpStatusCode.BadRequest, "Unabble to process request.");
             }
             catch (Exception e)
             {
