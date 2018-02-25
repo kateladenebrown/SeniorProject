@@ -17,8 +17,6 @@ using System.Web.Http;
 using TurnBasedGameAPI.Models;
 using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
-using GameEF;
-using System.Linq;
 using TurnBasedGameAPI.ViewModels;
 using System.Text.RegularExpressions;
 
