@@ -6,7 +6,7 @@
 @model Collection<ApiDescription>
 
 @{
-    ViewBag.Title = "ASP.NET Web API Help Page";
+    ViewBag.Title = "Chain Rule Games API Help Page";
 
     // Group APIs by controller
     ILookup<HttpControllerDescriptor, ApiDescription> apiGroups = Model.ToLookup(api => api.ActionDescriptor.ControllerDescriptor);
@@ -23,9 +23,9 @@
 <div id="body" class="help-page">
     <section class="featured">
         <div class="content-wrapper">
-            <h2>Introduction</h2>
+            <h2>API Calls</h2>
             <p>
-                Provide a general description of your APIs here.
+                The comprehensive API calls listed below cover everything needed to successfully use the turn based multiplayer framework.
             </p>
         </div>
     </section>

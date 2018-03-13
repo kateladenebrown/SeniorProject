@@ -1,3 +1,5 @@
+@*ApiGroup.cshtml Modified by James*@
+
 @using System.Web.Http
 @using System.Web.Http.Controllers
 @using System.Web.Http.Description
@@ -6,8 +8,8 @@
 @model IGrouping<HttpControllerDescriptor, ApiDescription>
 
 @{
-    var controllerDocumentation = ViewBag.DocumentationProvider != null ? 
-        ViewBag.DocumentationProvider.GetDocumentation(Model.Key) : 
+    var controllerDocumentation = ViewBag.DocumentationProvider != null ?
+        ViewBag.DocumentationProvider.GetDocumentation(Model.Key) :
         null;
 }
 
@@ -18,24 +20,32 @@
 }
 <table class="help-page-table">
     <thead>
-        <tr><th>API</th><th>Description</th></tr>
+        <tr>
+            <th>Method</th>
+            <th>Name</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var api in Model)
-    {
-        <tr>
-            <td class="api-name"><a href="@Url.Action("Api", "Help", new { apiId = api.GetFriendlyId() })">@api.HttpMethod.Method @api.RelativePath</a></td>
-            <td class="api-documentation">
-            @if (api.Documentation != null)
-            {
-                <p>@api.Documentation</p>
-            }
-            else
-            {
-                <p>No documentation available.</p>
-            }
-            </td>
-        </tr>
-    }
+        @foreach (var api in Model.OrderBy(x => x.ActionDescriptor.ActionName ))
+        {
+            <tr>
+                <td class="api-method">@api.HttpMethod.Method</td>
+                <td class="api-name"><a href="@Url.Action("Api", "Help", new { apiId = api.GetFriendlyId() })">@api.ActionDescriptor.ActionName</a></td>
+                <td class="api-url">@api.RelativePath</td>
+                @*<td class="api-url"><a href="@Url.Action("Api", "Help", new { apiId = api.GetFriendlyId() })">@api.HttpMethod.Method @api.RelativePath</a></td>*@
+                <td class="api-documentation">
+                    @if (api.Documentation != null)
+                    {
+                        <p>@api.Documentation</p>
+                    }
+                    else
+                    {
+                        <p>No documentation available.</p>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
