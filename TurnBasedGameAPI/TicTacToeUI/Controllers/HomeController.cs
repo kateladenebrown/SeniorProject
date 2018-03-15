@@ -26,5 +26,13 @@ namespace TicTacToeUI.Controllers
 
             return View();
         }
+
+        // James March 2018
+        public ActionResult Rules()
+        {
+            ViewBag.Message = "Your help page.";
+
+            return View();
+        }
     }
 }
