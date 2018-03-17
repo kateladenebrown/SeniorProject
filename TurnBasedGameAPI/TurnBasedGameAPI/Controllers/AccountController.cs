@@ -19,6 +19,7 @@ using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
 using TurnBasedGameAPI.ViewModels;
 using System.Text.RegularExpressions;
+using System.Web.Http.Cors;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -27,6 +28,7 @@ namespace TurnBasedGameAPI.Controllers
     /// </summary>
     [Authorize]
     [RoutePrefix("api/Account")]
+    //[EnableCors(origins: "*", headers: "*", methods: "*")]
     public class AccountController : ApiController
     {
         private const string LocalLoginProvider = "Local";
