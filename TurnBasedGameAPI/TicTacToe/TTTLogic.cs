@@ -9,6 +9,27 @@ namespace TicTacToe
 {
 	public class TTTLogic : IGameLogic
 	{
+        //All
+        //3-17-2018
+        /// <summary>
+        /// Determines whether there are a valid number of players.
+        /// </summary>
+        /// <param name="players">The list of players.</param>
+        /// <returns>A boolean indicating whether or not there are exactly two players.</returns>
+        public bool TryCreateGame(ref string responseMessage, List<string> players)
+        {
+            if (players.Count == 2)
+            {
+                return true;
+            }
+            else
+            {
+                responseMessage = "Incorrect number of players. Tic Tac Toe can only be played with exactly two players.";
+                return false;
+            }
+        }
+
+
 		//Implemented by Michael Case, 02-22-2018
 		//Edited by Todd Clark, 02-24-2018. Changed implementation to work with JSON.
 		/// <summary>
