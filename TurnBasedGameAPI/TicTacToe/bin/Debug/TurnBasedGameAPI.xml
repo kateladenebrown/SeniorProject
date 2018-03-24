@@ -629,6 +629,14 @@
             
             </summary>
         </member>
+        <member name="M:TurnBasedGameAPI.IGameLogic.TryCreateGame(System.String@,System.Collections.Generic.List{System.String})">
+            <summary>
+            Determines whether the conditions to create a game have been met.
+            </summary>
+            <param name="responseMessage">A location to store a response message for the user.</param>
+            <param name="players">The list of all players, including those invited to the new game and the initiator.</param>
+            <returns>A boolean value indicating the validity.</returns>
+        </member>
         <member name="M:TurnBasedGameAPI.IGameLogic.TryTakeTurn(System.String@,System.String,System.Int32,System.String,System.String)">
             <summary>
             

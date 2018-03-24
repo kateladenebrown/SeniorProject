@@ -87,6 +87,12 @@ namespace TurnBasedGameAPI.Controllers
                         return Content(HttpStatusCode.NotFound, "One or more of the game participants were not found in the database.");
                     }
 
+                    string createGameMessage = null;
+                    if (!logic.TryCreateGame(ref createGameMessage, participants.Select(x => x.UserName).ToList()))
+                    {
+                        return Content(HttpStatusCode.BadRequest, createGameMessage);
+                    }
+
                     Game g = new Game()
                     {
                         Start = DateTime.Now,

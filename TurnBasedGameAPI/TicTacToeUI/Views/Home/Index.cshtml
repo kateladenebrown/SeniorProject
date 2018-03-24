@@ -421,7 +421,7 @@
                     data: JSON.stringify(userList)
                 }).done(function (data) {
                     getAllGames();
-                    $('#newGameModal').modal('show');
+                    $('#newGameModal').modal('hide');
 
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     console.log(jqXHR);

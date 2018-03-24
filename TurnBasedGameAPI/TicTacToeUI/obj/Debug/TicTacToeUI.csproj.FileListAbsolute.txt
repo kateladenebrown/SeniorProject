@@ -86,7 +86,6 @@ E:\git\SeniorProject2\TurnBasedGameAPI\TicTacToeUI\bin\System.Web.WebPages.xml
 E:\git\SeniorProject2\TurnBasedGameAPI\TicTacToeUI\bin\System.Web.WebPages.Deployment.xml
 E:\git\SeniorProject2\TurnBasedGameAPI\TicTacToeUI\bin\System.Web.WebPages.Razor.xml
 E:\git\SeniorProject2\TurnBasedGameAPI\TicTacToeUI\bin\System.Web.Optimization.xml
-E:\git\SeniorProject2\TurnBasedGameAPI\TicTacToeUI\obj\Debug\TicTacToeUI.csprojResolveAssemblyReference.cache
 E:\git\SeniorProject2\TurnBasedGameAPI\TicTacToeUI\obj\Debug\TicTacToeUI.csproj.CoreCompileInputs.cache
 E:\git\SeniorProject2\TurnBasedGameAPI\TicTacToeUI\obj\Debug\TicTacToeUI.dll
 E:\git\SeniorProject2\TurnBasedGameAPI\TicTacToeUI\obj\Debug\TicTacToeUI.pdb
