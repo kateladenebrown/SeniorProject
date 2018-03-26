@@ -249,9 +249,11 @@
                         case 2:
                             var gameLink = "<a role='button' data-gid='" + game.Id + "' class='list-group-item activeGameLink'>Game with " + users + " created on " + game.Start + "</a>";
                             $('#activeGamesPanel .list-group').append(gameLink);
+                            break; 
                         case 3:
                             var gameLink = "<a role='button' data-gid='" + game.Id + "' class='list-group-item pastGameLink'>Game with " + users + " started on " + game.Start + " and completed on " + game.End + "</a>";
                             $('#pastGamesPanel .list-group').append(gameLink);
+                            break;
                     }
                 });
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -472,6 +474,34 @@
                 $('#pendingGameModal').modal('show');
             });
 
+
+            //katebrown 3/25/18 30m
+            $(document).on('click', '.activeGameLink', function (e) {
+                var gid = $(this).data('gid');
+                var newWindow = window.open("", "_blank");
+
+                $.ajax({
+                    url: 'http://localhost:54897/api/Game/' + gid,
+                    method: 'GET',
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.accessToken
+                    }
+                }).done(function (data) {
+                    newWindow.location.href = 'gameplay/tttgameplay?gameID=' + gid + '&json=' + data.GameState1;
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                    //TODO: show error message
+                }).always(function () {
+                    $("body").css("cursor", "auto");
+                });
+
+
+                
+
+               
+            });
+                
+
             $(document).on('click', '#rejectPendingGameButton', function (e) {
                 var gid = $('#pendingGameID').html();
 
@@ -495,6 +525,34 @@
                     $("body").css("cursor", "auto");
                 });
             });
+
+            //katebrown 3/25/18 1.5h
+            //event handler for button to accept a pending game request
+            $(document).on('click', '#acceptPendingGameButton', function (e) {
+                var gid = $('#pendingGameID').html();
+
+                $("body").css("cursor", "progress");
+                $.ajax({
+                    url: 'http://localhost:54897/api/Game/UpdateUserStatus?newStatus=2&gID=' + gid,
+                    method: 'POST',
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.accessToken
+                    }
+                }).done(function (data) {
+                    getAllGames();
+                    $('#pendingGameModal').modal('hide');
+                    $('#pendingGameID').empty();
+                    $('#pendingGameStartDate').empty();
+                    $('#pendingGameUsersTbody').empty();
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                    //TODO: show error message
+                }).always(function () {
+                    $("body").css("cursor", "auto");
+                });
+
+            });
+
         });
     </script>
 }
