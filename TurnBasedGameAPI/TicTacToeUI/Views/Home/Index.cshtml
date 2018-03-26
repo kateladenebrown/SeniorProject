@@ -227,7 +227,7 @@
         function getAllGames() {
             $("body").css("cursor", "progress");
             $.ajax({
-                url: 'http://localhost:54897/api/Game/MyGames',
+                url: 'http://ttt.chainrulegames.com/api/Game/MyGames',
                 method: 'GET',
                 headers: {
                     "Authorization": "Bearer " + localStorage.accessToken
@@ -246,12 +246,14 @@
                             var gameLink = "<a role='button' data-gid='" + game.Id + "' class='list-group-item pendingGameLink'>Game with " + users + " created on " + game.Start + "</a>";
                             $('#pendingGamesPanel .list-group').append(gameLink);
                             break;
-                        case 2:
-                            var gameLink = "<a role='button' data-gid='" + game.Id + "' class='list-group-item activeGameLink'>Game with " + users + " created on " + game.Start + "</a>";
-                            $('#activeGamesPanel .list-group').append(gameLink);
-                        case 3:
-                            var gameLink = "<a role='button' data-gid='" + game.Id + "' class='list-group-item pastGameLink'>Game with " + users + " started on " + game.Start + " and completed on " + game.End + "</a>";
-                            $('#pastGamesPanel .list-group').append(gameLink);
+						case 2:
+							var gameLink = "<a role='button' data-gid='" + game.Id + "' class='list-group-item activeGameLink'>Game with " + users + " created on " + game.Start + "</a>";
+							$('#activeGamesPanel .list-group').append(gameLink);
+							break;
+						case 3:
+							var gameLink = "<a role='button' data-gid='" + game.Id + "' class='list-group-item pastGameLink'>Game with " + users + " started on " + game.Start + " and completed on " + game.End + "</a>";
+							$('#pastGamesPanel .list-group').append(gameLink);
+							break;
                     }
                 });
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -265,7 +267,7 @@
         function getUserInformation() {
             $("body").css("cursor", "progress");
             $.ajax({
-                url: 'http://localhost:54897/api/Account/Details',
+                url: 'http://ttt.chainrulegames.com/api/Account/Details',
                 method: 'GET',
                 headers: {
                     "Authorization": "Bearer " + localStorage.accessToken
@@ -313,7 +315,7 @@
 
                 $("body").css("cursor", "progress");
                 $.ajax({
-                    url: 'http://localhost:54897/api/Account/Register',
+                    url: 'http://ttt.chainrulegames.com/api/Account/Register',
                     method: 'POST',
                     data: {
                         Email: email,
@@ -341,12 +343,16 @@
                 });
             });
 
+			$('#registerModal').on('hidden.bs.modal', function (e) {
+				$('#registerErrorAlert').addClass('hidden');
+			});
+
             $(document).on('click', '#loginButton', function (e) {
                 username = $('#loginUsername').val();
                 pwd = $('#loginPassword').val();
 
                 $.ajax({
-                    url: 'http://localhost:54897/api/Account/tokenLogin',
+                    url: 'http://ttt.chainrulegames.com/api/Account/tokenLogin',
                     method: 'POST',
                     data: {
                         grant_type: 'password',
@@ -372,6 +378,10 @@
                 });
             });
 
+			$('#loginModal').on('hidden.bs.modal', function (e) {
+				$('#loginErrorAlert').addClass('hidden');
+			});
+
             $(document).on('click', '#logoutButton', function (e) {
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("tokenExpiration");
@@ -382,7 +392,7 @@
                 $("body").css("cursor", "progress");
                 //Build the list of users (which is used when starting a new game).
                 $.ajax({
-                    url: 'http://localhost:54897/api/Account/GetAll',
+                    url: 'http://ttt.chainrulegames.com/api/Account/GetAll',
                     method: 'GET',
                     headers: {
                         "Authorization": "Bearer " + localStorage.accessToken
@@ -411,7 +421,7 @@
 
                 $("body").css("cursor", "progress");
                 $.ajax({
-                    url: 'http://localhost:54897/api/Game/Create',
+                    url: 'http://ttt.chainrulegames.com/api/Game/Create',
                     method: 'POST',
                     headers: {
                         "Authorization": "Bearer " + localStorage.accessToken
@@ -477,7 +487,7 @@
 
                 $("body").css("cursor", "progress");
                 $.ajax({
-                    url: 'http://localhost:54897/api/Game/UpdateUserStatus?newStatus=3&gID=' + gid,
+                    url: 'http://ttt.chainrulegames.com/api/Game/UpdateUserStatus?newStatus=3&gID=' + gid,
                     method: 'POST',
                     headers: {
                         "Authorization": "Bearer " + localStorage.accessToken
@@ -494,7 +504,31 @@
                 }).always(function () {
                     $("body").css("cursor", "auto");
                 });
-            });
+			});
+
+			$(document).on('click', '#acceptPendingGameButton', function (e) {
+				var gid = $('#pendingGameID').html();
+
+				$("body").css("cursor", "progress");
+				$.ajax({
+					url: 'http://ttt.chainrulegames.com/api/Game/UpdateUserStatus?newStatus=2&gID=' + gid,
+					method: 'POST',
+					headers: {
+						"Authorization": "Bearer " + localStorage.accessToken
+					}
+				}).done(function (data) {
+					getAllGames();
+					$('#pendingGameModal').modal('hide');
+					$('#pendingGameID').empty();
+					$('#pendingGameStartDate').empty();
+					$('#pendingGameUsersTbody').empty();
+				}).fail(function (jqXHR, textStatus, errorThrown) {
+					console.log(jqXHR);
+					//TODO: show error message
+				}).always(function () {
+					$("body").css("cursor", "auto");
+				});
+			});
         });
     </script>
 }
