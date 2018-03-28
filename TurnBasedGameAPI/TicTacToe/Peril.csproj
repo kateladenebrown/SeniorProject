@@ -7,8 +7,8 @@
     <ProjectGuid>{258AFAE6-467A-4658-B8AD-33C19487BC5B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TicTacToe</RootNamespace>
-    <AssemblyName>TicTacToe</AssemblyName>
+    <RootNamespace>Peril</RootNamespace>
+    <AssemblyName>Peril</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -43,9 +43,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\MoveModel.cs" />
+    <Compile Include="Models\PerilGameStateModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PerilGameState.cs" />
     <Compile Include="PerilLogic.cs" />
+    <Compile Include="Types\Battle.cs" />
+    <Compile Include="Types\Player.cs" />
+    <Compile Include="Types\Territory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TurnBasedGameAPI\TurnBasedGameAPI.csproj">
