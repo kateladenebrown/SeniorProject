@@ -144,53 +144,71 @@ namespace TicTacToe
 			outputGameState = JsonConvert.SerializeObject(initialGameState);
 		}
 
-		//Todd Clark
-		//02-21-2018
-		/// <summary>
-		/// Attempts to update a users current status in a game. 
-		/// Returns the following:
-		/// 0: Invalid status change.
-		/// 1: Valid status change.
-		/// 2: Valid status change, set game to active.
-		/// 3: Valid status change, set game to inactive.
-		/// </summary>
-		/// <param name="outputGameState"></param>
-		/// <param name="currentGameState"></param>
-		/// <param name="gameId"></param>
-		/// <param name="usernameStatusList"></param>
-		/// <param name="callingUsername"></param>
-		/// <param name="requestedStatus"></param>
-		/// <returns></returns>
-		public int TryUpdateUserStatus(ref string outputGameState, string currentGameState, int gameId, List<Tuple<string, int>> usernameStatusList, string callingUsername, int requestedStatus)
-		{
-			int currentUserStatus = usernameStatusList.Single(x => x.Item1 == callingUsername).Item2;
-			bool otherPendingUsers = usernameStatusList.Where(x => x.Item1 != callingUsername && x.Item2 == 1).Any();
+        //Tyler Lancaster (framework by Todd Clark)
+        /// <summary>
+        /// Attempts to update a users current status in a game. 
+        /// </summary>
+        /// <param name="outputGameState"></param>
+        /// <param name="currentGameState"></param>
+        /// <param name="gameId"></param>
+        /// <param name="usernameStatusList"></param>
+        /// <param name="callingUsername"></param>
+        /// <param name="requestedStatus"></param>
+        /// <returns>
+        /// 0: Invalid status change.
+        /// 1: Valid status change.
+        /// 2: Valid status change, set game to active.
+        /// 3: Valid status change, set game to inactive.
+        /// </returns>
+        public int TryUpdateUserStatus(ref string outputGameState, string currentGameState, int gameId, List<Tuple<string, int>> usernameStatusList, string callingUsername, int requestedStatus)
+        {
+            int currentUserStatus = usernameStatusList.Single(x => x.Item1 == callingUsername).Item2;
+            bool otherPendingUsers = usernameStatusList.Where(x => x.Item1 != callingUsername && x.Item2 == 1).Any();
 
-			if (currentUserStatus == 1 && requestedStatus == 2)
-			{
-				if (!otherPendingUsers)
-				{
-					CreateGame(ref outputGameState, usernameStatusList);
-					return 2;
-				}
-				return 1;
-			}
-			else if (currentUserStatus == 1 && requestedStatus == 3)
-			{
-				//rejected invite
-				return 3;
-			}
-			else if (currentUserStatus == 2 && requestedStatus == 3)
-			{
-				PerilGameState tempGameState = JsonConvert.DeserializeObject<PerilGameState>(currentGameState);
-				tempGameState.Victor = usernameStatusList.Where(x => x.Item1 != callingUsername).First().Item1;
-				outputGameState = JsonConvert.SerializeObject(tempGameState);
-				return 3;
-			}
-			else
-			{
-				return 0;
-			}
-		}
-	}
+            if (currentUserStatus == 1 && requestedStatus == 2)
+            {
+                if (otherPendingUsers)
+                {
+                    return 1;
+                }
+                else
+                {
+                    CreateGame(ref outputGameState, usernameStatusList);
+
+                    return 2;
+                }
+            }
+            else if (currentUserStatus == 1 && requestedStatus == 3)
+            {
+                //rejected invite
+                return 3;
+            }
+            else if (currentUserStatus == 2 && requestedStatus == 3)
+            {
+                if (usernameStatusList.Where(x => x.Item1 != callingUsername && x.Item2 == 2).Any()) //any remaining active players
+                {
+                    //callingUsername.troops.owner = Neutral;
+
+                    PerilGameState tempGameState = JsonConvert.DeserializeObject<PerilGameState>(currentGameState);
+                    outputGameState = JsonConvert.SerializeObject(tempGameState);
+
+                    return 1;
+                }
+                else
+                {
+                    PerilGameState tempGameState = JsonConvert.DeserializeObject<PerilGameState>(currentGameState);
+                    tempGameState.Victor = usernameStatusList.Single(x => x.Item1 != callingUsername && x.Item2 == 2).Item1; // last remaining active player wins
+                    outputGameState = JsonConvert.SerializeObject(tempGameState);
+
+                    return 3;
+                }
+
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+    }
 }
