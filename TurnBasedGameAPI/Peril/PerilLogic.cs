@@ -258,13 +258,13 @@ namespace Peril
                             t.Owner = UserName;
                             CurGameState.Territories.Add(t);
                             CurGameState.TurnPosition++; // this advances the turn order 
+
+                            retInt = 1;
                         }
                     }
                     // calc front end of turn
                     CurGameState.TurnPosition = 0; // set to first players turn
                     PrepareTurn(JsonConvert.SerializeObject(CurGameState), 0);
-
-                    retInt = 1;
 
                     break; // end case 0
 
@@ -276,10 +276,10 @@ namespace Peril
                             Types.Territory t = move.To;
                             t.ForceCount += move.howMany;
                             CurGameState.Players.Single(x => x.Name == UserName).Unallocated += -move.howMany;
+
+                            retInt = 1;
                         }
                     }
-
-                    retInt = 1;
 
                     break; // end case 1
 
@@ -294,12 +294,13 @@ namespace Peril
                             CurGameState.ActiveBattle = thisBattle;
                             // show Battle screen
                             // update final battle results
+
+                            retInt = 1; 
                         }
                     }
 
-                    retInt = 1;
-
                     break; // end case 2
+
                 case 3: // case of movement
                     if (CurGameState.TurnOrder[CurGameState.TurnPosition] == UserName && move.To.Owner == UserName)
                     { // must be your turn and moving to an owned territory
@@ -311,7 +312,6 @@ namespace Peril
                                 CurGameState.Players.Single(x => x.Name == UserName).leaderMoved = true;
 
                                 retInt = 1;
-
                             }
                         }
                         else if (move.From.Moveable >= move.howMany && move.howMany != -1) // case of moving troops
