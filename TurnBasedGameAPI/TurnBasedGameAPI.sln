@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurnBasedGameAPI.Tests", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEF", "GameEF\GameEF.csproj", "{1AFFA97A-D283-4928-A20E-C1B05F67E63C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peril", "TicTacToe\Peril.csproj", "{258AFAE6-467A-4658-B8AD-33C19487BC5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peril", "Peril\Peril.csproj", "{258AFAE6-467A-4658-B8AD-33C19487BC5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
