@@ -5,7 +5,7 @@ using System.Web;
 
 namespace TicTacToe
 {
-	public class TTTGameState
+	public class PerilGameState
 	{
 		#region properties
 		public string CurrentTurn { get; set; }
@@ -22,7 +22,7 @@ namespace TicTacToe
 			}
 		}
 
-		public TTTGameState(Dictionary<string, string> turnOrder)
+		public PerilGameState(Dictionary<string, string> turnOrder)
 		{
 			CurrentTurn = "x";
 			Grid = new string[9];

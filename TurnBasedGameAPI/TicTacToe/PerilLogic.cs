@@ -7,7 +7,7 @@ using System.Web;
 
 namespace TicTacToe
 {
-	public class TTTLogic : IGameLogic
+	public class PerilLogic : IGameLogic
 	{
 		//Implemented by Michael Case, 02-22-2018
 		//Edited by Todd Clark, 02-24-2018. Changed implementation to work with JSON.
@@ -22,7 +22,7 @@ namespace TicTacToe
 		/// <returns></returns>
 		public int TryTakeTurn(ref string outputGameState, string currentGameState, int gameId, string callingUsername, string requestedTurn)
 		{
-			TTTGameState tempGameState = JsonConvert.DeserializeObject<TTTGameState>(currentGameState);
+			PerilGameState tempGameState = JsonConvert.DeserializeObject<PerilGameState>(currentGameState);
 
 			// Return if it's not the user's turn
 			if (tempGameState.CurrentTurnUser != callingUsername)
@@ -63,7 +63,7 @@ namespace TicTacToe
 		/// </summary>
 		/// <param name="gameState">Current state of the game</param>
 		/// <returns>3 if game is over, 1 if game continues</returns>
-		private int GetGameStatus(ref TTTGameState gameState)
+		private int GetGameStatus(ref PerilGameState gameState)
 		{
 			// I'm not sure how we are implenting the grid yet
 			// 1 or 2 dimensional array?
@@ -139,7 +139,7 @@ namespace TicTacToe
 				{ "x", usernameStatusList[0].Item1 },
 				{ "o", usernameStatusList[1].Item1 }
 			};
-			TTTGameState initialGameState = new TTTGameState(turnOrder);
+			PerilGameState initialGameState = new PerilGameState(turnOrder);
 
 			outputGameState = JsonConvert.SerializeObject(initialGameState);
 		}
@@ -182,7 +182,7 @@ namespace TicTacToe
 			}
 			else if (currentUserStatus == 2 && requestedStatus == 3)
 			{
-				TTTGameState tempGameState = JsonConvert.DeserializeObject<TTTGameState>(currentGameState);
+				PerilGameState tempGameState = JsonConvert.DeserializeObject<PerilGameState>(currentGameState);
 				tempGameState.Victor = usernameStatusList.Where(x => x.Item1 != callingUsername).First().Item1;
 				outputGameState = JsonConvert.SerializeObject(tempGameState);
 				return 3;
