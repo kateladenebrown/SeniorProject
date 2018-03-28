@@ -10,11 +10,9 @@ namespace TicTacToeUI.Controllers
 {
     public class GamePlayController : Controller
     {
-        public ActionResult TTTGamePlay(int gameID, string json)
+        public ActionResult TTTGamePlay(int gameID)
         {
-            TTTGameStateModel model = JsonConvert.DeserializeObject<TTTGameStateModel>(json);
-            model.GameId = gameID;
-            return View(model);
+            return View(gameID);
         }
     }
 }

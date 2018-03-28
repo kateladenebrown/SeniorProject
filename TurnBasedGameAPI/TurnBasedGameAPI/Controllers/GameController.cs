@@ -276,7 +276,7 @@ namespace TurnBasedGameAPI.Controllers
                         switch (tryTurnResult)
                         {
                             case (int)GameLogicResponseCodes.Invalid: //Invalid player turn, no change to game status
-                                return BadRequest();
+                                return Content(HttpStatusCode.BadRequest, "Invalid player turn.");
                             case (int)GameLogicResponseCodes.Valid: //Valid player turn, no change to game status
                                 break;
                             case (int)GameLogicResponseCodes.GameActive: //Valid player turn, game status changes to active
