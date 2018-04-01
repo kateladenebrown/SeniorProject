@@ -1,0 +1,103 @@
+﻿@*Kate Brown 3/27/18 9h*@
+
+
+@using TicTacToeUI.Models;
+@model  int
+
+
+@*TicTacToe gameboard layout. filled with jquery in RefreshBoard()*@
+<style>
+	.cell {
+		width: 33%;
+		height: 20vh;
+	}
+
+	td:empty:after {
+		content: "\00a0";
+	}
+</style>
+
+<div style="margin: 25px;">
+	<table style="width : 100%; text-align : center; font-size: 72px;">
+		<tbody>
+			<tr>
+				<td class="cell" id="0" style="border-right : solid 2px; border-bottom : solid 2px"></td>
+				<td class="cell" id="1" style="border-bottom : solid 2px"></td>
+				<td class="cell" id="2" style="border-left : solid 2px; border-bottom : solid 2px"></td>
+			</tr>
+			<tr>
+				<td class="cell" id="3" style="border-right : solid 2px;"></td>
+				<td class="cell" id="4"></td>
+				<td class="cell" id="5" style="border-left : solid 2px;"></td>
+			</tr>
+			<tr>
+				<td class="cell" id="6" style="border-right : solid 2px; border-top : solid 2px"></td>
+				<td class="cell" id="7" style="border-top : solid 2px"></td>
+				<td class="cell" id="8" style="border-left : solid 2px; border-top : solid 2px"></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<div id="turn"></div>
+@section scripts {
+	<script type="text/javascript">
+
+        var winnerDisplayed = false;
+
+        //Retrieves the latest gamestate using the game id and fills the gameboard. alerts user when there is a winner.
+        function RefreshBoard() {
+            $.ajax({
+				url: 'http://tttapi.chainrulegames.com/api/Game/' + @(Model),
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + localStorage.accessToken
+                }
+            }).done(function (data) {
+
+                var gameState = JSON.parse(data.GameState1);
+                $('#0').text(gameState.Grid[0] || "");
+                $('#1').text(gameState.Grid[1] || "");
+                $('#2').text(gameState.Grid[2] || "");
+                $('#3').text(gameState.Grid[3] || "");
+                $('#4').text(gameState.Grid[4] || "");
+                $('#5').text(gameState.Grid[5] || "");
+                $('#6').text(gameState.Grid[6] || "");
+                $('#7').text(gameState.Grid[7] || "");
+                $('#8').text(gameState.Grid[8] || "");
+                $('#turn').text("Current turn: " + gameState.CurrentTurnUser);
+                if (gameState.Victor !== null && !winnerDisplayed) {
+                    if (gameState.Victor === "draw") {
+                        alert(gameState.Victor + "!");
+                    } else {
+                        alert(gameState.Victor + " wins!");
+                    }
+					winnerDisplayed = true; 
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                //TODO: show error message
+            });
+        }
+
+        //refershes the content of the gameboard every second
+        RefreshBoard();
+		window.setInterval(RefreshBoard, 1000);
+
+        //click event which sends a turn to the api when a player clicks on a tictactoe space.
+        $(document).on('click', '.cell', function (e) {
+            $.ajax({
+				url: 'http://tttapi.chainrulegames.com/api/Game/Update?gameId=@(Model)',
+                method: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": "Bearer " + localStorage.accessToken
+                },
+                data: JSON.stringify(e.currentTarget.id)
+            }).done(function (data) {
+                RefreshBoard();
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error: It is not your turn.');
+            });
+        });
+	</script>
+}
