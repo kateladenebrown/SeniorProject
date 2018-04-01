@@ -1,5 +1,5 @@
 ﻿@*Kate Brown 3/27/18 9h*@
-
+@*Todd Clark 4/1/2018 Edited to work on mobile*@
 
 @using TicTacToeUI.Models;
 @model  int
@@ -63,8 +63,15 @@
                 $('#5').text(gameState.Grid[5] || "");
                 $('#6').text(gameState.Grid[6] || "");
                 $('#7').text(gameState.Grid[7] || "");
-                $('#8').text(gameState.Grid[8] || "");
-                $('#turn').text("Current turn: " + gameState.CurrentTurnUser);
+				$('#8').text(gameState.Grid[8] || "");
+				if (winnerDisplayed)
+				{
+					$('#turn').text("Winner: " + gameState.Victor);
+				}
+				else
+				{
+					$('#turn').text("Current turn: " + gameState.CurrentTurnUser);
+				}
                 if (gameState.Victor !== null && !winnerDisplayed) {
                     if (gameState.Victor === "draw") {
                         alert(gameState.Victor + "!");
@@ -84,20 +91,23 @@
 		window.setInterval(RefreshBoard, 1000);
 
         //click event which sends a turn to the api when a player clicks on a tictactoe space.
-        $(document).on('click', '.cell', function (e) {
-            $.ajax({
-				url: 'http://tttapi.chainrulegames.com/api/Game/Update?gameId=@(Model)',
-                method: 'POST',
-                contentType: 'application/json',
-                headers: {
-                    "Authorization": "Bearer " + localStorage.accessToken
-                },
-                data: JSON.stringify(e.currentTarget.id)
-            }).done(function (data) {
-                RefreshBoard();
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                alert('Error: It is not your turn.');
-            });
+		$(document).on('click touchstart', '.cell', function (e) {
+			if (!winnerDisplayed)
+			{
+				$.ajax({
+					url: 'http://tttapi.chainrulegames.com/api/Game/Update?gameId=@(Model)',
+					method: 'POST',
+					contentType: 'application/json',
+					headers: {
+						"Authorization": "Bearer " + localStorage.accessToken
+					},
+					data: JSON.stringify(e.currentTarget.id)
+				}).done(function (data) {
+					RefreshBoard();
+				}).fail(function (jqXHR, textStatus, errorThrown) {
+					alert('Error: It is not your turn.');
+				});
+			}
         });
 	</script>
 }

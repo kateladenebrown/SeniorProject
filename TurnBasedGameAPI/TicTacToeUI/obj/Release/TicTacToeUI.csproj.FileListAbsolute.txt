@@ -39,3 +39,4 @@ C:\Users\tehph\Source\Repos\SeniorProject\TurnBasedGameAPI\TicTacToeUI\bin\Syste
 C:\Users\tehph\Source\Repos\SeniorProject\TurnBasedGameAPI\TicTacToeUI\obj\Release\TicTacToeUI.csproj.CoreCompileInputs.cache
 C:\Users\tehph\Source\Repos\SeniorProject\TurnBasedGameAPI\TicTacToeUI\obj\Release\TicTacToeUI.dll
 C:\Users\tehph\Source\Repos\SeniorProject\TurnBasedGameAPI\TicTacToeUI\obj\Release\TicTacToeUI.pdb
+C:\Users\tehph\Source\Repos\SeniorProject\TurnBasedGameAPI\TicTacToeUI\obj\Release\TicTacToeUI.csprojResolveAssemblyReference.cache
