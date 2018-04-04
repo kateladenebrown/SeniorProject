@@ -8,11 +8,11 @@ using TicTacToeUI.Models;
 
 namespace TicTacToeUI.Controllers
 {
-    public class GamePlayController : Controller
-    {
-        public ActionResult TTTGamePlay(int gameID)
-        {
-            return View(gameID);
-        }
-    }
+	public class GamePlayController : Controller
+	{
+		public ActionResult TTTGamePlay(int gameID)
+		{
+			return View(gameID);
+		}
+	}
 }
