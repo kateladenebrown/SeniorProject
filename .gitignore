@@ -19,3 +19,4 @@ TurnBasedGameAPI/TurnBasedGameAPI/obj/Debug/TurnBasedGameAPI.csproj.FileListAbso
 TurnBasedGameAPI/TurnBasedGameAPI.Tests/obj/Debug/TurnBasedGameAPI.Tests.csproj.FileListAbsolute.txt
 /.vs/VSWorkspaceState.json
 /.vs/slnx.sqlite
+/TurnBasedGameAPI/packages/Microsoft.Net.Compilers.2.6.1/tools/Microsoft.Build.Tasks.CodeAnalysis.dll

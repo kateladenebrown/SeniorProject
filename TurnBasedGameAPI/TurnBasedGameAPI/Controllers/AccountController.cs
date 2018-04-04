@@ -17,9 +17,9 @@ using System.Web.Http;
 using TurnBasedGameAPI.Models;
 using TurnBasedGameAPI.Providers;
 using TurnBasedGameAPI.Results;
-using GameEF;
-using System.Linq;
 using TurnBasedGameAPI.ViewModels;
+using System.Text.RegularExpressions;
+using System.Web.Http.Cors;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -28,6 +28,7 @@ namespace TurnBasedGameAPI.Controllers
     /// </summary>
     [Authorize]
     [RoutePrefix("api/Account")]
+    //[EnableCors(origins: "*", headers: "*", methods: "*")]
     public class AccountController : ApiController
     {
         private const string LocalLoginProvider = "Local";
@@ -67,7 +68,7 @@ namespace TurnBasedGameAPI.Controllers
             {
                 using (var db = new GameEntities())
                 {
-                    db.AspNetUsers.Single(x => x.UserName == User.Identity.Name).Active = false; // set active to false
+                    db.AspNetUsers.Single(x => x.UserName == User.Identity.Name).Active = false;
                     db.SaveChanges();
                 }
                 return Ok("The user account has been successfully deactivated.");
@@ -238,7 +239,8 @@ namespace TurnBasedGameAPI.Controllers
             {
                 using (var db = new GameEntities())
                 {
-                    var users = db.AspNetUsers.Where(u => u.Active == true).Select(x => new { x.Id, x.UserName }).ToList();
+                    // Modified by Michael Case to use a view-model
+                    var users = db.AspNetUsers.Select(x => new { x.UserName, x.Id }).ToList();
                     return Ok(users);
                 }
             }
@@ -260,58 +262,59 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>List of all active users</returns>
         [HttpGet]
         [Route("GetActive")]
-        public async Task<IHttpActionResult> GetActive()
+        public IHttpActionResult GetActive()
         {
             try
             {
                 using (var db = new GameEntities())
                 {
-
-                    //get all users whose status is active (2)
-                    List<AspNetUser> activeUsers = db.AspNetUsers.Where(au => au.Active == true).ToList();
+                    //Get all users whose status is active.
+                    List<AspNetUser> activeUsers = db.AspNetUsers.Where(au => au.Active).ToList();
 
                     return Ok(activeUsers);
                 }
             }
-            catch (ArgumentNullException e)
-            {
-                return Content(System.Net.HttpStatusCode.BadRequest, "No data found.");
-            }
             catch (Exception e)
             {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error and was unable to create the game. Please inform the development team.");
+                return Content(System.Net.HttpStatusCode.InternalServerError, "The server encountered an error. Please inform the development team.");
             }
         }
 
         // POST api/Account/UpdatePersonalDetails
         // Written by Tyler Lancaster, 2/6/2018
         /// <summary>
-        /// Updates user's publicly available information
+        /// Updates user's publicly available information.
         /// </summary>
-        /// <returns>A message indicating that the details were updated successfully, or an error otherwise</returns>
+        /// <returns>A message indicating that the details were updated successfully, or an error otherwise.</returns>
         [HttpPost]
         [Route("UpdatePersonalDetails")]
-        public async Task<IHttpActionResult> UpdatePersonalDetails(AspNetUser user)
+        public IHttpActionResult UpdatePersonalDetails(AspNetUser user)
         {
             try
             {
                 using (var db = new GameEntities())
                 {
-
                     AspNetUser u = db.AspNetUsers.Single(us => us.Id == user.Id);
 
                     if (user.LastName != null)
+                    {
                         u.LastName = user.LastName;
+                    }
 
                     if (user.FirstName != null)
+                    {
                         u.FirstName = user.FirstName;
+                    }
 
-                    if (user.Email != null)
+                    if (user.Email != null && ValidEmailCheck(user.Email))
+                    {
                         u.Email = user.Email;
+                    }
 
-                    if (user.PhoneNumber != null)
+                    if (user.PhoneNumber != null && ValidPhoneNumCheck(user.PhoneNumber))
+                    {
                         u.PhoneNumber = user.PhoneNumber;
-
+                    }
 
                     db.SaveChanges();
 
@@ -596,6 +599,35 @@ namespace TurnBasedGameAPI.Controllers
             }
 
             base.Dispose(disposing);
+        }
+
+        /// <summary>
+        /// Checks if given email address is correctly formatted. Loose definition.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns>True if email address is validly formatted else returns false</returns>
+        private static bool ValidEmailCheck(string email)
+        {
+            try
+            {
+                var addy = new System.Net.Mail.MailAddress(email);
+                return addy.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Checks if given phone number is correctly formatted.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>True if phone number is validly formatted else returns false</returns>
+        private static bool ValidPhoneNumCheck(string number)
+        {
+            return Regex.Match(number, @"^(\+[0-9]{9})$").Success;
         }
 
         #region Helpers

@@ -13,6 +13,16 @@ namespace TurnBasedGameAPI
     /// </summary>
     public interface IGameLogic
     {
+        //All
+        //3-17-2018
+        /// <summary>
+        /// Determines whether the conditions to create a game have been met.
+        /// </summary>
+        /// <param name="responseMessage">A location to store a response message for the user.</param>
+        /// <param name="players">The list of all players, including those invited to the new game and the initiator.</param>
+        /// <returns>A boolean value indicating the validity.</returns>
+        bool TryCreateGame(ref string responseMessage, List<string> players);
+
         //Kate Brown
         //02-13-2018
         /// <summary>
