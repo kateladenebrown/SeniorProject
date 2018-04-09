@@ -26,5 +26,12 @@ namespace PerilUI.Controllers
 
 			return View();
 		}
+
+		public ActionResult Rules()
+		{
+			ViewBag.Message = "Your rules page.";
+
+			return View();
+		}
 	}
 }
