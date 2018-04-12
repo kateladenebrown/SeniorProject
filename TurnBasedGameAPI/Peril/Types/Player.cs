@@ -30,5 +30,7 @@ namespace Peril.Types
 
         public int TurnPosition { get; set; }           // Where in turn order they are
 
+        public string hexColor { get; set; }            // player color
+
     }
 }
