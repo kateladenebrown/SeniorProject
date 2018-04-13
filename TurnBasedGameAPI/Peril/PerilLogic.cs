@@ -239,30 +239,32 @@ namespace Peril
         } // end try take turn
 
         /// <summary>
-        /// Sets up the First players, First turn.
+        /// Sets up the First player's First turn.
         /// </summary>
         /// <param name="CurGamState"></param>
         /// <param name="whomsTurn"></param>
-        /// <returns>JSON string GameState.</returns>
+        /// <returns>Updated JSON gameState</returns>
         private string PrepareTurn(string CurGamState, int whomsTurn)
         {
-            string retString; // holds the string that will be returned
             PerilGameStateModel thisState = JsonConvert.DeserializeObject<PerilGameStateModel>(CurGamState);
-            string whom = thisState.Players.Single(x => x.TurnPosition == whomsTurn).Name; // get name of current player
-            List<Types.Territory> holder = thisState.Territories.Where(x => x.Owner == whom).ToList(); // gets list of territories owned by player
-            int value = 0; // holder for powergain
-            foreach (Types.Territory t in holder)
-            { value += t.PowerValue; } // FE add PowerValue of each Territory
+            Player curPlayer = thisState.Players.Single(x => x.TurnPosition == whomsTurn);
 
-            value = value * thisState.PowerRate; // Rate * totalPowerValue = totalPowerGain. overlapped storage
+            int value = 0;                                              // holder for powergain
 
-            if (value < MinPowerGain) { value = MinPowerGain; } // if you gain less then Min, change to min
-            Types.Player p = thisState.Players.Single(x => x.Name == whom); // make copy of player
-            p.PowerTotal += value; // add value to players powerTotal
+            foreach (int t in curPlayer.TerritoryList)
+            {
+                value += thisState.Territories[t].PowerValue;           // FE add PowerValue of each Territory
+            }
 
-            thisState.Players.Add(p); // add player to thisState, serialize, return
-            retString = JsonConvert.SerializeObject(thisState);
-            return retString;
+            value = value * thisState.PowerRate;                        // Rate * totalPowerValue = totalPowerGain. overlapped storage
+
+            if (value < MinPowerGain) { value = MinPowerGain; }         // if you gain less then Min, change to min
+ 
+            curPlayer.PowerTotal += value;                              // add value to players powerTotal
+
+            thisState.Players.Add(curPlayer);                           // add player to thisState, serialize, return
+ 
+            return JsonConvert.SerializeObject(thisState);
         }
     }
 

@@ -13,11 +13,11 @@ namespace Peril.Models
 
         public List<Player> Players { get; set; }
 
-        public Types.Battle ActiveBattle { get; set; }
+        public Battle ActiveBattle { get; set; }
 
         public int Phase { get; set; }
 
-        public Dictionary<int, Types.Territory> Territories { get; set; }
+        public Dictionary<int, Territory> Territories { get; set; }
 
         public List<int> TurnOrder { get; set; }
 
