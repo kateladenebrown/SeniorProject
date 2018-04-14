@@ -1,0 +1,536 @@
+﻿@{
+	ViewBag.Title = "Peril";
+}
+
+<div class="jumbotron">
+	<h1>Chain Rule Games - Peril</h1>
+	<div id="loginPanel" class="hidden">
+		<h3>To play, you must first log in. If you do not yet have an account, use the button below to register.</h3>
+		<div class="text-center" style="margin-top:30px;">
+			<button class="btn btn-lg btn-primary" data-toggle="modal" data-target="#loginModal">Login</button>
+			<button class="btn btn-lg btn-primary" data-toggle="modal" data-target="#registerModal">Register</button>
+		</div>
+	</div>
+</div>
+
+<div id="gamePanel">
+	<div class="row">
+		<div class="col-md-4">
+			<div class="panel panel-default" id="pendingGamesPanel">
+				<div class="panel-heading">Pending Game Requests</div>
+				<div class="list-group"></div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="panel panel-default" id="activeGamesPanel">
+				<div class="panel-heading">Active Games</div>
+				<div class="list-group"></div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="panel panel-default" id="pastGamesPanel">
+				<div class="panel-heading">Completed Games</div>
+				<div class="list-group"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="text-right">
+		<button class="btn btn-primary" id="newGameModalButton">New Game</button>
+	</div>
+</div>
+
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="loginModalLabel">Login</h4>
+			</div>
+			<div class="modal-body">
+				<div class="hidden alert alert-success" role="alert" id="registerMessage">
+					<button type="button" class="close alert-custom-dismiss" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					Your account was created successfully. You may now log in.
+				</div>
+				<div class="hidden alert alert-danger" role="alert" id="loginErrorAlert">
+					<button type="button" class="close alert-custom-dismiss" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<span id="loginErrorText"></span>
+				</div>
+
+				<div class="form-group">
+					<label for="loginUsername">Username:</label>
+					<input type="text" class="form-control login-input" id="loginUsername" placeholder="Username" required>
+				</div>
+				<div class="form-group">
+					<label for="loginPassword">Password:</label>
+					<input type="password" class="form-control login-input" id="loginPassword" placeholder="Password" required>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="loginButton">Log In</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Registration Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="registerModalLabel">Register A New Account</h4>
+			</div>
+			<div class="modal-body">
+				<div class="hidden alert alert-danger" role="alert" id="registerErrorAlert">
+					<button type="button" class="close alert-custom-dismiss" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<ul id="registerErrorTextList"></ul>
+				</div>
+
+				<div class="form-group">
+					<label for="registerUsername">Username:</label>
+					<input type="text" class="form-control register-input" id="registerUsername" placeholder="Username" required>
+				</div>
+				<div class="form-group">
+					<label for="registerEmail">Email Address:</label>
+					<input type="email" class="form-control register-input" id="registerEmail" placeholder="Email Address" required>
+				</div>
+				<div class="form-group">
+					<label for="registerFirstName">First Name:</label>
+					<input type="text" class="form-control register-input" id="registerFirstName" placeholder="First Name">
+				</div>
+				<div class="form-group">
+					<label for="registerLastName">Last Name:</label>
+					<input type="text" class="form-control register-input" id="registerLastName" placeholder="Last Name">
+				</div>
+				<div class="form-group">
+					<label for="registerPassword">Password:</label>
+					<input type="password" class="form-control register-input" id="registerPassword" placeholder="Password" required>
+				</div>
+				<div class="form-group">
+					<label for="registerPasswordConfirm">Confirm Password:</label>
+					<input type="password" class="form-control register-input" id="registerPasswordConfirm" placeholder="Confirm Password" required>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="registerButton">Register Account</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- New Game Modal -->
+<div class="modal fade" id="newGameModal" tabindex="-1" role="dialog" aria-labelledby="newGameModalLabel">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="newGameModalLabel">Start A New Game</h4>
+			</div>
+			<div class="modal-body">
+				<div class="hidden alert alert-danger" role="alert" id="newGameErrorAlert">
+					<button type="button" class="close alert-custom-dismiss" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<ul id="newGameErrorTextList"></ul>
+				</div>
+
+				<div class="form-group">
+					<label for="userSelector">
+						User To Play With:
+					</label>
+					<select class="form-control" id="userSelector"></select>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-primary" id="createGameButton">Create Game</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Pending Game Modal -->
+<div class="modal fade" id="pendingGameModal" tabindex="-1" role="dialog" aria-labelledby="pendingGameModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="newGameModalLabel">Pending Game Details</h4>
+			</div>
+			<div class="modal-body">
+				<div class="hidden alert alert-danger" role="alert" id="pendingGameErrorAlert">
+					<button type="button" class="close alert-custom-dismiss" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<div id="pendingGameErrorText"></div>
+				</div>
+
+				<div class="form-group">
+					<label class="control-label">Game ID:</label>
+					<span class="form-control-static" id="pendingGameID"></span>
+				</div>
+
+				<div class="form-group">
+					<label class="control-label">Creation Date:</label>
+					<span class="form-control-static" id="pendingGameStartDate"></span>
+				</div>
+
+				<div>
+					<label class="control-label">Users:</label>
+					<div>
+						<table class="table">
+							<thead>
+								<tr>
+									<th>UserName</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							<tbody id="pendingGameUsersTbody"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer hidden">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-danger" id="rejectPendingGameButton">Reject Request</button>
+				<button type="button" class="btn btn-primary" id="acceptPendingGameButton">Accept Request</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@section scripts {
+	<script type="text/javascript">
+        var currentUserInfo;
+        var gameList = {};
+
+        function loadGamePanel() {
+            $('#loginPanel').addClass('hidden');
+            $('#gamePanel').removeClass('hidden');
+            $('#logoutButton').parent().removeClass('hidden');
+            $('#loggedInMessage').parent().removeClass('hidden');
+            getUserInformation();
+            getAllGames();
+        }
+
+        function loadLoginPanel() {
+            $('#gamePanel').addClass('hidden');
+            $('#loginPanel').removeClass('hidden');
+            $('#logoutButton').parent().addClass('hidden');
+            $('#loggedInMessage').parent().addClass('hidden');
+        }
+
+		window.setInterval(getAllGames, 5000);
+
+        function getAllGames() {
+            $("body").css("cursor", "progress");
+            $.ajax({
+				url: 'http://localhost:54897/api/Game/MyGames',
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + localStorage.accessToken
+                }
+            }).done(function (data) {
+                gameList = {};
+                $('#gamePanel .list-group').empty();
+                data.forEach(function (game) {
+                    gameList[game.Id] = game;
+                    var users = "";
+                    game.Users.forEach(function (user) {
+                        users += (users) ? ", " + user.UserName : user.UserName;
+                    });
+                    switch (game.Status) {
+                        case 1:
+                            var gameLink = "<a role='button' data-gid='" + game.Id + "' class='list-group-item pendingGameLink'>Game with " + users + " created on " + game.Start + "</a>";
+                            $('#pendingGamesPanel .list-group').append(gameLink);
+                            break;
+						case 2:
+							var gameLink = "<a href='@Url.Content("~/GamePlay/TTTGamePlay")?gameID=" + game.Id + "' role='button' data-gid='" + game.Id + "' class='list-group-item activeGameLink'>Game with " + users + " created on " + game.Start + "</a>";
+							$('#activeGamesPanel .list-group').append(gameLink);
+							break;
+						case 3:
+							var gameLink = "<a role='button' data-gid='" + game.Id + "' class='list-group-item pastGameLink'>Game with " + users + " started on " + game.Start + " and completed on " + game.End + "</a>";
+							$('#pastGamesPanel .list-group').append(gameLink);
+							break;
+                    }
+                });
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR);
+                //TODO: show error message
+            }).always(function () {
+                $("body").css("cursor", "auto");
+            });
+        }
+
+        function getUserInformation() {
+            $("body").css("cursor", "progress");
+            $.ajax({
+				url: 'http://localhost:54897/api/Account/Details',
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + localStorage.accessToken
+                }
+            }).done(function (data) {
+                $('#loggedInMessage').html("Hello, " + data.UserName);
+                currentUserInfo = data;
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                //TODO: show error message
+            }).always(function () {
+                $("body").css("cursor", "auto");
+            });
+        }
+
+        $(document).ready(function () {
+            //Check to see if user has a valid token in local storage.
+            if (localStorage.accessToken && localStorage.tokenExpiration) {
+                //If token exists but is expired, remove it from storage and show the login.
+                if (localStorage.tokenExpiration < new Date()) {
+                    localStorage.removeItem("accessToken");
+                    localStorage.removeItem("tokenExpiration");
+                    loadLoginPanel()
+                } else {
+                    //User has an active token - use it to try and load the main page.
+                    loadGamePanel();
+                }
+            } else {
+                loadLoginPanel()
+            }
+
+            $('.alert-custom-dismiss').on('click', function (e) {
+                $(this).parent().addClass('hidden');
+            });
+
+
+            //Button clicks:
+            $(document).on('click', '#registerButton', function (e) {
+                var username = $('#registerUsername').val();
+                var pwd = $('#registerPassword').val();
+                var confirm_pwd = $('#registerPasswordConfirm').val();
+                var fname = $('#registerFirstName').val();
+                var lname = $('#registerLastName').val();
+                var email = $('#registerEmail').val();
+
+                $("body").css("cursor", "progress");
+                $.ajax({
+					url: 'http://localhost:54897/api/Account/Register',
+                    method: 'POST',
+                    data: {
+                        Email: email,
+                        Username: username,
+                        FirstName: fname,
+                        LastName: lname,
+                        Password: pwd,
+                        ConfirmPassword: confirm_pwd
+                    }
+                }).done(function (data) {
+                    $('#registerModal').modal('hide');
+                    $('.register-input').val("");
+                    $('#registerMessage').removeClass('hidden');
+                    $('#loginModal').modal('show');
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    $('#registerErrorAlert').removeClass('hidden');
+                    $('#registerErrorTextList').empty();
+                    for (var property in jqXHR.responseJSON.ModelState) {
+                        if (jqXHR.responseJSON.ModelState && jqXHR.responseJSON.ModelState.hasOwnProperty(property)) {
+                            $('#registerErrorTextList').append("<li>" + jqXHR.responseJSON.ModelState[property] + "</li>");
+                        }
+                    }
+                }).always(function () {
+                    $("body").css("cursor", "auto");
+                });
+            });
+
+			$('#registerModal').on('hidden.bs.modal', function (e) {
+				$('#registerErrorAlert').addClass('hidden');
+			});
+
+            $(document).on('click', '#loginButton', function (e) {
+                username = $('#loginUsername').val();
+                pwd = $('#loginPassword').val();
+
+                $.ajax({
+					url: 'http://localhost:54897/api/Account/tokenLogin',
+                    method: 'POST',
+                    data: {
+                        grant_type: 'password',
+                        username: username,
+                        password: pwd
+                    }
+                }).done(function (data) {
+                    //Clear the form
+                    $('.login-input').val("");
+
+                    //Put the newly created token and its expiration date into local storage
+                    localStorage.accessToken = data.access_token;
+                    var tempDate = new Date();
+                    tempDate.setSeconds(tempDate.getSeconds() + data.expires_in);
+                    localStorage.tokenExpiration = tempDate;
+
+                    //Hide/Show relevent panels.
+                    $('#loginModal').modal('hide');
+                    loadGamePanel();
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    $('#loginErrorAlert').removeClass('hidden');
+                    $('#loginErrorText').html(jqXHR.responseJSON.error_description);
+                });
+            });
+
+			$('#loginModal').on('hidden.bs.modal', function (e) {
+				$('#loginErrorAlert').addClass('hidden');
+			});
+
+            $(document).on('click', '#logoutButton', function (e) {
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("tokenExpiration");
+                loadLoginPanel();
+            });
+
+            $(document).on('click', '#newGameModalButton', function (e) {
+                $("body").css("cursor", "progress");
+                //Build the list of users (which is used when starting a new game).
+                $.ajax({
+					url: 'http://localhost:54897/api/Account/GetAll',
+                    method: 'GET',
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.accessToken
+                    }
+                }).done(function (data) {
+                    $('#userSelector').empty();
+                    data.forEach(function (user) {
+                        var newOption = "<option value='" + user.UserName + "'>" + user.UserName + "</option>";
+                        $('#userSelector').append(newOption);
+                    });
+
+                    $('#newGameModal').modal('show');
+                    console.log(data);
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                    //TODO: show error message
+                }).always(function () {
+                    $("body").css("cursor", "auto");
+                });
+            });
+
+            $(document).on('click', '#createGameButton', function (e) {
+                var userToPlayWith = $('#userSelector').val();
+                var userList = [];
+                userList.push($('#userSelector').val());
+
+                $("body").css("cursor", "progress");
+                $.ajax({
+					url: 'http://localhost:54897/api/Game/Create',
+                    method: 'POST',
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.accessToken
+                    },
+                    contentType: 'application/json',
+                    //dataType: 'json',
+                    data: JSON.stringify(userList)
+                }).done(function (data) {
+                    getAllGames();
+                    $('#newGameModal').modal('hide');
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                    //TODO: show error message
+                }).always(function () {
+                    $("body").css("cursor", "auto");
+                });
+            });
+
+            $(document).on('click', '.pendingGameLink', function (e) {
+                var gid = $(this).data('gid');
+                var game = gameList[gid];
+                var currentUserStatus = 0;
+
+                $('#pendingGameID').html(gid);
+                $('#pendingGameStartDate').html(game.Start);
+
+                $('#pendingGameUsersTbody').empty();
+                game.Users.forEach(function (user) {
+                    if (user.UserName == currentUserInfo.UserName) {
+                        currentUserStatus = user.Status;
+                    }
+                    var newRow = "<tr><td>" + user.UserName + "</td><td>";
+                    switch (user.Status) {
+                        case 1:
+                            newRow += "Pending";
+                            break;
+                        case 2:
+                            newRow += "Active";
+                            break;
+                        case 3:
+                            newRow += "Inactive";
+                            break;
+                    }
+                    newRow += "</td></tr>";
+                    $('#pendingGameUsersTbody').append(newRow);
+                });
+
+                if (currentUserStatus == 1) {
+                    $('#pendingGameErrorText').html("Your status for this game is still 'Pending' - please select an option below.");
+                    $('#pendingGameErrorAlert').removeClass('hidden');
+                    $('#pendingGameModal .modal-footer').removeClass('hidden');
+                } else {
+                    $('#pendingGameErrorAlert').addClass('hidden');
+                    $('#pendingGameModal .modal-footer').addClass('hidden');
+                }
+
+                $('#pendingGameModal').modal('show');
+            });
+
+            $(document).on('click', '#rejectPendingGameButton', function (e) {
+                var gid = $('#pendingGameID').html();
+
+                $("body").css("cursor", "progress");
+                $.ajax({
+					url: 'http://localhost:54897/api/Game/UpdateUserStatus?newStatus=3&gID=' + gid,
+                    method: 'POST',
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.accessToken
+                    }
+                }).done(function (data) {
+                    getAllGames();
+                    $('#pendingGameModal').modal('hide');
+                    $('#pendingGameID').empty();
+                    $('#pendingGameStartDate').empty();
+                    $('#pendingGameUsersTbody').empty();
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                    //TODO: show error message
+                }).always(function () {
+                    $("body").css("cursor", "auto");
+                });
+			});
+
+			$(document).on('click', '#acceptPendingGameButton', function (e) {
+				var gid = $('#pendingGameID').html();
+
+				$("body").css("cursor", "progress");
+				$.ajax({
+					url: 'http://localhost:54897/api/Game/UpdateUserStatus?newStatus=2&gID=' + gid,
+					method: 'POST',
+					headers: {
+						"Authorization": "Bearer " + localStorage.accessToken
+					}
+				}).done(function (data) {
+					getAllGames();
+					$('#pendingGameModal').modal('hide');
+					$('#pendingGameID').empty();
+					$('#pendingGameStartDate').empty();
+					$('#pendingGameUsersTbody').empty();
+				}).fail(function (jqXHR, textStatus, errorThrown) {
+					console.log(jqXHR);
+					//TODO: show error message
+				}).always(function () {
+					$("body").css("cursor", "auto");
+				});
+			});
+        });
+	</script>
+}

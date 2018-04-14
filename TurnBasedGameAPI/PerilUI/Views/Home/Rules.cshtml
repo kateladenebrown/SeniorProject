@@ -1,0 +1,68 @@
+﻿
+@{
+	ViewBag.Title = "Rules";
+}
+
+<h2>Peril Rules</h2>
+
+<h3>
+	Objective 
+</h3>
+<p>
+	Spread and conquer the map by occupying every territory and eliminating all opponents.
+</p>
+<h3>Setup</h3>
+<p>
+	You control a special piece referred to as the Leader and many other pieces referred to as troops which constitute your army, and you are differentiated from other players by an assigned color. Initially, territories are held by a neutral faction and the number of neutral troops located there is based on the territory’s connections to other territories. The neutral faction does not attack, but will defend their territory when attacked. A turn order will be selected for you by the computer. Players take turns as dictated by turn order to select a single territory to take over initially where their Leader will be placed and their troops start, and will spread from that starting point.
+	As the game progresses, you will increase the size of your army primarily by buying troops with Currency. Be aware that any troops that are bought are placed automatically where your Leader currently resides. Currency is generated based on a number of factors:
+	Each territory earns the player [some amount] of Currency, based on the strategic value of the territory.
+	A default amount of Currency is earned each turn, regardless of territories held.
+	[Bonuses for multiple connected territories/all connected]
+</p>
+<h3>
+	Play
+</h3>
+<p>
+	Once all players have chosen their starting territory, the player that was selected to go first will begin their first turn.
+	<br />
+	Each turn is split into three phases: Preparation, Attack, Reinforcement.
+</p>
+<h3>
+	Preparation
+</h3>
+<p>
+	During the Preparation phase, players may choose to buy more troops with Currency, all of which will be placed in the same territory that the Leader currently resides in. During this phase, any troops co-located with the Leader may also be gifted to another player, and gifted troops will be placed where that player’s Leader is. If the other player’s Leader is not on the map, you cannot gift them troops.
+	Once you have completed your turn preparation, you may commence your attack phase.
+</p>
+
+<h3>Attack</h3>
+
+<p>
+	During the Attack phase, the player has the option to attack adjacent opponent- or neutral-owned territories. In order to attack, you must have at least two troops in the attacking territory. First, select the territory you are attacking from, and which territory you are attacking, and choose how many troops to commit to the attack. You may commit, at most, the amount of troops in the attacking territory minus the minimum of one troop that must remain behind to hold the territory. For instance, if you had 5 troops in your attacking territory, the most you could commit to the attack is 4.
+	Attacks are executed in waves of up to three attackers against up to two defenders. The results of combat is decided based on chance. After each wave, you have the option to retreat or continue with the next wave. You may also throw caution to the wind and fully commit to your attack, automatically completing all waves. Be aware that if there are an equal amount of attackers and defenders, the defenders have a slight advantage.
+	Once either all defending troops on the defending territory are eliminated or you no longer have enough troops to attack with, or you retreat, the attack is considered complete. Once an attack is complete, the victor has a chance to gain [some amount] of their opponent’s defeated troops. Thus, if the defender (including the neutral faction) wins, they may bolster their position with more troops, so plan your attacks carefully.
+	If you conquered the territory you were attacking, your remaining committed troops will automatically move to hold the territory. You may send additional troops from the attacking territory to the conquered territory during this time, as long as at least one troop is left in the attacking territory. You may also choose to move your Leader into the newly captured territory.
+	You may continue your attack from any viable territory, including the newly conquered territory. Once you can no longer attack or you choose to cease, you will move on to the last phase, Reinforcement.
+	<br />
+	<br />
+	A note on the Leader:
+	If territory holding the Leader is taken, the Leader is killed and you must pay Currency to replace him/her. The cost of replacing your Leader increases with each death. Once bought, you may place your Leader on any of your owned territories during your Preparation phase.
+	The player that defeats another player’s Leader gains the Currency equivalent to the cost for that player to replace their Leader. When you completely remove an opponent from the game, you gain that defeated player’s entire Currency.
+	While your Leader is dead, you may not place more troops on the map. You also may not gain the additional troops from winning combat.
+</p>
+
+<h3>Reinforcement</h3>
+<p>
+	During this phase, you may move troops to adjacent owned territories. While you can make multiple moves in this phase, each individual troop may only move once per turn. At least one troop must remain on every owned territory at any given time. You may also move your Leader to an adjacent owned territory.
+</p>
+<h3>Elimination</h3>
+<p>
+	A player is eliminated when all their territories are conquered. When a player is eliminated by another player, the conquering player gains all the eliminated player’s Currency.
+	A player is also eliminated if they choose to resign from the game. In this case, all their remaining troops immediately turn neutral and their Leader is removed.
+</p>
+<h3>Winning</h3>
+<p>
+	The winner is the last person standing when all opponents have been eliminated.
+</p>
+
+
