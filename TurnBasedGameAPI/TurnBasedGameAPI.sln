@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEF", "GameEF\GameEF.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peril", "Peril\Peril.csproj", "{258AFAE6-467A-4658-B8AD-33C19487BC5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerilUI", "PerilUI\PerilUI.csproj", "{3FD56BAE-AF33-4CCE-A941-65099BBDB07C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{258AFAE6-467A-4658-B8AD-33C19487BC5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{258AFAE6-467A-4658-B8AD-33C19487BC5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{258AFAE6-467A-4658-B8AD-33C19487BC5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FD56BAE-AF33-4CCE-A941-65099BBDB07C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FD56BAE-AF33-4CCE-A941-65099BBDB07C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FD56BAE-AF33-4CCE-A941-65099BBDB07C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FD56BAE-AF33-4CCE-A941-65099BBDB07C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
