@@ -8,12 +8,18 @@ using Peril.Types;
 
 namespace Peril.Models
 {
-    class PerilGameStateModel
+    class PerilGameState
     {
-
-        public List<Player> Players { get; set; }
+        public Dictionary<string, Player> Players { get; set; }
 
         public Battle ActiveBattle { get; set; }
+
+        public BattleResult BattleResult { get; set; }
+
+        /// <summary>
+        /// The probability of a troop being revived.
+        /// </summary>
+        public int ReviveRate { get; set; } = 25;
 
         public int Phase { get; set; }
 
@@ -21,16 +27,15 @@ namespace Peril.Models
 
         public List<int> TurnOrder { get; set; }
 
-        public int PowerRate { get; set; }
+        public int PowerRate { get; set; } = 7;
 
         public int CurrentTurn { get; set; }
 
-        public string Victor { get; set; }
+        public string Victor { get; set; };
 
-
-        public PerilGameStateModel()
+        public PerilGameState()
         {
-            // unpack curTurn gameState JSON into holder object
+
         }
     }
 }

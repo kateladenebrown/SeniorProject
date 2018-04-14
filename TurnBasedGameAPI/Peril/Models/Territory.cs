@@ -12,16 +12,44 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Peril.Types
+namespace Peril.Models
 {
     public class Territory
     {
-        public string Name { get; set; } // title of territory
-        public string Owner { get; set; } // which player owns this
-        public int ForceCount { get; set; } // number of units on board
-        public int PowerValue { get; set; } // currency value of this territory
-        public int TerritoryNumber { get; set; }
-        public List<int> TConnections { get; set; } // the title of territories that are connected to this one
+
+        /// <summary>
+        /// The territory ID.
+        /// </summary>
+        public int ID { get; set; }
+
+        /// <summary>
+        /// The title of the territory.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The username for the owner of the territory.
+        /// </summary>
+        public string Owner { get; set; } 
+
+        /// <summary>
+        /// The number of units on the territory.
+        /// </summary>
+        public int ForceCount { get; set; } 
+
+        /// <summary>
+        /// The value of owning the territory.
+        /// </summary>
+        public int PowerValue { get; set; } 
+
+        /// <summary>
+        /// The list of territories (by ID) that are connected to this one.
+        /// </summary>
+        public List<int> Connections { get; set; } 
+
+        /// <summary>
+        /// The number of movable troops on this territory.
+        /// </summary>
         public int Moveable { get; set; }
 
         /// <summary>
@@ -42,7 +70,7 @@ namespace Peril.Types
         {
             Name = _name;
             ForceCount = force;
-            TConnections = Tconnections;
+            Connections = Tconnections;
             Owner = _owner;
             PowerValue = _powerValue;
         }

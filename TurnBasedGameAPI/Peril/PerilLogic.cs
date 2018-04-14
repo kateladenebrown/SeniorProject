@@ -5,14 +5,17 @@ using System.Linq;
 using TurnBasedGameAPI;
 using System.Web;
 using Peril.Models;
-using Peril.Types;
 
 namespace Peril
 {
     public class PerilLogic : IGameLogic
     {
-        int MinPowerGain = 0;
-        int TroopCost = 0;
+        private int MinPowerGain { get; set; } = 0;
+        private int TroopCost { get; set; } = 0;
+
+        enum Phase { Setup, Allocation, Attack, Move };
+        // This enum handles the negative values for the HowMany in Move Modal. Unsure if we wanted to seperate these
+        enum Move { Leader = -1, EndTurn = -2, Retreat = -3 };
 
         //KateBrown 10 mins
         //4-3-2018
@@ -56,47 +59,49 @@ namespace Peril
             int currentUserStatus = usernameStatusList.Single(x => x.Item1 == callingUsername).Item2;
             bool otherPendingUsers = usernameStatusList.Where(x => x.Item1 != callingUsername && x.Item2 == 1).Any();
 
+            //Using is pending and requesting a move to "active"
             if (currentUserStatus == 1 && requestedStatus == 2)
             {
                 if (otherPendingUsers)
                 {
                     return 1;
                 }
-                else
+                else //If there are no other pending users, start the game.
                 {
                     outputGameState = CreateGame(usernameStatusList);
 
                     return 2;
                 }
             }
+            //User rejected the invite.
             else if (currentUserStatus == 1 && requestedStatus == 3)
             {
-                //rejected invite
                 return 3;
             }
+            //User forfeited the game.
             else if (currentUserStatus == 2 && requestedStatus == 3)
             {
-
                 PerilGameState tempGameState = JsonConvert.DeserializeObject<PerilGameState>(currentGameState);
 
-                if (usernameStatusList.Where(x => x.Item1 != callingUsername && x.Item2 == 2).Any()) //any remaining active players
+                //If there are 2 or more remaining active users, the game is not yet over.
+                if (usernameStatusList.Where(x => x.Item1 != callingUsername && x.Item2 == 2).Count() > 1)
                 {
-                    Player currentPlayer = tempGameState.Players.Single(x => x.Name == callingUsername);
+                    Player currentPlayer = tempGameState.Players[callingUsername];
 
                     foreach (int i in currentPlayer.TerritoryList)
                     {
-                        tempGameState.Territories[i].Owner = "Neutral";
+                        tempGameState.Territories[i].Owner = null;
                     }
 
-                    currentPlayer.hexColor = "#a8a8a8";  //Grey
+                    currentPlayer.HexColor = "#a8a8a8";  //Grey
 
-                    tempGameState.TurnOrder.Remove(currentPlayer.TurnPosition); //removes player from TurnOrder list
+                    tempGameState.TurnOrder.Remove(currentPlayer.ID);
 
                     outputGameState = JsonConvert.SerializeObject(tempGameState);
 
                     return 1;
                 }
-                else
+                else //There is only one other active player left, so the game is over.
                 {
                     tempGameState.Victor = usernameStatusList.Single(x => x.Item1 != callingUsername && x.Item2 == 2).Item1; // last remaining active player wins
 
@@ -113,10 +118,10 @@ namespace Peril
         }
 
         /// <summary>
-        /// Sets initial gameState 
+        /// Creates the initial game state object.
         /// </summary>
         /// Coded by Stephen 
-        /// <param name="playerNames"></param>
+        /// <param name="playerNames">The list of players in the game.</param>
         public string CreateGame(List<Tuple<string, int>> usernameStatusList)
         {
             PerilGameState thisGame = new PerilGameState();
@@ -134,138 +139,309 @@ namespace Peril
 
                 Player p = new Player();
                 p.Name = selectedUser.Item1;
-                p.TurnPosition = j;
+                p.ID = j;
                 j++;
-                thisGame.Players.Add(p);
+                thisGame.Players.Add(selectedUser.Item1, p);
             } while (usernameStatusList.Count() > 0);
 
             return JsonConvert.SerializeObject(thisGame);
         }
 
-
-        public int TryTakeTurn(ref string OutPutGameState, string CurrentGameState, int GameID, string UserName, string RequestedTurn)
+        public int TryTakeTurn(ref string outPutGameState, string currentGameState, int gameID, string userName, string requestedTurn)
         {
-            Models.MoveModel move = JsonConvert.DeserializeObject<Models.MoveModel>(RequestedTurn);
-            Models.PerilGameStateModel CurGameState = JsonConvert.DeserializeObject<Models.PerilGameStateModel>(CurrentGameState);
+            MoveModel move = JsonConvert.DeserializeObject<MoveModel>(requestedTurn);
+            PerilGameState curGameState = JsonConvert.DeserializeObject<PerilGameState>(currentGameState);
+            Player player = curGameState.Players[userName];
+            int retInt = 0; // zero is invalid request code, will return this unless move works
 
-            //int retInt = 0;
-
-            //switch (CurGameState.Phase)
-            //{
-            //    case 0: // case of initial setup phase. placement only of necromancer
-            //        if (move.howMany == -1 && move.To.Owner == "Neutral") // -1 to mean move player && To must be Neutral 
-            //        {
-            //            if (UserName == CurGameState.TurnOrder[CurGameState.CurrentTurn]) // check if is users turn
-            //            {
-            //                Types.Territory t = move.To;
-            //                t.Owner = UserName;
-            //                CurGameState.Territories.Add(t);
-            //                CurGameState.CurrentTurn++; // this advances the turn order 
-
-            //                retInt = 1;
-            //            }
-            //        }
-            //        // calc front end of turn
-            //        CurGameState.CurrentTurn = 0; // set to first players turn
-            //        PrepareTurn(JsonConvert.SerializeObject(CurGameState), 0);
-
-            //        break; // end case 0
-
-            //    case 1: // case of allocation
-            //        if (CurGameState.TurnOrder[CurGameState.CurrentTurn] == UserName && move.To.Owner == UserName)
-            //        { // must be your turn and moving to your territory
-            //            if (move.howMany <= CurGameState.Players.Single(x => x.Name == UserName).Unallocated)
-            //            { // howMany must be less then or equal to the number of that players unallocated
-            //                Types.Territory t = move.To;
-            //                t.ForceCount += move.howMany;
-            //                CurGameState.Players.Single(x => x.Name == UserName).Unallocated += -move.howMany;
-
-            //                retInt = 1;
-            //            }
-            //        }
-
-            //        break; // end case 1
-
-            //    case 2: // case of attack
-            //        if (CurGameState.TurnOrder[CurGameState.CurrentTurn] == UserName && CurGameState.ActiveBattle != null) { } // show battle screen
-            //                                                                                                                      // if its your turn and activeBattle is not null. show battle
-            //        if (CurGameState.TurnOrder[CurGameState.CurrentTurn] == UserName && move.From.Owner == UserName && move.To.Owner != UserName)
-            //        { // must be your turn and and moving from your territory to a where u arent the owner
-            //            if (move.howMany < move.From.ForceCount)
-            //            { // howMany must have less then number in territory
-            //                Types.Battle thisBattle = new Types.Battle(RequestedTurn);
-            //                CurGameState.ActiveBattle = thisBattle;
-            //                // show Battle screen
-            //                // update final battle results
-
-            //                retInt = 1; 
-            //            }
-            //        }
-
-            //        break; // end case 2
-
-            //    case 3: // case of movement
-            //        if (CurGameState.TurnOrder[CurGameState.CurrentTurn] == UserName && move.To.Owner == UserName)
-            //        { // must be your turn and moving to an owned territory
-            //            if (move.howMany == -1)// case of leader movement
-            //            {
-            //                if (!CurGameState.Players.Single(x => x.Name == UserName).leaderMoved)
-            //                {
-            //                    CurGameState.Players.Single(x => x.Name == UserName).LeaderLocation = move.To.TerritoryNumber;
-            //                    CurGameState.Players.Single(x => x.Name == UserName).leaderMoved = true;
-
-            //                    retInt = 1;
-            //                }
-            //            }
-            //            else if (move.From.Moveable >= move.howMany && move.howMany != -1) // case of moving troops
-            //            {
-            //                Types.Territory t = move.To;
-            //                Types.Territory f = move.From;
-            //                t.ForceCount += move.howMany;
-            //                f.ForceCount = f.ForceCount - move.howMany;
-            //                f.Moveable += -move.howMany;
-
-            //                retInt = 1;
-            //            }
-            //        }
-
-            //        break; // end case 3
-            //}
-            // serialize here
-            OutPutGameState = JsonConvert.SerializeObject(CurGameState);
-            // put curGameState into OutPutGameState
-
-            return 0;
-        } // end try take turn
-
-        /// <summary>
-        /// Sets up the First player's First turn.
-        /// </summary>
-        /// <param name="CurGamState"></param>
-        /// <param name="whomsTurn"></param>
-        /// <returns>Updated JSON gameState</returns>
-        private string PrepareTurn(string CurGamState, int whomsTurn)
-        {
-            PerilGameStateModel thisState = JsonConvert.DeserializeObject<PerilGameStateModel>(CurGamState);
-            Player curPlayer = thisState.Players.Single(x => x.TurnPosition == whomsTurn);
-
-            int value = 0;                                              // holder for powergain
-
-            foreach (int t in curPlayer.TerritoryList)
+            // Check if it is the user's turn.
+            if (player.ID == curGameState.TurnOrder[curGameState.CurrentTurn])
             {
-                value += thisState.Territories[t].PowerValue;           // FE add PowerValue of each Territory
+                Territory to = (curGameState.Territories.ContainsKey(move.To)) ? curGameState.Territories[move.To] : null;
+                Territory from = (curGameState.Territories.ContainsKey(move.From)) ? curGameState.Territories[move.From] : null;
+
+                switch (curGameState.Phase)
+                {
+                    case (int)Phase.Setup:
+
+                        //If the location the user is trying to claim is available (and they haven't yet chosen), give them the territory.
+                        if (to.Owner == null && player.LeaderLocation == -1)
+                        {
+                            to.Owner = userName; // change owner to username
+                            retInt = 1;
+
+                            if (IncrementTurnOrder(ref curGameState))
+                            {
+                                curGameState.Phase = (int)Phase.Allocation;
+                                CalculatePowerGain(ref curGameState);
+                            }
+                        }
+                        break;
+
+                    case (int)Phase.Allocation:
+
+                        if (player.LeaderLocation == -1 && move.From == (int)Move.Leader)
+                        {
+                            if (player.PowerTotal >= player.LeaderCost && player.TerritoryList.Contains(move.To))
+                            {
+                                player.PowerTotal -= player.LeaderCost;
+                                player.LeaderCost = player.LeaderCost * 2;
+                                player.LeaderLocation = move.To;
+                                retInt = 1;
+                            }
+                        }
+                        else if (player.LeaderLocation != -1 && move.HowMany > 0)
+                        {
+                            // Check if the player has enough currency to make the purchase.
+                            int CostHolder = move.HowMany * TroopCost;
+                            if (player.PowerTotal >= CostHolder)
+                            {
+                                player.PowerTotal -= CostHolder;
+                                curGameState.Territories[player.LeaderLocation].ForceCount += move.HowMany;
+                                retInt = 1;
+                            }
+                        }
+                        else if (move.HowMany == (int)Move.EndTurn)
+                        {
+                            curGameState.Phase = (int)Phase.Attack;
+                            retInt = 1;
+                        }
+                        break;
+
+                    case (int)Phase.Attack:
+
+                        //If there is a battle going on and there is not yet a victor:
+                        if (curGameState.ActiveBattle != null)
+                        {
+                            if (move.HowMany == (int)Move.Retreat)
+                            {
+                                FinalResult(ref curGameState, false);
+                            }
+                            else
+                            {
+                                Attack(ref curGameState);
+                            }
+                            break;
+                        }
+                        //Validate battle creation call.
+                        else if (from.Owner == userName
+                            && to.Owner != userName
+                            && move.HowMany < from.ForceCount
+                            && move.HowMany > 0
+                            && from.Connections.Contains(move.To))
+                        {
+                            curGameState.ActiveBattle = new Battle(move);
+                            retInt = 1;
+                        }
+                        else if (move.HowMany == (int)Move.EndTurn)
+                        {
+                            curGameState.Phase = (int)Phase.Move;
+                            SetMovableTroops(ref curGameState);
+                            retInt = 1;
+                        }
+                        
+                        break;
+
+                    case (int)Phase.Move:
+                        if (to.Owner != userName)
+                        {
+                            break;
+                        }
+
+                        if (move.HowMany == (int)Move.Leader && !player.LeaderMoved)
+                        {
+                            player.LeaderLocation = move.To;
+                            player.LeaderMoved = true;
+                        }
+                        else if (move.HowMany <= from.Moveable && move.HowMany > 0 && (from.ForceCount - move.HowMany) > 0)
+                        {
+                            to.ForceCount += move.HowMany;
+                            from.ForceCount -= move.HowMany;
+                            from.Moveable -= move.HowMany;
+                        }
+                        else if (move.HowMany == (int)Move.EndTurn)
+                        {
+                            IncrementTurnOrder(ref curGameState);
+                            CalculatePowerGain(ref curGameState);
+                        }
+                        else
+                        {
+                            break;
+                        }
+
+                        retInt = 1;
+                        break;
+                }
             }
 
-            value = value * thisState.PowerRate;                        // Rate * totalPowerValue = totalPowerGain. overlapped storage
+            outPutGameState = JsonConvert.SerializeObject(curGameState);
 
-            if (value < MinPowerGain) { value = MinPowerGain; }         // if you gain less then Min, change to min
- 
-            curPlayer.PowerTotal += value;                              // add value to players powerTotal
-
-            thisState.Players.Add(curPlayer);                           // add player to thisState, serialize, return
- 
-            return JsonConvert.SerializeObject(thisState);
+            return retInt;
         }
-    }
 
+        /// <summary>
+        /// Increments the turn order, looping back to the start if needed.
+        /// </summary>
+        /// <param name="gameState">The current game state.</param>
+        /// <returns>Whether or not turn order reset.</returns>
+        private bool IncrementTurnOrder(ref PerilGameState gameState)
+        {
+            int nextTurnIndex = gameState.TurnOrder.IndexOf(gameState.CurrentTurn) + 1;
+
+            if (nextTurnIndex >= gameState.TurnOrder.Count())
+            {
+                gameState.CurrentTurn = gameState.TurnOrder[0];
+                return true;
+            }
+            else
+            {
+                gameState.CurrentTurn = gameState.TurnOrder[nextTurnIndex];
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Sets up all player's turns. Counts Territories powervalue times powerGainRate and adds power to players total.
+        /// </summary>
+        /// Coded by Stephen
+        /// <param name="CurGamState"></param>
+        /// <param name="currentTurn"></param>
+        /// <returns>No return. Acts upon ref to CurGameState</returns>
+        private void CalculatePowerGain(ref PerilGameState curGameState)
+        {
+            int currentTurn = curGameState.CurrentTurn;
+            Player player = curGameState.Players.Single(x => x.Value.ID == currentTurn).Value;
+
+            int value = 0; // holder for powergain
+
+            foreach (int t in player.TerritoryList)
+            {
+                value += curGameState.Territories[t].PowerValue * curGameState.PowerRate;
+            }
+
+            player.PowerTotal += (value < MinPowerGain) ? MinPowerGain : value;
+        }
+
+        private void SetMovableTroops(ref PerilGameState gameState)
+        {
+            int currentTurn = gameState.CurrentTurn;
+            Player player = gameState.Players.Single(x => x.Value.ID == currentTurn).Value;
+            player.LeaderMoved = false;
+
+            foreach (int i in player.TerritoryList)
+            {
+                Territory t = gameState.Territories[i];
+                t.Moveable = t.ForceCount;
+            }
+        }
+
+
+        // Coded by Stephen
+        // Modified by James
+        /// <summary>
+        /// Used to run attack algorithm when a player attacks another. 
+        /// </summary>
+        private void Attack(ref PerilGameState gameState)
+        {
+            Random random = new Random();
+            int attackDice = gameState.ActiveBattle.RemainingAttackers >= 3 ? 3 : gameState.ActiveBattle.RemainingAttackers;
+            int defenderDice = gameState.ActiveBattle.RemainingDefenders >= 2 ? 2 : gameState.ActiveBattle.RemainingDefenders;
+
+            int[] attackRolls = {
+                    random.Next(1, 7),
+                    random.Next(1, 7),
+                    random.Next(1, 7)
+                };
+            Array.Sort(attackRolls);
+
+            int[] defendRolls = {
+                    random.Next(1, 7),
+                    random.Next(1, 7)
+                };
+            Array.Sort(defendRolls);
+
+            // Count losses
+            int counter = (attackDice <= defenderDice) ? attackDice : defenderDice;
+            for (int i = 0; i < counter; i++)
+            {
+                if (attackRolls[attackDice - 1 - i] < defendRolls[defenderDice - 1 - i])
+                {
+                    gameState.ActiveBattle.AttackersLost++;
+                }
+                else
+                {
+                    gameState.ActiveBattle.DefendersLost++;
+                }
+            }
+
+
+            if (gameState.ActiveBattle.RemainingAttackers < 1)
+            {
+                FinalResult(ref gameState, true);
+            }
+            else if (gameState.ActiveBattle.RemainingDefenders < 1)
+            {
+                FinalResult(ref gameState, false);
+            }
+        }
+
+        // Code by Stephen and Tyler
+        // Modified by James
+        /// <summary>
+        /// Handles the end battle result
+        /// </summary>
+        /// <param name="attackerWon"></param>
+        private void FinalResult(ref PerilGameState gameState, bool attackerWon)
+        {
+            Random random = new Random();
+            int revivedTroops = 0;
+
+            Territory from = gameState.Territories[gameState.ActiveBattle.FromTerritory];
+            Territory to = gameState.Territories[gameState.ActiveBattle.Committed];
+            Player attacker = gameState.Players[from.Owner];
+            Player defender = gameState.Players[to.Owner];
+
+            if (attackerWon == true)
+            {
+                // Determine how many troops to revive based on % out of 100
+                for (int i = 0; i < gameState.ActiveBattle.DefendersLost; i++)
+                {
+                    if (random.Next(1, 101) <= gameState.ReviveRate)
+                    {
+                        revivedTroops++;
+                    }
+                }
+
+                // Defenders leader killed/taken
+                if (defender.LeaderLocation == to.ID)
+                {
+                    defender.LeaderLocation = -1;
+                }
+
+                // Place all committed & resurrected troops to new territory
+                to.Owner = attacker.Name;
+                to.ForceCount = gameState.ActiveBattle.RemainingAttackers + revivedTroops;
+                // Remove committed troops for attacking territory
+                from.ForceCount -= gameState.ActiveBattle.Committed;
+            }
+            else
+            {
+                // Determine how many troops to revive based on % out of 100
+                for (int i = 0; i < gameState.ActiveBattle.AttackersLost; i++)
+                {
+                    if (random.Next(1, 101) <= gameState.ReviveRate)
+                    {
+                        revivedTroops++;
+                    }
+                }
+                // Set territories new troop counts
+                to.ForceCount = gameState.ActiveBattle.RemainingDefenders + revivedTroops;
+                from.ForceCount -= gameState.ActiveBattle.AttackersLost;
+            }
+
+            gameState.BattleResult = new BattleResult(gameState.ActiveBattle.AttackersLost, gameState.ActiveBattle.DefendersLost, attackerWon, revivedTroops, defender.Name, attacker.Name);
+            gameState.ActiveBattle = null;
+        }
+
+    }
 }
