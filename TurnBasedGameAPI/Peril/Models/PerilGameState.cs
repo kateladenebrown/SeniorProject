@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Peril.Models;
-using Peril.Types;
 
 namespace Peril.Models
 {
@@ -31,7 +30,7 @@ namespace Peril.Models
 
         public int CurrentTurn { get; set; }
 
-        public string Victor { get; set; };
+        public string Victor { get; set; }
 
         public PerilGameState()
         {

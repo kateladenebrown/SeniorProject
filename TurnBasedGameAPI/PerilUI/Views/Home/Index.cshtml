@@ -206,6 +206,7 @@
 @section scripts {
 	<script type="text/javascript">
         var currentUserInfo;
+        var refreshInterval;
         var gameList = {};
 
         function loadGamePanel() {
@@ -213,6 +214,7 @@
             $('#gamePanel').removeClass('hidden');
             $('#logoutButton').parent().removeClass('hidden');
             $('#loggedInMessage').parent().removeClass('hidden');
+            refreshInterval = window.setInterval(getAllGames, 5000);
             getUserInformation();
             getAllGames();
         }
@@ -223,8 +225,6 @@
             $('#logoutButton').parent().addClass('hidden');
             $('#loggedInMessage').parent().addClass('hidden');
         }
-
-		window.setInterval(getAllGames, 5000);
 
         function getAllGames() {
             $("body").css("cursor", "progress");
@@ -387,6 +387,7 @@
             $(document).on('click', '#logoutButton', function (e) {
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("tokenExpiration");
+                clearInterval(refreshInterval);
                 loadLoginPanel();
             });
 
