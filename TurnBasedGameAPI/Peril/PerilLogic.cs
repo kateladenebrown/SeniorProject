@@ -80,40 +80,55 @@ namespace Peril
             }
             //User forfeited the game.
             else if (currentUserStatus == 2 && requestedStatus == 3)
-            {
-                PerilGameState tempGameState = JsonConvert.DeserializeObject<PerilGameState>(currentGameState);
-
-                //If there are 2 or more remaining active users, the game is not yet over.
-                if (usernameStatusList.Where(x => x.Item1 != callingUsername && x.Item2 == 2).Count() > 1)
-                {
-                    Player currentPlayer = tempGameState.Players[callingUsername];
-
-                    foreach (int i in currentPlayer.TerritoryList)
-                    {
-                        tempGameState.Territories[i].Owner = null;
-                    }
-
-                    currentPlayer.HexColor = "#a8a8a8";  //Grey
-
-                    tempGameState.TurnOrder.Remove(currentPlayer.ID);
-
-                    outputGameState = JsonConvert.SerializeObject(tempGameState);
-
-                    return 1;
-                }
-                else //There is only one other active player left, so the game is over.
-                {
-                    tempGameState.Victor = usernameStatusList.Single(x => x.Item1 != callingUsername && x.Item2 == 2).Item1; // last remaining active player wins
-
-                    outputGameState = JsonConvert.SerializeObject(tempGameState);
-
-                    return 3;
-                }
-
+            {  
+                return RemovePlayer(callingUsername, ref currentGameState, ref outputGameState, ref usernameStatusList);;
             }
             else
             {
                 return 0;
+            }
+        }
+
+        //Tyler Lancaster
+        /// <summary>
+        /// Removes given user. If only one active player remains, that player wins and game ends.
+        /// </summary>
+        /// <param name="user"> User to be removed </param>
+        /// <param name="currentGameState"> reference </param>
+        /// <param name="outputGameState"> reference </param>
+        /// <param name="usernameStatusList"> reference </param>
+        /// <returns>
+        /// 1: Valid status change.
+        /// 3: Valid status change, set game to inactive.</returns>
+        public int RemovePlayer(string user, ref string currentGameState, ref string outputGameState, ref List<Tuple<string, int>> usernameStatusList)
+        {
+            PerilGameState tempGameState = JsonConvert.DeserializeObject<PerilGameState>(currentGameState);
+
+            //If there are 2 or more remaining active users, the game is not yet over.
+            if (usernameStatusList.Where(x => x.Item1 != user && x.Item2 == 2).Count() > 1)
+            {
+                Player currentPlayer = tempGameState.Players[user];
+
+                foreach (int i in currentPlayer.TerritoryList)
+                {
+                    tempGameState.Territories[i].Owner = null;
+                }
+
+                currentPlayer.HexColor = "#a8a8a8";  //Grey
+
+                tempGameState.TurnOrder.Remove(currentPlayer.ID);
+
+                outputGameState = JsonConvert.SerializeObject(tempGameState);
+
+                return 1;
+            }
+            else //There is only one other active player left, so the game is over.
+            {
+                tempGameState.Victor = usernameStatusList.Single(x => x.Item1 != user && x.Item2 == 2).Item1; // last remaining active player wins
+
+                outputGameState = JsonConvert.SerializeObject(tempGameState);
+
+                return 3;
             }
         }
 
