@@ -239,7 +239,7 @@ namespace Peril
                             SetMovableTroops(ref curGameState);
                             retInt = 1;
                         }
-                        
+
                         break;
 
                     case (int)Phase.Move:
@@ -441,6 +441,37 @@ namespace Peril
 
             gameState.BattleResult = new BattleResult(gameState.ActiveBattle.AttackersLost, gameState.ActiveBattle.DefendersLost, attackerWon, revivedTroops, defender.Name, attacker.Name);
             gameState.ActiveBattle = null;
+        }
+
+        // coded by Stephen
+        // first pass at makeMap
+        private void MakeMap(ref PerilGameState thisGame)
+        {
+            // set up map here and generate territory list
+            Dictionary<int, List<int>> fromFile;
+            fromFile = MapReader(); // make FileOPS to load fromFile
+            Territory t;
+
+            foreach (int i in fromFile.Keys)
+            { // generate the territory list
+                t = new Territory();
+                t.Owner = "Neutral";
+                t.ID = i;
+                t.Connections = fromFile[i]; // this grabs the list of connections ? ?
+                t.ForceCount = fromFile[i].Count; // default to 1 ?
+                t.PowerValue = t.ForceCount * 10 ; // connections times 10
+                thisGame.Territories.Add(i, t);
+            }
+
+        }
+
+        // Coded by Stephen
+        private Dictionary<int, List<int>> MapReader()
+        {
+            Dictionary<int, List<int>> retDict ;
+
+
+            return retDict;
         }
 
     }
