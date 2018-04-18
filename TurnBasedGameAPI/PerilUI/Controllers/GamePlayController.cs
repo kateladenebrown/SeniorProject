@@ -10,9 +10,9 @@ namespace PerilUI.Controllers
 {
 	public class GamePlayController : Controller
 	{
-		public ActionResult PerilGamePlay(int id)
+		public ActionResult PerilGamePlay(int gameID)
 		{
-			return View(id);
+			return View(gameID);
 		}
 	}
 }
