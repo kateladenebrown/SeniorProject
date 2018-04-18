@@ -485,6 +485,27 @@
                 $('#pendingGameModal').modal('show');
             });
 
+            //katebrown 3/25/18 30m
+            $(document).on('click', '.activeGameLink', function (e) {
+                var gid = $(this).data('gid');
+                var newWindow = window.open("", "_blank");
+
+                $.ajax({
+                    url: 'http://localhost:54897/api/Game/' + gid,
+                    method: 'GET',
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.accessToken
+                    }
+                }).done(function (data) {
+                    newWindow.location.href = 'gameplay/perilgameplay?gameID=' + gid;
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                    //TODO: show error message
+                }).always(function () {
+                    $("body").css("cursor", "auto");
+                });
+            });
+
             $(document).on('click', '#rejectPendingGameButton', function (e) {
                 var gid = $('#pendingGameID').html();
 
