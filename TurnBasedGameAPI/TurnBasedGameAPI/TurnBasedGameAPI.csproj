@@ -254,6 +254,7 @@
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\GameDetails.cs" />
     <Compile Include="ViewModels\SimpleUserModel.cs" />
     <Compile Include="ViewModels\UserDetailsModel.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />

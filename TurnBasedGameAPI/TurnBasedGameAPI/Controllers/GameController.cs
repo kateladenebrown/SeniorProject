@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web.Http;
 using System.Net;
 using System.Data.Entity;
+using TurnBasedGameAPI.ViewModels;
 
 namespace TurnBasedGameAPI.Controllers
 {
@@ -56,7 +57,7 @@ namespace TurnBasedGameAPI.Controllers
         /// <returns>Returns the newly created game's ID if the game was created successfully, or an error otherwise.</returns>
         [HttpPost]
         [Route("Create", Name = "Create New Game")]
-        public IHttpActionResult CreateGame(List<string> players)
+        public IHttpActionResult CreateGame([FromBody] List<string> players)
         {
             try
             {
@@ -82,6 +83,12 @@ namespace TurnBasedGameAPI.Controllers
                     if (newGameUsers.Count() != players.Count())
                     {
                         return Content(HttpStatusCode.NotFound, "One or more of the game participants were not found in the database.");
+                    }
+
+                    string createGameMessage = null;
+                    if (!logic.TryCreateGame(ref createGameMessage, participants.Select(x => x.UserName).ToList()))
+                    {
+                        return Content(HttpStatusCode.BadRequest, createGameMessage);
                     }
 
                     Game g = new Game()
@@ -128,21 +135,19 @@ namespace TurnBasedGameAPI.Controllers
             {
                 using (var db = new GameEntities())
                 {
-                    IQueryable<Game> myGames = db.GameUsers.Where(gu => gu.AspNetUser.UserName == User.Identity.Name).Select(g => g.Game);
+                    IQueryable<Game> gameQueryable = db.GameUsers
+                        .Where(gu => gu.AspNetUser.UserName == User.Identity.Name)
+                        .Select(g => g.Game)
+                        .Include(x => x.GameUsers.Select(y => y.AspNetUser));
 
                     if (gameStatus != -1)
                     {
-                        myGames = myGames.Where(x => x.Status == gameStatus);
+                        gameQueryable = gameQueryable.Where(x => x.Status == gameStatus);
                     }
 
-                    ////May not be neccessary:
-                    ////In the case that the user exists but does not have any games, return OK with an empty result.
-                    //if (!myGames.Any())
-                    //{
-                    //    return Ok();
-                    //}
+                    List<GameDetails> gameList = gameQueryable.ToList().Select(x => new GameDetails(x)).ToList();
 
-                    return Ok(myGames.ToList());
+                    return Ok(gameList);
                 }
             }
             catch (ArgumentNullException e)
