@@ -34,7 +34,9 @@ namespace Peril.Models
 
         public PerilGameState()
         {
-
+            this.Players = new Dictionary<string, Player>();
+            this.Territories = new Dictionary<int, Territory>();
+            this.TurnOrder = new List<int>();
         }
     }
 }
