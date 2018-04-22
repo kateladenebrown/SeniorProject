@@ -210,7 +210,7 @@ namespace Peril
             gameState.Territories = territories;
         }
 
-        // Coded by James
+        // Coded by James & Garrick
         /// <summary>
         /// Creates a dictionary of each territory (key as territory id) to list of connecting territories (value as list of territory ids) 
         /// </summary>
