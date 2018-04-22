@@ -57,6 +57,22 @@ namespace Peril.Models
         /// </summary>
         public Territory() { }
 
+        // Coded by James
+        /// <summary>
+        /// Overloaded constructor sets ID, ForceCount, PowerValue, & Connections
+        /// </summary>
+        /// <param name="_id"></param>
+        /// <param name="_forceCount"></param>
+        /// <param name="_powerValue"></param>
+        /// <param name="_connections"></param>
+        public Territory(int _id, int _forceCount, int _powerValue, List<int> _connections)
+        {
+            ID = _id;
+            ForceCount = _forceCount;
+            PowerValue = _powerValue;
+            Connections = _connections;
+        }
+
         /// <summary>
         /// Used to construct each territory.
         /// </summary>

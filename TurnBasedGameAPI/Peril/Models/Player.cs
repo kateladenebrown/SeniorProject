@@ -16,6 +16,9 @@ namespace Peril.Models
 {
     public class Player
     {
+        /// <summary>
+        /// The player's ID
+        /// </summary>
         public int ID { get; set; } = -1;
 
         /// <summary>
@@ -43,7 +46,7 @@ namespace Peril.Models
         /// </summary>
         public bool LeaderMoved { get; set; } = false;
 
-        public int LeaderCost { get; set; } = 10; //TODO - costs!
+        public int LeaderCost { get; set; } = 6; 
 
         /// <summary>
         /// The player's color.
