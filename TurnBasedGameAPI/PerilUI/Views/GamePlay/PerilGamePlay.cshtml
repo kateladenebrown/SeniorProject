@@ -1,113 +1,69 @@
-﻿@*Kate Brown 3/27/18 9h*@
-@*Todd Clark 4/1/2018 Edited to work on mobile*@
+﻿@*Michael Case April 20, 2018*@
 
 @using PerilUI.Models;
 @model  int
 
+<head>
+    <style>
+     
+    </style>
+</head>
 
-@*TicTacToe gameboard layout. filled with jquery in RefreshBoard()*@
-<style>
-	.cell {
-		width: 33%;
-		height: 20vh;
-	}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Map -->
+        <div class="col-xs-9">
+                <img src="~/Content/map.png" class="img-responsive" alt="Responsive image">
+      
+        </div>
+         
+        <!-- Game Panel -->
+        <div class="col-xs-3">
+            <!-- Leader Portrait (this could be optional) -->
+                <img src="~/Content/skeleking.jpg" class="img-responsive" alt="Responsive image" style="background-color:blue;
+                        color:white;padding:10px;margin-bottom:10px;max-height:300px">
+            
+            <!-- Button to open Detailed Status Modal -->
+            <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#statusModal"
+                    style="background-color:orange; margin-bottom:10px">
+                Open Status Window
+            </button>
 
-	td:empty:after {
-		content: "\00a0";
-	}
-</style>
+            <!-- Simple Status Window -->
+            <div class="status-window", style="background-color:aqua;color:white;margin-bottom:10px;">
+                <p>Game details here. Needs some work</p>
+            </div>
 
-<div style="margin: 25px;">
-	<table style="width : 100%; text-align : center; font-size: 72px;">
-		<tbody>
-			<tr>
-				<td class="cell" id="0" style="border-right : solid 2px; border-bottom : solid 2px"></td>
-				<td class="cell" id="1" style="border-bottom : solid 2px"></td>
-				<td class="cell" id="2" style="border-left : solid 2px; border-bottom : solid 2px"></td>
-			</tr>
-			<tr>
-				<td class="cell" id="3" style="border-right : solid 2px;"></td>
-				<td class="cell" id="4"></td>
-				<td class="cell" id="5" style="border-left : solid 2px;"></td>
-			</tr>
-			<tr>
-				<td class="cell" id="6" style="border-right : solid 2px; border-top : solid 2px"></td>
-				<td class="cell" id="7" style="border-top : solid 2px"></td>
-				<td class="cell" id="8" style="border-left : solid 2px; border-top : solid 2px"></td>
-			</tr>
-		</tbody>
-	</table>
+            <!-- End Turn/phase, etc. button -->
+            <button type="button" class="btn btn-primary btn-lg btn-block" style="background-color:red">End Turn</button>
+
+            
+            <!-- Detailed Status Modal -->
+            <div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="Status" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel">Game Status</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="modTerr" class="text-left">Owned Territories</p>
+                            <p id="modTroops" class="text-left">Troops</p>
+                            <p id="modPower" class="text-left">Power</p>
+                            <p id="modReviveCost" class="text-left">Necro Revival Cost</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div id="turn"></div>
+
 @section scripts {
-	<script type="text/javascript">
 
-        var winnerDisplayed = false;
-
-        //Retrieves the latest gamestate using the game id and fills the gameboard. alerts user when there is a winner.
-        function RefreshBoard() {
-            $.ajax({
-				url: 'http://tttapi.chainrulegames.com/api/Game/' + @(Model),
-                method: 'GET',
-                headers: {
-                    "Authorization": "Bearer " + localStorage.accessToken
-                }
-            }).done(function (data) {
-
-                var gameState = JSON.parse(data.GameState1);
-                $('#0').text(gameState.Grid[0] || "");
-                $('#1').text(gameState.Grid[1] || "");
-                $('#2').text(gameState.Grid[2] || "");
-                $('#3').text(gameState.Grid[3] || "");
-                $('#4').text(gameState.Grid[4] || "");
-                $('#5').text(gameState.Grid[5] || "");
-                $('#6').text(gameState.Grid[6] || "");
-                $('#7').text(gameState.Grid[7] || "");
-				$('#8').text(gameState.Grid[8] || "");
-				if (winnerDisplayed)
-				{
-					$('#turn').text("Winner: " + gameState.Victor);
-				}
-				else
-				{
-					$('#turn').text("Current turn: " + gameState.CurrentTurnUser);
-				}
-                if (gameState.Victor !== null && !winnerDisplayed) {
-                    if (gameState.Victor === "draw") {
-                        alert(gameState.Victor + "!");
-                    } else {
-                        alert(gameState.Victor + " wins!");
-                    }
-					winnerDisplayed = true;
-                }
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR);
-                //TODO: show error message
-            });
-        }
-
-        //Refreshes the content of the gameboard every second
-        RefreshBoard();
-		window.setInterval(RefreshBoard, 1000);
-
-        //click event which sends a turn to the api when a player clicks on a tictactoe space.
-		$(document).on('click touchstart', '.cell', function (e) {
-			if (!winnerDisplayed)
-			{
-				$.ajax({
-					url: 'http://tttapi.chainrulegames.com/api/Game/Update?gameId=@(Model)',
-					method: 'POST',
-					contentType: 'application/json',
-					headers: {
-						"Authorization": "Bearer " + localStorage.accessToken
-					},
-					data: JSON.stringify(e.currentTarget.id)
-				}).done(function (data) {
-					RefreshBoard();
-				}).fail(function (jqXHR, textStatus, errorThrown) {
-					alert('Error: It is not your turn.');
-				});
-			}
-        });
-	</script>
 }

@@ -249,7 +249,7 @@
                             $('#pendingGamesPanel .list-group').append(gameLink);
                             break;
 						case 2:
-							var gameLink = "<a href='@Url.Content("~/GamePlay/TTTGamePlay")?gameID=" + game.Id + "' role='button' data-gid='" + game.Id + "' class='list-group-item activeGameLink'>Game with " + users + " created on " + game.Start + "</a>";
+							var gameLink = "<a href='@Url.Content("~/GamePlay/PerilGamePlay")?gameID=" + game.Id + "' role='button' data-gid='" + game.Id + "' class='list-group-item activeGameLink'>Game with " + users + " created on " + game.Start + "</a>";
 							$('#activeGamesPanel .list-group').append(gameLink);
 							break;
 						case 3:
