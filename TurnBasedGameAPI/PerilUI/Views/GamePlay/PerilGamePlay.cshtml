@@ -3,6 +3,7 @@
 @model  int
 
 <!-- Page Layout coded by Michael Case, Map Coded by Garrick Evans, Battle Coded by James Alberts -->
+<!-- All code merged by James -->
 <!DOCTYPE html svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <html lang="en">
 <head>
@@ -11,12 +12,11 @@
     <meta name="viewport" conent="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="PerilGamePlayStyles.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script type="text/javascript" src="PerilGamePlayScripts.js"></script>
 </head>
 <body>
+    <!------------------------------------- Page Layout Coded by Mike ------------------------------------>
     <div class="container-fluid">
         <div class="row">
             <!-- Map -->
@@ -497,7 +497,7 @@
                 </svg>
             </div>
 
-            <!-- Game Panel Coded by Mike -->
+            <!----------------- Game Panel Coded by Mike ------------------------->
             <div class="col-xs-3">
                 <!-- Leader Portrait (this could be optional) -->
                 <img src="~/Content/skeleking.jpg" class="img-responsive" alt="Responsive image" style="background-color:blue;
@@ -543,6 +543,34 @@
         </div>
     </div>
     <!------------------------------------------- Coded by James ----------------------------------------------->
+    <!-- Move Modal Coded by James -->
+    <div id="moveModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 id="moveModalHeader"></h4>
+                </div>
+                <div class="modal-body text-left">
+                    <p id="moveModalTroopsBody"></p>
+                    <p id="moveModalLeaderBody"></p>
+                    <p id="insufficientTroopCount" class="redText"></p>
+                    <form id="moveTroopsForm">
+                        Enter how many troops you would like to move:<br>
+                        <input type="number" id="moveTroopsField" min="1" max="1">
+                    </form>
+                    <p id="invalidTroopEntry" class="redText"></p>
+                    <button id="moveLeaderBtn" onclick="MoveLeader()" type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Move Leader</button>
+                    <button id="moveTroopsBtn" onclick="MoveTroops()" type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Move Troops</button>
+                    <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Commit Attacker Troops Modal Coded by James -->
     <div id="commitModal" class="modal fade" role="dialog">
         <div class="modal-dialog">

@@ -425,6 +425,7 @@ namespace Peril
             if (nextTurnIndex >= gameState.TurnOrder.Count())
             {
                 gameState.CurrentTurn = gameState.TurnOrder[0];
+                gameState.PowerRate += 0.1;
                 return true;
             }
             else
