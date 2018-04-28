@@ -6,14 +6,18 @@
     fill: #22aa44;
 }
 
-.highlighted 
+.selected 
 {
-    fill: #000000;
+    fill: #fff;
 }
 
-.moveable 
+.highlighted 
 {
 	fill: #ffd800;
+}
+
+.blackedOut {
+    fill: #000000;
 }
 
 .connection:hover 

@@ -162,7 +162,7 @@ namespace Peril
             colors.Add("#FFA500"); // Orange
             colors.Add("#800080"); // Purple
             colors.Add("#FF0000"); // Red
-            colors.Add("#FFFF00"); // Yellow
+            colors.Add("#808000"); // Olive
 
             // Create players, add initial values to each player, and then add them to game state
             int i = 0;

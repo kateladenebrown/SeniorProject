@@ -513,6 +513,16 @@
                 <div class="status-window" , style="background-color:aqua;color:white;margin-bottom:10px;">
                     <p>Game details here. Needs some work</p>
                 </div>
+                <!-- Added by James. Button handles buying leader if needed -->
+                <button id="buyLeaderBtn" onclick="ShowBuyLeader()" type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#buyLeaderModal"
+                        style="background-color:blue">
+                    Buy Leader
+                </button>
+                <!-- Added by James. Button handles buying troops if needed -->
+                <button id="buyTroopsBtn" onclick="ShowBuyTroops()" type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#buyTroopsModal"
+                        style="background-color:blue">
+                    Buy Troops
+                </button>
                 <!-- End Turn/phase, etc. button -->
                 <button type="button" class="btn btn-primary btn-lg btn-block" style="background-color:red">End Turn</button>
 
@@ -543,6 +553,59 @@
         </div>
     </div>
     <!------------------------------------------- Coded by James ----------------------------------------------->
+    <!-- Buy Leader Modal Coded by James -->
+    <div id="buyLeaderModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 id="buyLeaderModalHeader"></h4>
+                </div>
+                <div class="modal-body text-left">
+                    <p id="buyLeaderPowerBody"></p>
+                    <p id="buyLeaderCostBody"></p>
+                    <p id="buyLeaderInstructionBody"></p>
+                    <p id="insufficientPower" class="redText"></p>
+
+                    <button id="purchaseLeaderBtn" onclick="BuyLeader()" type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Purchase</button>
+                    <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buy Troops Modal Coded by James -->
+    <div id="buyTroopsModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 id="buyTroopsModalHeader"></h4>
+                </div>
+                <div class="modal-body text-left">
+                    <p id="buyTroopsInstructionBody"></p>
+                    <p id="buyTroopsPowerBody"></p>
+                    <p id="buyTroopsCostBody"></p>
+                    <form id="buyTroopsForm">
+                        Enter how many troops you would like to buy:<br>
+                        <input type="number" id="buyTroopsField" min="0" max="0">
+                    </form>
+                    <p id="purchaseResults" class="redText"></p>
+
+                    <button id="confirmPurchaseTroopsBtn" onclick="AddPurchasedTroops()" type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Confirm</button>
+                    <button id="purchaseTroopsBtn" onclick="BuyTroops()" type="button" class="btn btn-primary btn-lg">Purchase</button>
+                    <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Move Modal Coded by James -->
     <div id="moveModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -723,6 +786,8 @@
     <div class="hidden" id="gameID"></div>
     <div class="hidden" id="toID"></div>
     <div class="hidden" id="fromID"></div>
+    <!-- 1: Buy leader. -1 Not buying leader-->
+    <div class="hidden" id="buyLeader"></div>
 </body>
 
 </html>

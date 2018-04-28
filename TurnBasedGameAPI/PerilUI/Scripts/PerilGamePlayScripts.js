@@ -47,25 +47,25 @@ function centerMap() {
 
 // Marks connected territories yellow on mouseover
 //Written by Garrick Evans
-$(function () {
-    $('#map-matrix').children('path').filter('.territory').on('mouseenter mouseleave', function () {
-        var terrId = $(this).attr('id')
+//$(function () {
+//    $('#map-matrix').children('path').filter('.territory').on('mouseenter mouseleave', function () {
+//        var terrId = $(this).attr('id')
 
-        console.log('Territory Number: ' + terrId);
-        $(this).toggleClass('highlighted');
+//        console.log('Territory Number: ' + terrId);
+//        $(this).toggleClass('highlighted');
 
-        var i;
-        for (i = 0; i < connections[parseInt(terrId)].length; i++) {
-            $('#' + connections[parseInt(terrId)][i]).toggleClass('moveable');
-        }
-    });
-});
+//        var i;
+//        for (i = 0; i < connections[parseInt(terrId)].length; i++) {
+//            $('#' + connections[parseInt(terrId)][i]).toggleClass('moveable');
+//        }
+//    });
+//});
 
-$(function () {
-    $('#map-matrix').children('path').filter('.connection').on('click', function () {
-        console.log('Path: ' + $(this).attr('id'));
-    })
-});
+//$(function () {
+//    $('#map-matrix').children('path').filter('.connection').on('click', function () {
+//        console.log('Path: ' + $(this).attr('id'));
+//    })
+//});
 
 //Reads the connections JSON
 //Written by Garrick Evans
@@ -88,55 +88,7 @@ $(function () {
 // Method to handle click event for territories
 // ************************************************************************* TODO: Finish Method***************************************************************************************
 $('#.territory').click(function () {
-    var gameID = document.getElementById("gameID");
-
-    /* 
-        Logic for territory event handler
-        1. Get current game state
-        2. Use game state to make all variables needed
-        3. Check if players turn
-            3.1 If players turn, handle different possiblities depending on phases of game
-                3.1.1 Setup phase:
-                    - Check if territory is neutral (valid)
-                        - If checks pass, make api update call with move JSON
-                        - Else pop up saying territory already owned or leader already placed, maybe?
-                3.1.2 Allocation phase:
-                    - Check if player has leader on the board (player.leaderlocation == -1)
-                        - Unsure how we're handling purchases still, so allocation is still TODO
-                3.1.3 Attack phase:
-                    - Check if clicked territory has movable class
-                        - If has movable class, it implies 2nd (to) territory selected
-                            - If clicked territory owned by player, unknown how to handle yet
-                                (possibilities are show pop up saying already owned, or make this territory 1st selection (from) instead of (to), or do nothing, or ...)
-                            - Else clicked territory is not owned by player
-                                - Set (to) territory id in html to clicked territory id
-                                - Remove highlighted class from 'from' territory
-                                - Remove movable class from territories using connections and (from) territory id
-                                - Open commit modal to begin the attack
-                        - Else does not contain movable class, implies either 1st territory clicked on or a territory clicked outside of allowable connections
-                            treat both as 1st territory clicked??
-                                - Check if territory owned by player
-                                    - If owned by player
-                                        - Set (from) territory id in html to clicked territory id
-                                        - Add highlighted class to territory
-                                        - Add movable class to each connecting territories
-                3.1.4 Move phase:
-                    - Check if owned by player
-                        - If owned by player
-                            - Check if has movable class
-                                - If movable class, it implies 2nd (to) territory selected
-                                    - Set (to) territory id in html to clicked territory id
-                                    - Remove highlighted class from 'from' territory
-                                    - Remove movable class from connecting territories
-                                    - Open move modal to determine how many troops to move
-                                - Else does not contain movable class
-                                    - Set (from) territory id in html to clicked territory id
-                                    - Add highlighted class to territory
-                                    - Add moveable class to connecting territories
-                        - Else not owned by player either do nothing or show pop up of territory info or show pop up saying territory not owned by player ???                 
-            3.2 If not players turn show pop up of territory info ??
-
-    */
+    var gameID = $("#gameID").val;
 
     // GET request to game controllers GetGame(int id) for retrieving current game state
     $.ajax({
@@ -196,63 +148,122 @@ $('#.territory').click(function () {
                             }
                             break;
                         case 1: // Allocation Phase
-                            // TODO: Add code to allocation phase accounting for leader placement if needed
+                            // Player is buying leader
+                            if ($("#buyLeader").val == 1) {
+                                if (territoryOwner == playerName &&
+                                    gameState.Players[playerName].LeaderLocation == -1 &&
+                                    $(this).classList.contains('hightlighted')) {
+                                    CompleteLeaderPurchase();
+
+                                    // Remove highlighted and blackedOut territories
+                                    for (var territory in gameState.Territories) {
+                                        if (territory.value.Owner == playerName) {
+                                            $('#' + territory.key).classList.remove('highlighted');
+                                        } else {
+                                            $('#' + territory.key).classList.remove('blackedOut');
+                                        }
+                                    }
+                                }
+                            } else { // Not buying leader
+                                // TODO: Show pop up of territory info
+                            }
                             break;
                         case 2: // Attack Phase
-                            // Movable so 1st territory is already selected, making this the 2nd (to) territory selected
-                            if ($(this).classList.contains('moveable')) {
-                                // Territory owned by player
-                                if (territoryOwner == playerName) {
-                                    // TODO: Unknown how to handle yet, i.e. pop up saying already owned or make this 1st selection (from) instead of (to),...
-                                } else { // Territory not owned by player
-                                    document.getElementById("toID").innerHTML = territoryID;
-                                    var fromID = document.getElementById("fromID");
-                                    $('#' + fromID).classList.remove('highlighted');
-                                    var i;
-                                    for (i = 0; i < connections[fromID].length; i++) {
-                                        $('#' + connections[fromID][i]).classList.remove('moveable');
+                            // Territory is 'selected', 'highlighted', 'blackout', or none of those
+                            if ($(this).classList.contains('selected')) {
+                                // Undo coloring (selected/highlighted/blackedOut) of each territory accordingly
+                                for (var territory in gameState.Territories) {
+                                    if (territory.key == territoryID) {
+                                        $(this).classList.remove('selected');
+                                    } else if (territory.value.Owner != playerName && connections[territoryID].contains(territory.key)) {
+                                        $('#' + territory.key).classList.remove('highlighted');
+                                    } else {
+                                        $('#' + territory.key).classList.remove('blackedOut');
                                     }
-                                    // TODO: to and from IDs are both set in html only need to call/open commit modal
                                 }
-                            } else { // Not moveable so either it is 1st territory selected or new 1st territory selected outside of allowable range of previous 1st
-                                // Owned by player
-                                if (territoryOwner == playerName) {
-                                    document.getElementById("fromID").innerHTML = territoryID;
-                                    $('#' + territoryID).classList.add('highlighted');
-                                    var i;
-                                    for (i = 0; i < connections[territoryID].length; i++) {
-                                        $('#' + connections[territoryID][i]).classList.add('moveable');
+                            } else if ($(this).classList.contains('highlighted')) {
+                                $('#toID').val = territoryID;
+
+                                // Undo coloring (selected/highlighted/blackedOut) of each territory accordingly
+                                for (var territory in gameState.Territories) {
+                                    if (territory.key == territoryID) {
+                                        $(this).classList.remove('selected');
+                                    } else if (territory.value.Owner != playerName && connections[territoryID].contains(territory.key)) {
+                                        $('#' + territory.key).classList.remove('highlighted');
+                                    } else {
+                                        $('#' + territory.key).classList.remove('blackedOut');
                                     }
-                                } else { // Not owned by player
-                                    // TODO: Add pop up for territory info
+                                }
+
+                                // Load commit modal
+                                $('#commitModal').on('show.bs.modal', function () {
+                                    PopulateCommitModal();
+                                });
+                                $('#commitModal').modal('show');
+                            } else if ($(this).classList.contains('blackedOut')) {
+                                // TODO: Show pop up of territory info
+                            } else {
+                                $('#fromID').val = territoryID;
+
+                                // Color (selected/highlighted/blackedOut) each territory accordingly
+                                for (var territory in gameState.Territories) {
+                                    if (territory.key == territoryID) {
+                                        $(this).classList.add('selected');
+                                    } else if (territory.value.Owner != playerName && connections[territoryID].contains(territory.key)) {
+                                        $('#' + territory.key).classList.add('highlighted');
+                                    } else {
+                                        $('#' + territory.key).classList.add('blackedOut');
+                                    }
                                 }
                             }
-
                             break;
                         case 3: // Move Phase
-                            // Owned by player
-                            if (territoryOwner == playerName) {
-                                // Valid 'to' territory. Set toID to territory id & remove highlighted/moveable classes
-                                if ($(this).classList.contains('moveable')) {
-                                    document.getElementById("toID").innerHTML = territoryID;
-                                    var fromID = document.getElementById("fromID");
-                                    $('#' + fromID).classList.remove('highlighted');
-                                    var i;
-                                    for (i = 0; i < connections[fromID].length; i++) {
-                                        $('#' + connections[fromID][i]).classList.remove('moveable');
-                                    }
-
-                                    // TODO: Add call to move modal
-                                } else { // Not valid 'to' territory, set it as 'from'
-                                    document.getElementById("fromID").innerHTML = territoryID;
-                                    $('#' + territoryID).classList.add('highlighted');
-                                    var i;
-                                    for (i = 0; i < connections[territoryID].length; i++) {
-                                        $('#' + connections[territoryID][i]).classList.add('moveable');
+                            // Territory is 'selected', 'highlighted', 'blackedout', or none of those
+                            if ($(this).classList.contains('selected')) {
+                                // Undo coloring (selected/highlighted/blackedOut) of each territory accordingly
+                                for (var territory in gameState.Territories) {
+                                    if (territory.key == territoryID) {
+                                        $(this).classList.remove('selected');
+                                    } else if (territory.value.Owner == playerName && connections[territoryID].contains(territory.key)) {
+                                        $('#' + territory.key).classList.remove('highlighted');
+                                    } else {
+                                        $('#' + territory.key).classList.remove('blackedOut');
                                     }
                                 }
-                            } else { // Not owned by player
-                                // TODO: Add pop up for territory info
+                            } else if ($(this).classList.contains('highlighted')) {
+                                $('#toID').val = territoryID;
+
+                                // Undo coloring (selected/highlighted/blackedOut) of each territory accordingly
+                                for (var territory in gameState.Territories) {
+                                    if (territory.key == territoryID) {
+                                        $(this).classList.remove('selected');
+                                    } else if (territory.value.Owner == playerName && connections[territoryID].contains(territory.key)) {
+                                        $('#' + territory.key).classList.remove('highlighted');
+                                    } else {
+                                        $('#' + territory.key).classList.remove('blackedOut');
+                                    }
+                                }
+
+                                // Load move modal
+                                $('#moveModal').on('show.bs.modal', function () {
+                                    PopulateMoveModal();
+                                });
+                                $('#moveModal').modal('show');
+                            } else if ($(this).classList.contains('blackedOut')) {
+                                // TODO: Show pop up of territory info
+                            } else {
+                                $('#fromID').val = territoryID;
+
+                                // Color (selected/highlighted/blackedOut) each territory accordingly
+                                for (var territory in gameState.Territories) {
+                                    if (territory.key == territoryID) {
+                                        $(this).classList.add('selected');
+                                    } else if (territory.value.Owner == playerName && connections[territoryID].contains(territory.key)) {
+                                        $('#' + territory.key).classList.add('highlighted');
+                                    } else {
+                                        $('#' + territory.key).classList.add('blackedOut');
+                                    }
+                                }
                             }
                             break;
                         default: // Do nothing?
@@ -274,6 +285,210 @@ $('#.territory').click(function () {
     });
 });
 
+// James
+// Sets buyLeader to 1 indicating player is purchasing a leader and highlight each territory allowed to place leader
+function buyLeader() {
+    $("#buyLeader").val = 1;
+    var gameID = $("#gameID").val;
+
+    // GET request to game controllers GetGame(int id)
+    $.ajax({
+        method: 'GET',
+        url: '', // TODO: Add URL to call
+        headers: {
+            "Authorization": "Bearer " + localStorage.accessToken
+        }
+    }).done(function (data) {
+        var gameState = JSON.parse(data.GameState1);
+        var playerName = ""; // TODO: Add current players name somewhow
+
+        for (var territory in gameState.Territories) {
+            if (territory.value.Owner == playerName) {
+                $('#' + territory.key).classList.add('highlighted');
+            } else {
+                $('#' + territory.key).classList.add('blackedOut');
+            }
+        }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+    }).always(function () {
+        $("body").css("cursor", "auto");
+    });
+}
+
+// James
+// Opens modal and populates it with costs associated with players leader
+function ShowBuyLeaderModal() {
+    var gameID = $("#gameID").val;
+    var toTerritoryID = $("#toID").val;
+    // GET request to game controllers GetGame(int id)
+    $.ajax({
+        method: 'GET',
+        url: '', // TODO: Add URL to call
+        headers: {
+            "Authorization": "Bearer " + localStorage.accessToken
+        }
+    }).done(function (data) {
+        var gameState = JSON.parse(data.GameState1);
+        var playerName = ""; // TODO: Add current players name somewhow
+        var currentPower = gameState.Players[playerName].PowerTotal;
+        var necroCost = gameState.Players[playerName].LeaderCost;
+
+        // Modal content
+        $("#buyLeaderModalHeader").innerHTML = "Purchase Necromancer.";
+        $("#buyLeaderPowerBody").innerHTML = "You currently have " + currentPower + " power.";
+        $("#buyLeaderCostBody").innerHTML = "The cost to purchase a necromancer is " + necroCost + " power.";
+        $("#buyLeaderInstructionBody").innerHTML = "To puchase a necromancer, click on the purchase button then click on a territory that you own.";
+        $("#insufficientPower").innerHTML = "You do not have enough power to purchase a necromancer.";
+
+        // Conditional modal content
+        if (currentPower < necroCost) {
+            $("#buyLeaderInstructionBody").style.visibility = 'hidden';
+            $("#insufficientPower").style.visibility = 'visible';
+            $("#purchaseLeaderBtn").disabled = true;
+        } else {
+            $("#buyLeaderInstructionBody").style.visibility = 'visible';
+            $("#insufficientPower").style.visibility = 'hidden';
+            $("#purchaseLeaderBtn").disabled = false;
+        }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+    }).always(function () {
+        $("body").css("cursor", "auto");
+    });
+}
+
+// James
+// Handles values and calls to purcahse leader
+function CompleteLeaderPurchase() {
+    var gameID = $("#gameID").val;
+    // Create move JSON
+    var move = {
+        "HowMany": -1,
+        "From": -1,
+        "To": $("#toID").val
+    };
+    // POST request to game controllers Update(int id, [FromBody] string requestedTurn)
+    $.ajax({
+        method: 'POST',
+        url: '', // TODO: Add URL to AJAX call
+        data: JSON.stringify(move),
+        contentType: 'application/json',
+        headers: {
+            "Authorization": "Bearer " + localStorage.accessToken
+        }
+    }).done(function () {
+        $("#buyLeader").val = -1;
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+    }).always(function () {
+        $("body").css("cursor", "auto");
+    });
+}
+
+// James
+// Opens modal and populates it with costs associated with players troops
+function ShowBuyTroopsModal() {
+    var gameID = $("#gameID").val;
+
+    // GET request to game controllers GetGame(int id)
+    $.ajax({
+        method: 'GET',
+        url: '', // TODO: Add URL to call
+        headers: {
+            "Authorization": "Bearer " + localStorage.accessToken
+        }
+    }).done(function (data) {
+        var gameState = JSON.parse(data.GameState1);
+        var playerName = ""; // TODO: Add current players name somewhow
+        var currentPower = gameState.Players[playerName].PowerTotal;
+        // TODO: PerilGameState does not contain troop cost amount, only PerilLogic. Currently at 3
+        var troopsCost = 3;
+        var totalTroopsAllowed = Math.floor(currentPower / troopsCost);
+        var results = "";
+
+        $("#confirmPurchaseTroopsBtn").disabled = true;
+        $("#purchaseResults").style.visibility = 'hidden';
+        $("#buyTroopsField").max = totalTroopsAllowed;
+
+        // Modal content
+        $("#buyTroopsModalHeader").innerHTML = "Purchase Troops.";
+        $("#buyTroopsPowerBody").innerHTML = "You have " + currentPower + " power available to spend on troops.";
+        $("#buyTroopsCostBody").innerHTML = "The cost for each troop is " + troopsCost + " power.";
+
+        // Conditional modal content
+        if (currentPower < troopsCost) {
+            $("#buyTroopsInstructionBody").innerHTML = "You do not have enough power to purchase any troops.";
+            $("#purchaseTroopsBtn").disabled = true;
+            $("#buyTroopsForm").style.visibility = 'hidden';
+        } else {
+            $("#buyTroopsInstructionBody").innerHTML = "Enter the number of troops you wish to purchase between 1 and " + totalTroopsAllowed +
+                ", then click the purchase button. You will be given a chance to change your selection or confirm the entered amount. The troops will " +
+                "automatically be added to the territory that contains your necromancer.";
+            $("#purchaseTroopsBtn").disabled = false;
+            $("#buyTroopsForm").style.visibility = 'visible';
+        }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+    }).always(function () {
+        $("body").css("cursor", "auto");
+    });
+}
+
+// James
+// Validates players troop purchase selection then makes API call to change amounts
+function AddPurchasedTroops() {
+    var gameID = $("#gameID").val;
+    // GET request to game controllers GetGame(int id)
+    $.ajax({
+        method: 'GET',
+        url: '', // TODO: Add URL to call
+        headers: {
+            "Authorization": "Bearer " + localStorage.accessToken
+        }
+    }).done(function (data) {
+        var gameState = JSON.parse(data.GameState1);
+        var playerName = ""; // TODO: Add players name
+        var leaderLocation = gameState.Players[playerName].LeaderLocation;
+        var attemptedPurchase = $("#buyTroopsField").value;
+        var result = "";
+        var maxAllowed = $("#buyTroopsField").max;
+
+        // Valid user input
+        if (attemptedPurchase > 0 && attemptedPurchase <= maxAllowed) {
+            $("#confirmPurchaseTroopsBtn").disabled = false;
+            $("#purchaseResults").style.visibility = 'visible';
+
+            // Create move JSON
+            var move = {
+                "HowMany": attemptedPurchase, // Only how many matters here
+                "From": -1,
+                "To": -1
+            };
+
+            // POST request to game controllers Update(int id, [FromBody] string requestedTurn)
+            $.ajax({
+                method: 'POST',
+                url: '', // TODO: Add URL to AJAX call
+                data: JSON.stringify(move),
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": "Bearer " + localStorage.accessToken
+                }
+            }).done(function () {
+                result = attemptedPurchase + " troops have been added."
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+            }).always(function () {
+                $("body").css("cursor", "auto");
+            });
+        } else { //Invalid user input
+            $("#confirmPurchaseTroopsBtn").disabled = true;
+            result = "Invalid entry. Please enter a number between 1 and " + maxAllowed + ".";
+        }
+    }
+}
+
 // Coded by James
 // Fills out all of the vars in the modal that allows the user to choose how many troops to move
 function PopulateMoveModal() {
@@ -285,43 +500,41 @@ function PopulateMoveModal() {
             "Authorization": "Bearer " + localStorage.accessToken
         }
     }).done(function (data) {
-        var gameID = document.getElementById("gameID");
-        var toTerritoryID = document.getElementById("toID");
-        var fromTerritoryID = document.getElementById("fromID");
+        var gameID = $("#gameID").val;
+        var toTerritoryID = $("#toID").val;
+        var fromTerritoryID = $("#fromID").val;
         var gameState = JSON.parse(data.GameState1);
         var moveableTroops = gameState.Territories[fromTerritoryID].Moveable;
-        var moveModalBodyTroopsMoveable = "You are allowed to move up to " + moveableTroops + ".";
-        var moveModalLeaderBody = "You are allowed to move your leader.";
-        var moveModalBodyInsufficientCount = "You do not have enough troops to move from this territory."
 
         // Set max value in form to the players max allowable troops to move
-        document.getElementById("moveTroopsField").max = moveableTroops;
+        $("#moveTroopsField").max = moveableTroops;
 
         // Display content in page
-        document.getElementById("moveModalHeader").innerHTML = "You are planning to move troops from " + fromTerritoryID + " to " + toTerritoryID + ".";
-        document.getElementById("moveModalTroopsBody").innerHTML = moveModalBodyTroopsMoveable;
-        document.getElementById("moveModalLeaderBody").innerHTML = moveModalLeaderBody;
-        document.getElementById("insufficientTroopCount").innerHTML = moveModalBodyInsufficientCount;
+        $("#moveModalHeader").innerHTML = "You are planning to move troops from " + fromTerritoryID + " to " + toTerritoryID + ".";
+        $("#moveModalTroopsBody").innerHTML = "You are allowed to move up to " + moveableTroops + ".";
+        $("#moveModalLeaderBody").innerHTML = "You are allowed to move your leader.";
+        $("#insufficientTroopCount").innerHTML = "You do not have enough troops to move from this territory."
 
         // Handle leader at 'from' location
         var playerName = gameState.Territories[fromTerritoryID].Owner;
-        if (gameState.Players[playerName].LeaderLocation == fromTerritoryID) {
-            document.getElementById("moveModalLeaderBody").style.visibility = 'visible';
-            document.getElementById("moveLeaderBtn").style.visibility = 'visible';
+        if (gameState.Players[playerName].LeaderLocation == fromTerritoryID && !gameState.Players[playerName].LeaderMove &&
+            gameState.Territories[toTerritoryID].Owner == playerName) {
+            $("#moveModalLeaderBody").style.visibility = 'visible';
+            $("#moveLeaderBtn").style.visibility = 'visible';
         } else {
-            document.getElementById("moveModalLeaderBody").style.visibility = 'hidden';
-            document.getElementById("moveLeaderBtn").style.visibility = 'hidden';
+            $("#moveModalLeaderBody").style.visibility = 'hidden';
+            $("#moveLeaderBtn").style.visibility = 'hidden';
         }
 
         // Handle insufficient troop amount in modal
-        if (moveableTroops == 0) {
-            document.getElementById("moveTroopsForm").style.visibility = 'hidden';
-            document.getElementById("insufficientTroopCount").style.visibility = 'visible';
-            document.getElementById("moveTroopsBtn").disabled = true;
+        if (moveableTroops < 1) {
+            $("#moveTroopsForm").style.visibility = 'hidden';
+            $("#insufficientTroopCount").style.visibility = 'visible';
+            $("#moveTroopsBtn").disabled = true;
         } else {
-            document.getElementById("moveTroopsForm").style.visibility = 'visible';
-            document.getElementById("insufficientTroopCount").style.visibility = 'hidden';
-            document.getElementById("moveTroopsBtn").disabled = false;
+            $("#moveTroopsForm").style.visibility = 'visible';
+            $("#insufficientTroopCount").style.visibility = 'hidden';
+            $("#moveTroopsBtn").disabled = false;
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log(jqXHR);
@@ -333,18 +546,83 @@ function PopulateMoveModal() {
 // James
 // Makes API call to handle moving leader
 function MoveLeader() {
+    var gameID = $("#gameID").val;
 
+    // Create move JSON
+    var move = {
+        "HowMany": -1,
+        "From": $("#fromID").val,
+        "To": $("#toID").val
+    };
+
+    // POST request to game controllers Update(int id, [FromBody] string requestedTurn)
+    $.ajax({
+        method: 'POST',
+        url: '', // TODO: Add URL to AJAX call
+        data: JSON.stringify(move),
+        contentType: 'application/json',
+        headers: {
+            "Authorization": "Bearer " + localStorage.accessToken
+        }
+    }).done(function () {
+        // TODO: Anything?
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+    }).always(function () {
+        $("body").css("cursor", "auto");
+    });
 }
 
 // James
 // Makes API call to handle troop movements
 function MoveTroops() {
+    var gameID = $("#gameID").val;
+    var requestedMove = $("#moveTroopsField").value;
 
+    // GET request to game controllers GetGame(int id)
+    $.ajax({
+        method: 'GET',
+        url: '', // TODO: Add URL to call
+        headers: {
+            "Authorization": "Bearer " + localStorage.accessToken
+        }
+    }).done(function (data) {
+        var gameState = JSON.parse(data.GameState1);
+        var allowableMove = gameState.Territories[$("#fromID").val].Moveable;
+        var playerName = ""; // TODO: Add players name
+
+        // Valid user input
+        if (requestedMove > 0 && requestedMove <= allowableMove) {
+            // Create move JSON
+            var move = {
+                "HowMany": requestedMove,
+                "From": $("#fromID").val,
+                "To": $("#toID").val
+            };
+
+            // POST request to game controllers Update(int id, [FromBody] string requestedTurn)
+            $.ajax({
+                method: 'POST',
+                url: '', // TODO: Add URL to AJAX call
+                data: JSON.stringify(move),
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": "Bearer " + localStorage.accessToken
+                }
+            }).done(function () {
+                // TODO: Anything?
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+            }).always(function () {
+                $("body").css("cursor", "auto");
+            });
+        }
+    }
 }
 
-// ***********************************Coded by James: All scripts needed for battle**********************************************
+// James
 // Auto resize for modals
-$("#.modal").on("show.bs.modal", function () {
+$(".modal").on("show.bs.modal", function () {
     $(this).find(".modal-body").css({
         width: 'auto',
         height: 'auto',
@@ -352,50 +630,46 @@ $("#.modal").on("show.bs.modal", function () {
     });
 });
 
-// Coded by James
+// James
 // Fills out all of the vars in the modal that allows the user to choose how many to commit to battle
 function PopulateCommitModal() {
     // GET request to game controllers GetGame(int id)
     $.ajax({
         method: 'GET',
         url: '', // TODO: Add URL to call
-		headers: {
+        headers: {
             "Authorization": "Bearer " + localStorage.accessToken
         }
     }).done(function (data) {
-        var gameID = document.getElementById("gameID");
-        var toTerritoryID = document.getElementById("toID");
-        var fromTerritoryID = document.getElementById("fromID");
+        var gameID = $("#gameID").val;
+        var toTerritoryID = $("#toID").val;
+        var fromTerritoryID = $("#fromID").val;
         var gameState = JSON.parse(data.GameState1);
         var attackerName = gameState.TerritoryList[fromTerritoryID].Owner;
         var defenderName = gameState.TerritoryList[toTerritoryID].Owner;
         var totalAttackerForce = gameState.TerritoryList[fromTerritoryID].ForceCount - 1;
         var totalDefenderForce = gameState.TerritoryList[toTerritoryID].ForceCount;
 
-        // Vars to use in modal content
-        var commitBodyAttackerTroops = attackerName + " is allowed up to " + totalAttackerForce + " troops to attack.";
-        var commitBodyDefenderTroops = defenderName + " has " + totalDefenderForce + " troops to defend.";
-        var insuficientTroopCount = "You do not have sufficient troops to attack."
-        var showInsufficient = document.getElementById("insufficientTroops");
-        document.getElementById("OpenAttackBtn").disabled = true;
+        $("#OpenAttackBtn").disabled = true;
 
         // Set max value in form to the attackers starting total available troops
-        var maxTroops = document.getElementById("commitTroopField").max = totalAttackerForce;
+        $("#commitTroopField").max = totalAttackerForce;
 
         // Display content in page
-        document.getElementById("commitHeader").innerHTML = attackerName + " is planning to attack " + defenderName + ".";
-        document.getElementById("commitAttackerTroops").innerHTML = commitBodyAttackerTroops;
-        document.getElementById("commitDefenderTroops").innerHTML = commitBodyDefenderTroops;
-        document.getElementById("insufficientTroops").innerHTML = insuficientTroopCount;
+        $("#commitHeader").innerHTML = attackerName + " is planning to attack " + defenderName + ".";
+        $("#commitAttackerTroops").innerHTML = attackerName + " is allowed up to " + totalAttackerForce + " troops to attack.";
+        $("#commitDefenderTroops").innerHTML = defenderName + " has " + totalDefenderForce + " troops to defend.";
+        $("#insufficientTroops").innerHTML = "You do not have sufficient troops to attack."
 
         // Handle insufficient attacker troop amount in modal
-        if (totalAttackerForce == 0) {
-            var hideForm = document.getElementById("commitForm");
-            hideForm.style.visibility = 'hidden';
-            showInsufficient.style.visibility = 'visible';
-            document.getElementById("commitBtn").disabled = true;
+        if (totalAttackerForce < 1) {
+            $("#commitForm").style.visibility = 'hidden';
+            $("#insufficientTroops").style.visibility = 'visible';
+            $("#commitBtn").disabled = true;
         } else {
-            showInsufficient.style.visibility = 'hidden';
+            $("#commitForm").style.visibility = 'visible';
+            $("#insufficientTroops").style.visibility = 'hidden';
+            $("#commitBtn").disabled = false;
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log(jqXHR);
@@ -411,21 +685,21 @@ function ValidateTroopCount() {
     $.ajax({
         method: 'GET',
         url: '', // TODO: Add URL to call
-		headers: {
+        headers: {
             "Authorization": "Bearer " + localStorage.accessToken
         }
     }).done(function (data) {
-        var gameID = document.getElementById("gameID");
-        var toTerritoryID = document.getElementById("toID");
-        var fromTerritoryID = document.getElementById("fromID");
+        var gameID = $("#gameID").val;
+        var toTerritoryID = $("#toID").val;
+        var fromTerritoryID = $("#fromID").val;
         var gameState = JSON.parse(data.GameState1);
         var totalAttackerForce = gameState.TerritoryList[fromTerritoryID].ForceCount - 1;
         var commitMessage = "";
-        committedAttackTroops = document.getElementById("commitTroopField").value;
+        committedAttackTroops = $("#commitTroopField").value;
 
         // Handle validation of user chosen amount of troops committed
         if (committedAttackTroops > 0 && committedAttackTroops <= totalAttackerForce) {
-            document.getElementById("OpenAttackBtn").disabled = false;
+            $("#OpenAttackBtn").disabled = false;
             commitMessage = committedAttackTroops + "/" + totalAttackerForce +
                 " troops have been committed. Click \"Begin Attack\" to enter battle or change the number of troops to commit by reentering a new value and clicking \"Commit\".";
 
@@ -455,7 +729,7 @@ function ValidateTroopCount() {
         } else {
             commitMessage = "Invalid entry. Please enter a number between 1 and " + totalAttackerForce;
         }
-        document.getElementById("troopEntry").innerHTML = commitMessage;
+        $("#troopEntry").innerHTML = commitMessage;
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log(jqXHR);
     }).always(function () {
@@ -467,10 +741,9 @@ function ValidateTroopCount() {
 // Makes the calls needed to populate the active battle modal
 function InitBattleValues() {
     // Hide and disable buttons until needed
-    var hideResultBtn = document.getElementById("battleResultsBtn");
-    hideResultBtn.style.visibility = 'hidden';
-    document.getElementById("battleViewAttackBtn").disabled = false;
-    document.getElementById("battleViewRetreatBtn").disabled = false;
+    $("#battleResultsBtn").style.visibility = 'hidden';
+    $("#battleViewAttackBtn").disabled = false;
+    $("#battleViewRetreatBtn").disabled = false;
     UpdateBattlePage();
     SetBattleImages();
 }
@@ -482,14 +755,13 @@ function UpdateBattlePage() {
     $.ajax({
         method: 'GET',
         url: '', // TODO: Add URL to call
-        dataType: 'json'
-		headers: {
+        headers: {
             "Authorization": "Bearer " + localStorage.accessToken
         }
     }).done(function (data) {
-        var gameID = document.getElementById("gameID");
-        var toTerritoryID = document.getElementById("toID");
-        var fromTerritoryID = document.getElementById("fromID");
+        var gameID = $("#gameID").val;
+        var toTerritoryID = $("#toID").val;
+        var fromTerritoryID = $("#fromID").val;
         var gameState = JSON.parse(data.GameState1);
         var attackerName = gameState.TerritoryList[fromTerritoryID].Owner;
         var defenderName = gameState.TerritoryList[toTerritoryID].Owner;
@@ -498,17 +770,17 @@ function UpdateBattlePage() {
         var attackersLost = gameState.ActiveBattle.AttackersLost;
         var defendersLost = gameState.ActiveBattle.DefendersLost;
 
-        document.getElementById("attackVsDefend").innerHTML = attackerName + " is attacking " + defenderName + "!";
-        document.getElementById("committedForces").innerHTML = "Started battle with " + committedAttackerForce + " troops";
-        document.getElementById("defendingForces").innerHTML = "Started battle with " + totalDefenderForce + " troops";
+        $("#attackVsDefend").innerHTML = attackerName + " is attacking " + defenderName + "!";
+        $("#committedForces").innerHTML = "Started battle with " + committedAttackerForce + " troops";
+        $("#defendingForces").innerHTML = "Started battle with " + totalDefenderForce + " troops";
 
         var remainingAttackers = gameState.ActiveBattle.RemainingAttackers;
         var remainingDefenders = gameState.ActiveBattle.RemainingDefenders;
 
-        document.getElementById("attackTroopsLost").innerHTML = "Attacker has lost " + attackersLost + " troops";
-        document.getElementById("defendTroopsLost").innerHTML = "Defender has lost " + defendersLost + " troops";
-        document.getElementById("attackTroopsRemain").innerHTML = "Attacker has " + remainingAttackers + " troops remaining";
-        document.getElementById("defendTroopsRemain").innerHTML = "Defender has " + remainingDefenders + " troops remaining";
+        $("#attackTroopsLost").innerHTML = "Attacker has lost " + attackersLost + " troops";
+        $("#defendTroopsLost").innerHTML = "Defender has lost " + defendersLost + " troops";
+        $("#attackTroopsRemain").innerHTML = "Attacker has " + remainingAttackers + " troops remaining";
+        $("#defendTroopsRemain").innerHTML = "Defender has " + remainingDefenders + " troops remaining";
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log(jqXHR);
     }).always(function () {
@@ -523,52 +795,41 @@ function SetBattleImages() {
     $.ajax({
         method: 'GET',
         url: '', // TODO: Add URL to call
-        dataType: 'json'
-		headers: {
+        headers: {
             "Authorization": "Bearer " + localStorage.accessToken
         }
     }).done(function (data) {
-        var attackImg1 = document.getElementById("attack1Img");
-        var attackImg2 = document.getElementById("attack2Img");
-        var attackImg3 = document.getElementById("attack3Img");
-        var defendImg1 = document.getElementById("defend1Img");
-        var defendImg2 = document.getElementById("defend2Img");
-        var xAttackImg1 = document.getElementById("xAttack1Img");
-        var xAttackImg2 = document.getElementById("xAttack2Img");
-        var xAttackImg3 = document.getElementById("xAttack3Img");
-        var xDefendImg1 = document.getElementById("xDefend1Img");
-        var xDefendImg2 = document.getElementById("xDefend2Img");
-        var gameID = document.getElementById("gameID");
+        var gameID = $("#gameID").val;
         var gameState = JSON.parse(data.GameState1);
 
         // Remove all images from webpage except 1 of each for attacker and defender
-        attackImg1.style.visibility = 'visible';
-        attackImg2.style.visibility = 'hidden';
-        attackImg3.style.visibility = 'hidden';
-        defendImg1.style.visibility = 'visible';
-        defendImg2.style.visibility = 'hidden';
-        xAttackImg1.style.visibility = 'hidden';
-        xAttackImg2.style.visibility = 'hidden';
-        xAttackImg3.style.visibility = 'hidden';
-        xDefendImg1.style.visibility = 'hidden';
-        xDefendImg2.style.visibility = 'hidden';
+        $("#attack1Img").style.visibility = 'visible';
+        $("#attack2Img").style.visibility = 'hidden';
+        $("#attack3Img").style.visibility = 'hidden';
+        $("#defend1Img").style.visibility = 'visible';
+        $("#defend2Img").style.visibility = 'hidden';
+        $("#xAttack1Img").style.visibility = 'hidden';
+        $("#xAttack2Img").style.visibility = 'hidden';
+        $("#xAttack3Img").style.visibility = 'hidden';
+        $("#xDefend1Img").style.visibility = 'hidden';
+        $("#xDefend2Img").style.visibility = 'hidden';
 
         var remainingAttackers = gameState.ActiveBattle.RemainingAttackers;
         var remainingDefenders = gameState.ActiveBattle.RemainingDefenders;
 
         // Add correct number of attacker images
         if (remainingAttackers == 2) {
-            attackImg2.style.visibility = 'visible';
+            $("#attack2Img").style.visibility = 'visible';
         }
 
         if (remainingAttackers >= 3) {
-            attackImg2.style.visibility = 'visible';
-            attackImg3.style.visibility = 'visible';
+            $("#attack2Img").style.visibility = 'visible';
+            $("#attack3Img").style.visibility = 'visible';
         }
 
         // Add correct number of defending images
         if (remainingDefenders > 1) {
-            defendImg2.style.visibility = 'visible';
+            $("#defend2Img").style.visibility = 'visible';
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log(jqXHR);
@@ -584,14 +845,13 @@ function HandleAttacks() {
     $.ajax({
         method: 'GET',
         url: '', // TODO: Add URL to call
-        dataType: 'json'
-		headers: {
+        headers: {
             "Authorization": "Bearer " + localStorage.accessToken
         }
     }).done(function (data) {
-        var gameID = document.getElementById("gameID");
-        var toTerritoryID = document.getElementById("toID");
-        var fromTerritoryID = document.getElementById("fromID");
+        var gameID = $("#gameID").val;
+        var toTerritoryID = $("#toID").val;
+        var fromTerritoryID = $("#fromID").val;
         var gameState = JSON.parse(data.GameState1);
 
         SetBattleImages();
@@ -633,10 +893,9 @@ function HandleAttacks() {
         UpdateBattlePage();
 
         if (gameState.BattleResult != null) {
-            var showResultBtn = document.getElementById("battleResultsBtn");
-            showResultBtn.style.visibility = 'visible';
-            document.getElementById("battleViewAttackBtn").disabled = true;
-            document.getElementById("battleViewRetreatBtn").disabled = true;
+            $("#battleResultsBtn").style.visibility = 'visible';
+            $("#battleViewAttackBtn").disabled = true;
+            $("#battleViewRetreatBtn").disabled = true;
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log(jqXHR);
@@ -652,27 +911,27 @@ function SetXdOutTroopImages(attackedCount, attackLostRound, defendedCount, defe
     switch (attackedCount) {
         case 3:
             if (attackLostRound == 2) {
-                xAttackImg2.style.visibility = 'visible';
-                xAttackImg3.style.visibility = 'visible';
+                $("#xAttack2Img").style.visibility = 'visible';
+                $("#xAttack3Img").style.visibility = 'visible';
             }
 
             if (attackLostRound == 1) {
-                xAttackImg3.style.visibility = 'visible';
+                $("#xAttack3Img").style.visibility = 'visible';
             }
             break;
         case 2:
             if (attackLostRound == 2) {
-                xAttackImg1.style.visibility = 'visible';
-                xAttackImg2.style.visibility = 'visible';
+                $("#xAttack1Img").style.visibility = 'visible';
+                $("#xAttack2Img").style.visibility = 'visible';
             }
 
             if (attackLostRound == 1) {
-                xAttackImg2.style.visibility = 'visible';
+                $("#xAttack2Img").style.visibility = 'visible';
             }
             break;
         default:
             if (attackLostRound == 1) {
-                xAttackImg1.style.visibility = 'visible';
+                $("#xAttack1Img").style.visibility = 'visible';
             }
             break;
     }
@@ -681,17 +940,17 @@ function SetXdOutTroopImages(attackedCount, attackLostRound, defendedCount, defe
     switch (defendedCount) {
         case 2:
             if (defendLostRound == 2) {
-                xDefendImg1.style.visibility = 'visible';
-                xDefendImg2.style.visibility = 'visible';
+                $("#xDefend1Img").style.visibility = 'visible';
+                $("#xDefend2Img").style.visibility = 'visible';
             }
 
             if (defendLostRound == 1) {
-                xDefendImg2.style.visibility = 'visible';
+                $("#xDefend2Img").style.visibility = 'visible';
             }
             break;
         default:
             if (defendLostRound == 1) {
-                xDefendImg1.style.visibility = 'visible';
+                $("#xDefend1Img").style.visibility = 'visible';
             }
             break;
     }
@@ -700,9 +959,9 @@ function SetXdOutTroopImages(attackedCount, attackLostRound, defendedCount, defe
 // Coded by James
 // Makes API call to Update to handle attacker retreating from battle
 function BattleRetreat() {
-    var gameID = document.getElementById("gameID");
-    var toTerritoryID = document.getElementById("toID");
-    var fromTerritoryID = document.getElementById("fromID");
+    var gameID = $("#gameID").val;
+    var toTerritoryID = $("#toID").val;
+    var fromTerritoryID = $("#fromID").val;
 
     // Create move JSON
     var move = {
@@ -738,14 +997,13 @@ function BattleResults() {
     $.ajax({
         method: 'GET',
         url: '', // TODO: Add URL to call
-        dataType: 'json'
-		headers: {
+        headers: {
             "Authorization": "Bearer " + localStorage.accessToken
         }
     }).done(function (data) {
-        var gameID = document.getElementById("gameID");
-        var toTerritoryID = document.getElementById("toID");
-        var fromTerritoryID = document.getElementById("fromID");
+        var gameID = $("#gameID").val;
+        var toTerritoryID = $("#toID").val;
+        var fromTerritoryID = $("#fromID").val;
         var gameState = JSON.parse(data.GameState1);
 
         // vars from gameState JSON
@@ -762,15 +1020,10 @@ function BattleResults() {
             victor = defenderName;
         }
 
-        var battleResultsHeader = victor + " has won the battle.";
-        var battleResultsAttacker = attackerName + " has lost a total of " + attackerLosses + " troops.";
-        var battleResultsDefender = defenderName + " has lost a total of " + defenderLosses + " troops.";
-        var battleResultsRes = victor + "'s necromancer has successfully risen " + revived + " fallen troops.";
-
-        document.getElementById("batleRsltHeader").innerHTML = battleResultsHeader;
-        document.getElementById("batRsltAttacker").innerHTML = battleResultsAttacker;
-        document.getElementById("batRsltDefender").innerHTML = battleResultsDefender;
-        document.getElementById("batRsltRes").innerHTML = battleResultsRes;
+        $("#batleRsltHeader").innerHTML = victor + " has won the battle.";
+        $("#batRsltAttacker").innerHTML = attackerName + " has lost a total of " + attackerLosses + " troops.";
+        $("#batRsltDefender").innerHTML = defenderName + " has lost a total of " + defenderLosses + " troops.";
+        $("#batRsltRes").innerHTML = victor + "'s necromancer has successfully risen " + revived + " fallen troops.";
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log(jqXHR);
     }).always(function () {
