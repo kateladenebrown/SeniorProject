@@ -86,7 +86,6 @@ $(function () {
 
 // Coded by James
 // Method to handle click event for territories
-// ************************************************************************* TODO: Finish Method***************************************************************************************
 $('#.territory').click(function () {
     var gameID = $("#gameID").val;
 
@@ -165,7 +164,11 @@ $('#.territory').click(function () {
                                     }
                                 }
                             } else { // Not buying leader
-                                // TODO: Show pop up of territory info
+                                // Load territory information modal
+                                $('#territoryModal').on('show.bs.modal', function () {
+                                    ShowTerritoryInformation(territoryID);
+                                });
+                                $('#territoryModal').modal('show');                             
                             }
                             break;
                         case 2: // Attack Phase
@@ -201,7 +204,11 @@ $('#.territory').click(function () {
                                 });
                                 $('#commitModal').modal('show');
                             } else if ($(this).classList.contains('blackedOut')) {
-                                // TODO: Show pop up of territory info
+                                // Load territory information modal
+                                $('#territoryModal').on('show.bs.modal', function () {
+                                    ShowTerritoryInformation(territoryID);
+                                });
+                                $('#territoryModal').modal('show');
                             } else {
                                 $('#fromID').val = territoryID;
 
@@ -250,7 +257,11 @@ $('#.territory').click(function () {
                                 });
                                 $('#moveModal').modal('show');
                             } else if ($(this).classList.contains('blackedOut')) {
-                                // TODO: Show pop up of territory info
+                                // Load territory information modal
+                                $('#territoryModal').on('show.bs.modal', function () {
+                                    ShowTerritoryInformation(territoryID);
+                                });
+                                $('#territoryModal').modal('show');
                             } else {
                                 $('#fromID').val = territoryID;
 
@@ -275,8 +286,12 @@ $('#.territory').click(function () {
                     console.log(jqXHR);
                 })
             });
-        } else { // Not players turn, show territory info in popup maybe?
-            // TODO: Add pop up for territory info
+        } else { // Not players turn
+            // Load territory information modal
+            $('#territoryModal').on('show.bs.modal', function () {
+                ShowTerritoryInformation(territoryID);
+            });
+            $('#territoryModal').modal('show');
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.log(jqXHR);
@@ -286,8 +301,35 @@ $('#.territory').click(function () {
 });
 
 // James
+// Populates territory information modal
+function ShowTerritoryInformation(id) {
+    var gameID = $("#gameID").val;
+
+    // GET request to game controllers GetGame(int id)
+    $.ajax({
+        method: 'GET',
+        url: '', // TODO: Add URL to call
+        headers: {
+            "Authorization": "Bearer " + localStorage.accessToken
+        }
+    }).done(function (data) {
+        var gameState = JSON.parse(data.GameState1);
+
+        // Modal content
+        $('#territoryIDModalHeader').innerHTML = "Territory ID: " + id;
+        $('#territoryOwnerBody').innerHTML = "Territory Owner: " + gameState.Territories[id].Owner;
+        $('#territoryTroopCountBody').innerHTML = "Territory Troops: " + gameState.Territories[id].ForceCount;
+        $('#territoryPowerValueBody').innerHTML = "Territory Value: " + gameState.Territories[id].PowerValue;
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+    }).always(function () {
+        $("body").css("cursor", "auto");
+    });
+}
+
+// James
 // Sets buyLeader to 1 indicating player is purchasing a leader and highlight each territory allowed to place leader
-function buyLeader() {
+function BuyLeader() {
     $("#buyLeader").val = 1;
     var gameID = $("#gameID").val;
 

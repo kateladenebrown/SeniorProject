@@ -2,7 +2,7 @@
 @using PerilUI.Models;
 @model  int
 
-<!-- Page Layout coded by Michael Case, Map Coded by Garrick Evans, Battle Coded by James Alberts -->
+<!-- Main Game Page Layout Coded by Michael Case, Map Coded by Garrick Evans, the rest Coded by James Alberts -->
 <!-- All code merged by James -->
 <!DOCTYPE html svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <html lang="en">
@@ -553,6 +553,28 @@
         </div>
     </div>
     <!------------------------------------------- Coded by James ----------------------------------------------->
+    <!-- Territory Information Modal Coded by James -->
+    <div id="territoryModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 id="territoryIDModalHeader"></h4>
+                </div>
+                <div class="modal-body text-left">
+                    <p id="territoryOwnerBody"></p>
+                    <p id="territoryTroopCountBody"></p>
+                    <p id="territoryPowerValueBody"></p>
+
+                    <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Buy Leader Modal Coded by James -->
     <div id="buyLeaderModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -747,7 +769,8 @@
             </div>
         </div>
     </div>
-    <!-- Results modal Coded by James -->
+
+    <!-- Battle Results modal Coded by James -->
     <div id="battleResultsModal" class="modal fade backColor" role="dialog">
         <div class="modal-dialog">
 
